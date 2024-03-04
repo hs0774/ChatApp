@@ -8,19 +8,19 @@ import Chat from '../(models)/chat.ts';
 // import Details from '../(models)/details.ts';
 import Friendship from '../(models)/friendship.ts';
 import Inbox from '../(models)/inbox.ts';
-// import Message from '../(models)/message';
+// import Message from '../(models)/message.ts';
 import User from '../(models)/user.ts';
 
 
 
-interface IChat {
-    participants: mongoose.Types.ObjectId[];
-    messages: {
-      sender: mongoose.Types.ObjectId;
-      content: string;
-      timestamp: Date;
-    }[];
-}
+// interface IChat {
+//     participants: mongoose.Types.ObjectId[];
+//     messages: {
+//       sender: mongoose.Types.ObjectId;
+//       content: string;
+//       timestamp: Date;
+//     }[];
+// }
 interface IDetails {
     hobbies: string[];
     job: string;
@@ -46,12 +46,12 @@ interface IInbox {
     createdAt: Date;
 }
 
-interface IMessage {
-    sender: mongoose.Types.ObjectId;
-    receiver: mongoose.Types.ObjectId;
-    content: string;
-    createdAt: Date;
-}
+// interface IMessage {
+//     sender: mongoose.Types.ObjectId;
+//     receiver: mongoose.Types.ObjectId;
+//     content: string;
+//     createdAt: Date;
+// }
 
 interface IUser {
     username: string;
@@ -66,6 +66,18 @@ interface IUser {
     nonFriendsChat: boolean; 
 }
 
+interface IMessage extends Document {
+    sender: mongoose.Types.ObjectId;
+    content: string;
+    image?:Buffer;
+    createdAt: Date;
+}
+
+interface IChat extends Document {
+    participants: mongoose.Types.ObjectId[];
+    messages: IMessage[]; 
+}
+
 console.log('This script populates some test items to your database');
 
 const mongoDB = env.MONGODB_URI;
@@ -76,13 +88,13 @@ async function main() {
     console.log("Debug: About to connect");
     await mongoose.connect(mongoDB);
     // await updateUserFriends();
-   // await createChat();
+   //await chatCreate();
     // await createDetails();
     // await createFriendship();
     // await createInbox();
-    // await createMessage();
+    await messageCreate();
     // await createUser();
-    await updateFriends();
+    // await updateFriends();
     console.log("Debug: Closing Mongoose");
     mongoose.connection.close();
 }
@@ -92,19 +104,19 @@ async function main() {
 //update user[8] to have user[6] as a friend and vice versa
 // on schema plus an update on both friend arrays 
 
-async function updateFriends() {
-    const [user1, user2] = await Promise.all([
-        User.findOne({ username: "Dovie9" }),
-        User.findOne({ username: "Winifred16" }),
-    ]);
+// async function updateFriends() {
+//     const [user1, user2] = await Promise.all([
+//         User.findOne({ username: "Dovie9" }),
+//         User.findOne({ username: "Winifred16" }),
+//     ]);
 
-    if(user1 && user2) {
-        user1.friends.push(user2._id);
-        await user1.save();
-        user2.friends.push(user1._id);
-        await user2.save();
-    }
-}
+//     if(user1 && user2) {
+//         user1.friends.push(user2._id);
+//         await user1.save();
+//         user2.friends.push(user1._id);
+//         await user2.save();
+//     }
+// }
 // async function updateUserFriends() {
 //     const friendships = [
 //         [],       
@@ -128,8 +140,33 @@ async function updateFriends() {
 // }
 
 // async function chatCreate() {
-    
+//     const user = await User.find();
+
+//     const chats = [
+//         {participants:[user[1],user[8],user[6]]},
+//         {participants:[user[2],user[7]]},
+//         {participants:[user[2],user[1]]},
+//         {participants:[user[3],user[6]]},
+//         {participants:[user[4],user[5]]},
+//     ]
+
+//     for (const chat of chats) {
+//         const {participants} = chat;
+
+//         const newChat = new Chat({
+//             participants:participants,
+//         })
+
+//         await newChat.save();
+
+//         for (const user of participants) {
+//             user.chats.push(newChat._id);
+//             await user.save();
+//         }
+//     }
+
 // }
+
 
 // async function detailsCreate(hobbies:string[],job:string,interests:string,bio:string,age:number,sex:string,location:string) {
 //     try {
@@ -159,9 +196,37 @@ async function updateFriends() {
 // }
 
 
-// async function messageCreate() {
-    
-// }
+async function messageCreate() {
+    const chats = await Chat.find();
+
+    for (const chat of chats) {
+        const {participants} = chat;
+        for(let i=0;i<30;i++){
+            const randomSenderIndex = Math.floor(Math.random() * participants.length);
+            const randomSender = participants[randomSenderIndex];
+
+            const newMessage = {
+                sender: randomSender,
+                content: faker.lorem.sentence(), // Generate random content using faker
+                createdAt: new Date(),
+            };
+
+            // Add the new message to the chat's messages array
+            chat.messages.push(newMessage);
+            
+        }
+        await chat.save();
+
+    }
+    // participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    // messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }], 
+
+    // sender: mongoose.Types.ObjectId;
+    // receiver: mongoose.Types.ObjectId;
+    // content: string;
+    // image?:Buffer;
+    // createdAt: Date;
+}
 
 // async function userCreate(index:number,username:string,email:string,password:string,profilePic:Buffer) {
 //    //details,friends,chats,inbox left unfilled on purpose
@@ -176,9 +241,17 @@ async function updateFriends() {
 //    console.log('added user' + username)
 // }
 
-async function createChat() {
-    
-}
+// async function createChat() {
+//     //user[1] [8] [6]
+//     //user[2] [7]
+//     //user[2] [1]
+//     //user[3] [6]
+//     //user[4] [5]
+//     //create chat schemas with these chats this fills the particpants
+//     //section leave the messages part alone for now, 
+
+//     //
+// }
 
 // async function createDetails() {
 //     console.log('creating details');
