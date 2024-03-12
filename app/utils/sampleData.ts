@@ -5,10 +5,9 @@ import * as fs from 'fs';
 import {faker} from '@faker-js/faker'
 import bcrypt from 'bcryptjs';
 import Chat from '../(models)/chat.ts';
-// import Details from '../(models)/details.ts';
+import Details from '../(models)/details.ts';
 import Friendship from '../(models)/friendship.ts';
 import Inbox from '../(models)/inbox.ts';
-// import Message from '../(models)/message.ts';
 import User from '../(models)/user.ts';
 
 
@@ -98,11 +97,6 @@ async function main() {
     console.log("Debug: Closing Mongoose");
     mongoose.connection.close();
 }
-
-
-//to do 
-//update user[8] to have user[6] as a friend and vice versa
-// on schema plus an update on both friend arrays 
 
 // async function updateFriends() {
 //     const [user1, user2] = await Promise.all([
@@ -213,19 +207,10 @@ async function messageCreate() {
 
             // Add the new message to the chat's messages array
             chat.messages.push(newMessage);
-            
+
         }
         await chat.save();
-
     }
-    // participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    // messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }], 
-
-    // sender: mongoose.Types.ObjectId;
-    // receiver: mongoose.Types.ObjectId;
-    // content: string;
-    // image?:Buffer;
-    // createdAt: Date;
 }
 
 // async function userCreate(index:number,username:string,email:string,password:string,profilePic:Buffer) {
@@ -241,17 +226,6 @@ async function messageCreate() {
 //    console.log('added user' + username)
 // }
 
-// async function createChat() {
-//     //user[1] [8] [6]
-//     //user[2] [7]
-//     //user[2] [1]
-//     //user[3] [6]
-//     //user[4] [5]
-//     //create chat schemas with these chats this fills the particpants
-//     //section leave the messages part alone for now, 
-
-//     //
-// }
 
 // async function createDetails() {
 //     console.log('creating details');
@@ -286,14 +260,6 @@ async function messageCreate() {
 // }
 
 
-//so what i do is go through each users friendship array and create a friendship
-//schema with the user id i am on and then iterate through the array and create,
-//those relationships
-// i would then move on to the next and do the same but i need a conditional,
-// to check if a schema with both id exists 
-// 
-// if it doesnt exist make another one if it exists move to the next 
-
 // async function createInbox() {
 //     const user = await User.find();
 //     const inbox = [
@@ -326,14 +292,8 @@ async function messageCreate() {
 //        receiver.inbox.push(inboxQuery._id);
 //        await receiver.save();
 //     }
-//    //friend requests should create friend schemas and possibly be added to user 
-//    //friend array until denied which will terminate schema 
 // }
 
-
-// async function createMessage() {
-//     throw new Error('Function not implemented.');
-// }
 
 // async function createUser() {
 //     console.log('creating users');
@@ -368,9 +328,3 @@ async function messageCreate() {
 
 //quick note on how to get ts/node to compile this run "node --loader ts-node/esm sampleData.ts"
 // and make sure all files are named properly like user.ts detail.ts etc 
-
-
-//to do 
-//create a few chats between users and create the group chat of three people 
-//group chat is user[1] user[6] user[8]
-
