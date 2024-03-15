@@ -1,0 +1,26 @@
+.chatpage{
+    display: flex;
+    justify-content: space-around;
+    height: 900px;
+    width :900px;
+}
+
+.currentChat{
+    height:300px;
+    width: 300px;
+
+}
+.actualChat{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+.friendMessages{
+    align-self: flex-start;
+
+}
+
+.userMessages {
+    align-self: flex-end;
+
+}

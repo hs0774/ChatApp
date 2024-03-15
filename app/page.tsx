@@ -1,10 +1,13 @@
 import Image from "next/image";
-import styles from "./page.module.css";
+import styles from "./(styles)/page.module.css";
+import Link from 'next/link'
 
 export default function Home() {
   return (
     <main>
       <h1>Welcome to Home</h1>
+      <button><Link href="/signup">Sign up to get started</Link></button>
+      <p>Have an account? <button><Link href="/login">Log In</Link></button></p>
     </main>
   );
 }
