@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema, Document,Types } from "mongoose";
 
+
 interface IDetails extends Document {
         hobbies: string[];
         job: string;
@@ -7,7 +8,7 @@ interface IDetails extends Document {
         bio: string;
         age: number;
         sex: 'male' | 'female' | 'other';
-        location?: string;
+        location: string;
 }
 
 const DetailsSchema:Schema<IDetails> = new Schema({
@@ -20,6 +21,6 @@ const DetailsSchema:Schema<IDetails> = new Schema({
         location: { type: String },
 });
 
-const Details: Model<IDetails> = mongoose.model<IDetails>('Details', DetailsSchema);
+const Details: Model<IDetails> = mongoose.models.Details || mongoose.model<IDetails>('Details', DetailsSchema);
 
 export default Details;

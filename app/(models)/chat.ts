@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
 
+
 interface IChat extends Document {
     participants: mongoose.Types.ObjectId[];
     messages: {

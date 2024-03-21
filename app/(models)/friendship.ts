@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
 
+
 interface IFriendship extends Document {
     user: mongoose.Types.ObjectId;
     user2: mongoose.Types.ObjectId;

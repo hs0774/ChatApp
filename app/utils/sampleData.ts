@@ -4,11 +4,11 @@ import mongoose from 'mongoose';
 import * as fs from 'fs';
 import {faker} from '@faker-js/faker'
 import bcrypt from 'bcryptjs';
-import Chat from '../(models)/chat.ts';
-import Details from '../(models)/details.ts';
-import Friendship from '../(models)/friendship.ts';
-import Inbox from '../(models)/inbox.ts';
-import User from '../(models)/user.ts';
+// import Chat from '../(models)/chat.ts';
+// import Details from '../(models)/details.ts';
+// import Friendship from '../(models)/friendship.ts';
+// import Inbox from '../(models)/inbox.ts';
+// import User from '../(models)/user.ts';
 
 
 
@@ -91,7 +91,7 @@ async function main() {
     // await createDetails();
     // await createFriendship();
     // await createInbox();
-    await messageCreate();
+    // await messageCreate();
     // await createUser();
     // await updateFriends();
     console.log("Debug: Closing Mongoose");
@@ -190,28 +190,28 @@ async function main() {
 // }
 
 
-async function messageCreate() {
-    const chats = await Chat.find();
+// async function messageCreate() {
+//     const chats = await Chat.find();
 
-    for (const chat of chats) {
-        const {participants} = chat;
-        for(let i=0;i<30;i++){
-            const randomSenderIndex = Math.floor(Math.random() * participants.length);
-            const randomSender = participants[randomSenderIndex];
+//     for (const chat of chats) {
+//         const {participants} = chat;
+//         for(let i=0;i<30;i++){
+//             const randomSenderIndex = Math.floor(Math.random() * participants.length);
+//             const randomSender = participants[randomSenderIndex];
 
-            const newMessage = {
-                sender: randomSender,
-                content: faker.lorem.sentence(), // Generate random content using faker
-                createdAt: new Date(),
-            };
+//             const newMessage = {
+//                 sender: randomSender,
+//                 content: faker.lorem.sentence(), // Generate random content using faker
+//                 createdAt: new Date(),
+//             };
 
-            // Add the new message to the chat's messages array
-            chat.messages.push(newMessage);
+//             // Add the new message to the chat's messages array
+//             chat.messages.push(newMessage);
 
-        }
-        await chat.save();
-    }
-}
+//         }
+//         await chat.save();
+//     }
+// }
 
 // async function userCreate(index:number,username:string,email:string,password:string,profilePic:Buffer) {
 //    //details,friends,chats,inbox left unfilled on purpose

@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
 
+
 interface IInbox extends Document {
     sender: mongoose.Types.ObjectId;
     receiver: mongoose.Types.ObjectId;

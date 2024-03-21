@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema, Document,Types } from "mongoose";
 
+
 interface IUser extends Document {
     username: string;
     password: string; 
@@ -26,6 +27,6 @@ const UserSchema:Schema<IUser> = new Schema({
     nonFriendsChat: { type: Boolean, default: false }
 });
 
-const User: Model<IUser> = mongoose.model<IUser>('User', UserSchema);
+const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
 export default User;
