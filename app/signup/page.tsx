@@ -2,6 +2,8 @@
 import Link from 'next/link'
 import '../(styles)/signup.css'
 import React, { ChangeEvent, FormEvent, useState, ChangeEventHandler } from 'react';
+import { useAuth } from '../(stores)/authContext'; 
+import {useRouter } from 'next/navigation';
 
 interface FormData {
     email:string,
@@ -16,6 +18,8 @@ interface FormData {
     age:number,
 }
 export default function Signup() {
+    const { login } = useAuth();
+    const router = useRouter();
     const [formData,setFormData] = useState<FormData>({
         email:'',
         username:'',
@@ -293,7 +297,12 @@ export default function Signup() {
 
         if(!res.ok){
             throw new Error('failed to create')
-        }
+        } 
+        const { token, username,id } = await res.json();
+        localStorage.setItem("token", token);
+        localStorage.setItem("id", id);
+        login({token,username,id});
+        router.push(`/profile/${id}`)
     }
 
     function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void {

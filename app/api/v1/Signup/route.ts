@@ -1,10 +1,18 @@
+import 'dotenv/config';
+import env from '../../../utils/validateEnv.ts'
 import User from "../../../(models)/user";
 import Details from "../../../(models)/details";
 import bcrypt from 'bcryptjs';
 import {z} from 'zod';
 import validator from 'validator';
 import { NextResponse,NextRequest } from "next/server";
-import dbConnect from "@/app/utils/DbConnect";
+import dbConnect from "@/app/utils/dbConnect";
+import jwt from "jsonwebtoken";
+
+
+const createToken = (email: string | number) => {
+    return jwt.sign({email:email},env.SECRET)
+}
 
 const zodschema = z.object({
   email: z.string().email().max(50),
@@ -41,7 +49,7 @@ export async function POST(req:Request,res:Response) {
             return NextResponse.json({ message: `User already exists`}, {status:400})
         }
         const hash = await bcrypt.hash(sanitizedData.password as string, 10);
-        console.log(sanitizedData)
+        //console.log(sanitizedData)
         const details = new Details({
             hobbies:sanitizedData.hobbies,
             job:sanitizedData.occupation,
@@ -60,11 +68,12 @@ export async function POST(req:Request,res:Response) {
             details:details._id,
         })
         await newUser.save();
+        const token = createToken(sanitizedData.email)
+        return NextResponse.json({message: `User Created`,token,username:sanitizedData.username,email:sanitizedData.email,id:newUser._id},{status:201})
      }
-     return NextResponse.json({ message: `User Created`}, {status:201});
     } catch (error) {
         console.log(error)
-        return NextResponse.json({ message: `Error: ${error}`}, {status:404});
+        return NextResponse.json({ message: `Error: ${error}`}, {status:500});
     }
 }
 //validate and sanitize the data,
@@ -74,3 +83,7 @@ export async function POST(req:Request,res:Response) {
 
 //create a user with user schema, fill the user details that are also passed,
 // use jwt to create a token, and pass it to client
+
+//        await newUser.save();
+// const token = createToken(req.body.email)
+// res.status(200).json({token,username:req.body.username,email:req.body.email})

@@ -6,8 +6,8 @@ export default function Home() {
   return (
     <main>
       <h1>Welcome to Home</h1>
-      <button><Link href="/signup">Sign up to get started</Link></button>
-      <p>Have an account? <button><Link href="/login">Log In</Link></button></p>
+      {/* <button><Link href="/signup">Sign up to get started</Link></button>
+      <p>Have an account? <button><Link href="/login">Log In</Link></button></p> */}
     </main>
   );
 }

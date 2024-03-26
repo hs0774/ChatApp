@@ -1,15 +1,22 @@
+"use client"
 import React from 'react'
 import Link from 'next/link'
+import {useAuth} from '../(stores)/authContext'; 
 
 export default function Navbar() {
-  const logged = false;
+
+  const { user, logout } = useAuth();
+
+  const handleClick = () => {
+    logout();
+  }
   return (
     <nav>
       <div className='Navleft'>
         <Link href="/"><h1>ChatApp</h1></Link>
       </div>
       <div className='NavRight'>
-        {!logged ?
+        {!user ?
         <>
         <Link href="/login"><p>Log In</p> </Link>
         <Link href="/signup"><p>Sign up</p></Link>
@@ -17,8 +24,8 @@ export default function Navbar() {
         : 
         <>
         <Link href="/chat/3"><p>Chat!</p></Link>
-        <Link href="/profile/jim"><p>Hello, User</p></Link> 
-        <p>Logout</p> 
+        <Link href="/profile/jim"><p>Hello, {user.username}</p></Link> 
+        <button onClick={handleClick}>Logout</button> 
         </>
         }
       </div>

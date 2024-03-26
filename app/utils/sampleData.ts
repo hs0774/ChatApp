@@ -1,91 +1,91 @@
-import 'dotenv/config';
-import env from './validateEnv.ts'
-import mongoose from 'mongoose';
-import * as fs from 'fs';
-import {faker} from '@faker-js/faker'
-import bcrypt from 'bcryptjs';
-// import Chat from '../(models)/chat.ts';
-// import Details from '../(models)/details.ts';
-// import Friendship from '../(models)/friendship.ts';
-// import Inbox from '../(models)/inbox.ts';
-// import User from '../(models)/user.ts';
+// import 'dotenv/config';
+// import env from './validateEnv.ts'
+// import mongoose from 'mongoose';
+// import * as fs from 'fs';
+// import {faker} from '@faker-js/faker'
+// import bcrypt from 'bcryptjs';
+// // import Chat from '../(models)/chat.ts';
+// // import Details from '../(models)/details.ts';
+// // import Friendship from '../(models)/friendship.ts';
+// // import Inbox from '../(models)/inbox.ts';
+// // import User from '../(models)/user.ts';
 
 
 
-// interface IChat {
-//     participants: mongoose.Types.ObjectId[];
-//     messages: {
-//       sender: mongoose.Types.ObjectId;
-//       content: string;
-//       timestamp: Date;
-//     }[];
+// // interface IChat {
+// //     participants: mongoose.Types.ObjectId[];
+// //     messages: {
+// //       sender: mongoose.Types.ObjectId;
+// //       content: string;
+// //       timestamp: Date;
+// //     }[];
+// // }
+// interface IDetails {
+//     hobbies: string[];
+//     job: string;
+//     interests:string;
+//     bio: string;
+//     age: number;
+//     sex: 'male' | 'female' | 'other';
+//     location?: string;
 // }
-interface IDetails {
-    hobbies: string[];
-    job: string;
-    interests:string;
-    bio: string;
-    age: number;
-    sex: 'male' | 'female' | 'other';
-    location?: string;
-}
 
-interface IFriendship {
-    user: mongoose.Types.ObjectId;
-    friend: mongoose.Types.ObjectId;
-    status: 'pending' | 'accepted' | 'declined';
-    createdAt: Date;
-}
-
-interface IInbox {
-    user: mongoose.Types.ObjectId;
-    message: string;
-    type: 'message' | 'friendRequest'; 
-    read: boolean;
-    createdAt: Date;
-}
-
-// interface IMessage {
-//     sender: mongoose.Types.ObjectId;
-//     receiver: mongoose.Types.ObjectId;
-//     content: string;
+// interface IFriendship {
+//     user: mongoose.Types.ObjectId;
+//     friend: mongoose.Types.ObjectId;
+//     status: 'pending' | 'accepted' | 'declined';
 //     createdAt: Date;
 // }
 
-interface IUser {
-    username: string;
-    password: string; 
-    email: string; 
-    details: mongoose.Types.ObjectId;
-    profilePic: Buffer; 
-    friends: mongoose.Types.ObjectId[]; 
-    chats: mongoose.Types.ObjectId[]; 
-    status: boolean; 
-    inbox: mongoose.Types.ObjectId[]; 
-    nonFriendsChat: boolean; 
-}
+// interface IInbox {
+//     user: mongoose.Types.ObjectId;
+//     message: string;
+//     type: 'message' | 'friendRequest'; 
+//     read: boolean;
+//     createdAt: Date;
+// }
 
-interface IMessage extends Document {
-    sender: mongoose.Types.ObjectId;
-    content: string;
-    image?:Buffer;
-    createdAt: Date;
-}
+// // interface IMessage {
+// //     sender: mongoose.Types.ObjectId;
+// //     receiver: mongoose.Types.ObjectId;
+// //     content: string;
+// //     createdAt: Date;
+// // }
 
-interface IChat extends Document {
-    participants: mongoose.Types.ObjectId[];
-    messages: IMessage[]; 
-}
+// interface IUser {
+//     username: string;
+//     password: string; 
+//     email: string; 
+//     details: mongoose.Types.ObjectId;
+//     profilePic: Buffer; 
+//     friends: mongoose.Types.ObjectId[]; 
+//     chats: mongoose.Types.ObjectId[]; 
+//     status: boolean; 
+//     inbox: mongoose.Types.ObjectId[]; 
+//     nonFriendsChat: boolean; 
+// }
 
-console.log('This script populates some test items to your database');
+// interface IMessage extends Document {
+//     sender: mongoose.Types.ObjectId;
+//     content: string;
+//     image?:Buffer;
+//     createdAt: Date;
+// }
 
-const mongoDB = env.MONGODB_URI;
+// interface IChat extends Document {
+//     participants: mongoose.Types.ObjectId[];
+//     messages: IMessage[]; 
+// }
 
-main().catch((err) => console.log(err));
+// console.log('This script populates some test items to your database');
 
-async function main() {
-    console.log("Debug: About to connect");
-    await mongoose.connect(mongoDB);
+// const mongoDB = env.MONGODB_URI;
+
+// main().catch((err) => console.log(err));
+
+// async function main() {
+//     console.log("Debug: About to connect");
+//     await mongoose.connect(mongoDB);
     // await updateUserFriends();
    //await chatCreate();
     // await createDetails();
@@ -94,9 +94,9 @@ async function main() {
     // await messageCreate();
     // await createUser();
     // await updateFriends();
-    console.log("Debug: Closing Mongoose");
-    mongoose.connection.close();
-}
+//     console.log("Debug: Closing Mongoose");
+//     mongoose.connection.close();
+// }
 
 // async function updateFriends() {
 //     const [user1, user2] = await Promise.all([
