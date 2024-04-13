@@ -12,6 +12,7 @@ interface IUser extends Document {
     status: boolean; 
     inbox: Types.ObjectId[]; 
     nonFriendsChat: boolean; 
+    url: string;
 }
 
 const UserSchema:Schema<IUser> = new Schema({
@@ -26,6 +27,10 @@ const UserSchema:Schema<IUser> = new Schema({
     inbox: [{ type: Schema.Types.ObjectId, ref: 'Inbox' }],
     nonFriendsChat: { type: Boolean, default: false }
 });
+
+UserSchema.virtual("url").get(function(this:IUser){
+    return `/profile/${this._id}`
+})
 
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 

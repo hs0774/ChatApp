@@ -15,6 +15,6 @@ const FriendshipSchema: Schema<IFriendship> = new Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-const Friendship: Model<IFriendship> = mongoose.model<IFriendship>('Friendship', FriendshipSchema);
+const Friendship: Model<IFriendship> = mongoose.models.Friendship || mongoose.model<IFriendship>('Friendship', FriendshipSchema);
 
 export default Friendship;

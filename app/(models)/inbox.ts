@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Document } from "mongoose";
+import mongoose, { Model, Schema, Document} from "mongoose";
 
 
 interface IInbox extends Document {
@@ -19,6 +19,6 @@ const InboxSchema:Schema<IInbox> = new Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
-const Inbox: Model<IInbox> = mongoose.model<IInbox>('Inbox', InboxSchema);
+const Inbox: Model<IInbox> = mongoose.models.Inbox || mongoose.model<IInbox>('Inbox', InboxSchema);
 
 export default Inbox;

@@ -1,0 +1,40 @@
+/* inbox main page */
+.inboxCommands{
+    display: flex;
+    justify-content: space-evenly;
+} 
+
+.inboxTitles{
+    display: flex;
+    justify-content: space-around;
+}   
+
+.inboxAndMessage{
+    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+}
+
+.inboxMessages{
+    cursor: pointer;
+}
+
+/* inbox create message page  */
+
+.dropdown{
+    display: flex;
+    flex-direction: column;
+    border: 1px solid gray;
+}
+
+.dropdown:empty{
+    border: none;
+}
+
+.dropdown-row{
+    text-align: start;
+    
+}
+
+
+/* inbox read message page  */

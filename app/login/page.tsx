@@ -39,7 +39,7 @@ export default function Login() {
         if(!res.ok){
             throw new Error('failed to Login');
         } 
-        const { token, username,id } = await res.json();
+        const { token, username, id } = await res.json();
         localStorage.setItem("token", token);
         localStorage.setItem("username", username);
         localStorage.setItem("id", id);

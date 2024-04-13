@@ -23,8 +23,9 @@ export default function Navbar() {
         </>
         : 
         <>
-        <Link href="/chat/3"><p>Chat!</p></Link>
-        <Link href="/profile/jim"><p>Hello, {user.username}</p></Link> 
+        <Link href="/chat"><p>Chat!</p></Link>
+        <Link href="/inbox"><p>Inbox</p></Link>
+        <Link href={`/profile/${user.id}`}><p>Hello, {user.username}</p></Link> 
         <button onClick={handleClick}>Logout</button> 
         </>
         }

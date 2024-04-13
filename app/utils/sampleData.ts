@@ -1,14 +1,14 @@
-// import 'dotenv/config';
-// import env from './validateEnv.ts'
-// import mongoose from 'mongoose';
-// import * as fs from 'fs';
-// import {faker} from '@faker-js/faker'
-// import bcrypt from 'bcryptjs';
-// // import Chat from '../(models)/chat.ts';
-// // import Details from '../(models)/details.ts';
-// // import Friendship from '../(models)/friendship.ts';
-// // import Inbox from '../(models)/inbox.ts';
-// // import User from '../(models)/user.ts';
+import 'dotenv/config';
+import env from './validateEnv.ts'
+import mongoose from 'mongoose';
+import * as fs from 'fs';
+import {faker} from '@faker-js/faker'
+import bcrypt from 'bcryptjs';
+import Chat from '../(models)/chat.ts';
+import Details from '../(models)/details.ts';
+import Friendship from '../(models)/friendship.ts';
+import Inbox from '../(models)/inbox.ts';
+import User from '../(models)/user.ts';
 
 
 
@@ -20,6 +20,7 @@
 // //       timestamp: Date;
 // //     }[];
 // // }
+
 // interface IDetails {
 //     hobbies: string[];
 //     job: string;
@@ -94,6 +95,7 @@
     // await messageCreate();
     // await createUser();
     // await updateFriends();
+//      await createInbox();
 //     console.log("Debug: Closing Mongoose");
 //     mongoose.connection.close();
 // }
@@ -263,12 +265,12 @@
 // async function createInbox() {
 //     const user = await User.find();
 //     const inbox = [
-//         {sender:user[1],receiver:user[3],message:faker.lorem.words(10),type:'message'},
-//         {sender:user[3],receiver:user[5],message:faker.lorem.words(10),type:'message'},
+//         {sender:user[1],receiver:user[2],message:faker.lorem.words(10),type:'message'},
+//         {sender:user[3],receiver:user[2],message:faker.lorem.words(10),type:'message'},
 //         {sender:user[4],receiver:user[2],message:faker.lorem.words(10),type:'message'},
-//         {sender:user[1],receiver:user[3],message:`${user[1].username} has sent you a friend request`,type:'friendRequest'},
-//         {sender:user[8],receiver:user[2],message:`${user[3].username} has sent you a friend request`,type:'friendRequest'},
-//         {sender:user[4],receiver:user[6],message:`${user[4].username} has sent you a friend request`,type:'friendRequest'},
+//         {sender:user[1],receiver:user[2],message:`${user[1].username} has sent you a friend request`,type:'friendRequest'},
+//         {sender:user[5],receiver:user[2],message:`${user[5].username} has sent you a friend request`,type:'friendRequest'},
+//         {sender:user[4],receiver:user[2],message:`${user[4].username} has sent you a friend request`,type:'friendRequest'},
 //     ]
 
 //     for(const item of inbox) {

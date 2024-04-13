@@ -1,6 +1,6 @@
 "use client"
 import React, { createContext, useContext,useState,useEffect} from 'react';
-
+import {useRouter } from 'next/navigation';
 
 interface User {
   token: string;
@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children } : {children:any}) => {
   const [user, setUser] = useState<User | null>(null);
-
+  const router = useRouter();
     useEffect(() => {
 
         const token = localStorage.getItem('token');
@@ -39,6 +39,7 @@ export const AuthProvider = ({ children } : {children:any}) => {
   const logout = () => {
     setUser(null);
     localStorage.clear();
+    router.push('/');
   };
 
   return (

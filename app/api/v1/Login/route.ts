@@ -8,9 +8,10 @@ import validator from 'validator';
 import { NextResponse,NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
 import jwt from "jsonwebtoken";
+import sanitizeData from '@/app/utils/helperFunctions/sanitizeData.ts';
 
-const createToken = (email: string | number) => {
-    return jwt.sign({email:email},env.SECRET)
+const createToken = (email: string | number,id:string) => {
+    return jwt.sign({email:email,id:id},env.SECRET)
 }
 
 const zodschema = z.object({
@@ -29,18 +30,22 @@ export async function POST(req:Request,res:Response) {
 
      if(!validation.success) {
         return NextResponse.json(validation.error.errors, {status:400});
-     } else {
-        const sanitizedData : { [key: string]: string | number } = {};
-        for (const [key, value] of Object.entries(validation.data)) {
-            if (typeof value === 'string') {
-                sanitizedData[key] = validator.escape(value.trim());
-            } else {
-                sanitizedData[key] = validator.escape(String(value).trim());
-            }
+     } 
+     const sanitizedData = sanitizeData(validation);
+        // const sanitizedData : { [key: string]: string | number } = {};
+        // for (const [key, value] of Object.entries(validation.data)) {
+        //     if (typeof value === 'string') {
+        //         sanitizedData[key] = validator.escape(value.trim());
+        //     } else {
+        //         sanitizedData[key] = validator.escape(String(value).trim());
+        //     }
+        // }
+        if(!sanitizedData) {
+            return NextResponse.json({message:'Issue with validating data'},{status:400});
         }
         const user = await User.findOne({
             $or: [
-                { username: sanitizedData.userDetail },
+                { username: sanitizedData.userDetail},
                 { email: sanitizedData.userDetail }
             ]
         });
@@ -49,9 +54,9 @@ export async function POST(req:Request,res:Response) {
             return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
         }
         
-        const token = createToken(user.email)
+        const token = createToken(user.email,user._id);
         return NextResponse.json({message: `User Created`,token,username:user.username,email:user.email,id:user._id},{status:201})
-     }
+     
     } catch (error) {
         console.log(error)
         return NextResponse.json({ message: `Error: ${error}`}, {status:500});

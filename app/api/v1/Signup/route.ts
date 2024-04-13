@@ -8,6 +8,7 @@ import validator from 'validator';
 import { NextResponse,NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
 import jwt from "jsonwebtoken";
+import sanitizeData from '@/app/utils/helperFunctions/sanitizeData.ts';
 
 
 const createToken = (email: string | number) => {
@@ -33,17 +34,23 @@ export async function POST(req:Request,res:Response) {
      const body = await req.json();
      const validation = zodschema.safeParse(body);
 
+     //we can make this a function 
      if(!validation.success) {
         return NextResponse.json(validation.error.errors, {status:400});
-     } else {
-        const sanitizedData : { [key: string]: string | number } = {};
-        for (const [key, value] of Object.entries(validation.data)) {
-            if (typeof value === 'string') {
-                sanitizedData[key] = validator.escape(value.trim());
-            } else {
-                sanitizedData[key] = validator.escape(String(value).trim());
-            }
+     } 
+     const sanitizedData = sanitizeData(validation);
+        // const sanitizedData : { [key: string]: string | number } = {};
+        // for (const [key, value] of Object.entries(validation.data)) {
+        //     if (typeof value === 'string') {
+        //         sanitizedData[key] = validator.escape(value.trim());
+        //     } else {
+        //         sanitizedData[key] = validator.escape(String(value).trim());
+        //     }
+        // }
+        if(!sanitizedData) {
+            return NextResponse.json({message:'Issue with validating data'},{status:400});
         }
+        
         const user = await User.findOne({ username: sanitizedData.username, email: sanitizedData.email });
         if(user){
             return NextResponse.json({ message: `User already exists`}, {status:400})
@@ -70,7 +77,7 @@ export async function POST(req:Request,res:Response) {
         await newUser.save();
         const token = createToken(sanitizedData.email)
         return NextResponse.json({message: `User Created`,token,username:sanitizedData.username,email:sanitizedData.email,id:newUser._id},{status:201})
-     }
+    
     } catch (error) {
         console.log(error)
         return NextResponse.json({ message: `Error: ${error}`}, {status:500});

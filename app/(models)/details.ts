@@ -7,7 +7,7 @@ interface IDetails extends Document {
         interests:string;
         bio: string;
         age: number;
-        sex: 'male' | 'female' | 'other';
+        sex: 'Male' | 'Female' | 'Other';
         location: string;
 }
 
@@ -17,7 +17,7 @@ const DetailsSchema:Schema<IDetails> = new Schema({
         interests: { type: String },
         bio: { type: String },
         age: { type: Number },
-        sex: { type: String, enum: ['male', 'female', 'other'] },
+        sex: { type: String, enum: ['Male', 'Female', 'Other'] },
         location: { type: String },
 });
 

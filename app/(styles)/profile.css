@@ -1,0 +1,21 @@
+/* .dropdown .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 120px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    
+}
+.dropdown-toggle:focus + .dropdown-menu {
+    display: block;
+   
+}
+
+.dropdown{
+    display: flex;
+}
+
+.namePlusDropdown{
+    display: flex;
+} */
