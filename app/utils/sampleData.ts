@@ -1,16 +1,14 @@
-import 'dotenv/config';
-import env from './validateEnv.ts'
-import mongoose from 'mongoose';
-import * as fs from 'fs';
-import {faker} from '@faker-js/faker'
-import bcrypt from 'bcryptjs';
-import Chat from '../(models)/chat.ts';
-import Details from '../(models)/details.ts';
-import Friendship from '../(models)/friendship.ts';
-import Inbox from '../(models)/inbox.ts';
-import User from '../(models)/user.ts';
-
-
+import "dotenv/config";
+import env from "./validateEnv.ts";
+import mongoose from "mongoose";
+import * as fs from "fs";
+import { faker } from "@faker-js/faker";
+import bcrypt from "bcryptjs";
+import Chat from "../(models)/chat.ts";
+import Details from "../(models)/details.ts";
+import Friendship from "../(models)/friendship.ts";
+import Inbox from "../(models)/inbox.ts";
+import User from "../(models)/user.ts";
 
 // // interface IChat {
 // //     participants: mongoose.Types.ObjectId[];
@@ -41,7 +39,7 @@ import User from '../(models)/user.ts';
 // interface IInbox {
 //     user: mongoose.Types.ObjectId;
 //     message: string;
-//     type: 'message' | 'friendRequest'; 
+//     type: 'message' | 'friendRequest';
 //     read: boolean;
 //     createdAt: Date;
 // }
@@ -55,15 +53,15 @@ import User from '../(models)/user.ts';
 
 // interface IUser {
 //     username: string;
-//     password: string; 
-//     email: string; 
+//     password: string;
+//     email: string;
 //     details: mongoose.Types.ObjectId;
-//     profilePic: Buffer; 
-//     friends: mongoose.Types.ObjectId[]; 
-//     chats: mongoose.Types.ObjectId[]; 
-//     status: boolean; 
-//     inbox: mongoose.Types.ObjectId[]; 
-//     nonFriendsChat: boolean; 
+//     profilePic: Buffer;
+//     friends: mongoose.Types.ObjectId[];
+//     chats: mongoose.Types.ObjectId[];
+//     status: boolean;
+//     inbox: mongoose.Types.ObjectId[];
+//     nonFriendsChat: boolean;
 // }
 
 // interface IMessage extends Document {
@@ -75,7 +73,7 @@ import User from '../(models)/user.ts';
 
 // interface IChat extends Document {
 //     participants: mongoose.Types.ObjectId[];
-//     messages: IMessage[]; 
+//     messages: IMessage[];
 // }
 
 // console.log('This script populates some test items to your database');
@@ -87,14 +85,14 @@ import User from '../(models)/user.ts';
 // async function main() {
 //     console.log("Debug: About to connect");
 //     await mongoose.connect(mongoDB);
-    // await updateUserFriends();
-   //await chatCreate();
-    // await createDetails();
-    // await createFriendship();
-    // await createInbox();
-    // await messageCreate();
-    // await createUser();
-    // await updateFriends();
+// await updateUserFriends();
+//await chatCreate();
+// await createDetails();
+// await createFriendship();
+// await createInbox();
+// await messageCreate();
+// await createUser();
+// await updateFriends();
 //      await createInbox();
 //     console.log("Debug: Closing Mongoose");
 //     mongoose.connection.close();
@@ -115,16 +113,16 @@ import User from '../(models)/user.ts';
 // }
 // async function updateUserFriends() {
 //     const friendships = [
-//         [],       
-//         [9, 3, 7],     
-//         [8, 2],     
-//         [7],         
-//         [6],          
-//         [5, 7],        
-//         [4, 6, 2],     
-//         [3],           
-//         [2],          
-//         [],            
+//         [],
+//         [9, 3, 7],
+//         [8, 2],
+//         [7],
+//         [6],
+//         [5, 7],
+//         [4, 6, 2],
+//         [3],
+//         [2],
+//         [],
 //     ] //relationships between users but in 1 so will do -1 to zero index
 
 //     const users = await User.find();
@@ -163,7 +161,6 @@ import User from '../(models)/user.ts';
 
 // }
 
-
 // async function detailsCreate(hobbies:string[],job:string,interests:string,bio:string,age:number,sex:string,location:string) {
 //     try {
 //         const newDetails = new Details({
@@ -190,7 +187,6 @@ import User from '../(models)/user.ts';
 //         console.error(error + 'something went wrong');
 //     }
 // }
-
 
 // async function messageCreate() {
 //     const chats = await Chat.find();
@@ -228,7 +224,6 @@ import User from '../(models)/user.ts';
 //    console.log('added user' + username)
 // }
 
-
 // async function createDetails() {
 //     console.log('creating details');
 //     for (let i=0;i<10;i++){
@@ -261,7 +256,6 @@ import User from '../(models)/user.ts';
 //     }
 // }
 
-
 // async function createInbox() {
 //     const user = await User.find();
 //     const inbox = [
@@ -289,17 +283,16 @@ import User from '../(models)/user.ts';
 //                 user2: receiver._id,
 //                 status: 'pending',
 //             });
-//             await newFriendship.save();         
+//             await newFriendship.save();
 //        }
 //        receiver.inbox.push(inboxQuery._id);
 //        await receiver.save();
 //     }
 // }
 
-
 // async function createUser() {
 //     console.log('creating users');
-//     for(let i=0;i<10;i++){  
+//     for(let i=0;i<10;i++){
 //         const password = `password${i}`;
 //         const hash = await bcrypt.hash(password, 10);
 //         const avatarUrl = faker.image.avatar(); // Get the avatar image URL from Faker.js
@@ -327,6 +320,5 @@ import User from '../(models)/user.ts';
 //     }
 // }
 
-
 //quick note on how to get ts/node to compile this run "node --loader ts-node/esm sampleData.ts"
-// and make sure all files are named properly like user.ts detail.ts etc 
+// and make sure all files are named properly like user.ts detail.ts etc
