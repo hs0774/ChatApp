@@ -1,16 +1,19 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
 
 interface IChat extends Document {
+  title:string;
   participants: mongoose.Types.ObjectId[];
   messages: {
     sender: mongoose.Types.ObjectId;
     content: string;
     image?: Buffer;
     createdAt: Date;
+
   }[];
 }
 
 const ChatSchema: Schema<IChat> = new Schema({
+  title: {type: String,default: ''},
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   messages: [
     {

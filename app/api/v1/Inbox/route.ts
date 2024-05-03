@@ -48,21 +48,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
 
-    // if (!authHeader) {
-    //     return NextResponse.json({ message: 'Unauthorized' },{status:401});
-    // }
-
-    // const token = authHeader.split(' ')[1];
-
     if (!token) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-
-    // jwt.verify(token, env.SECRET, (err: any, decodedToken: any) => {
-    //     if (err) {
-    //         return NextResponse.json({ message: 'Invalid token' });
-    //     }
-    // });
 
     await dbConnect();
     const body = await req.json();
@@ -74,14 +62,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
     const sanitizedData = sanitizeData(validation);
-    // const sanitizedData : { [key: string]: string | number } = {};
-    // for (const [key, value] of Object.entries(validation.data)) {
-    //     if (typeof value === 'string') {
-    //         sanitizedData[key] = validator.escape(value.trim());
-    //     } else {
-    //         sanitizedData[key] = validator.escape(String(value).trim());
-    //     }
-    // }
+
     if (!sanitizedData) {
       return NextResponse.json(
         { message: "Issue with validating data" },

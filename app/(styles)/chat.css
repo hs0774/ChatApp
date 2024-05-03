@@ -1,14 +1,18 @@
-.chatpage {
-  display: flex;
-  justify-content: space-around;
-  height: 900px;
-  width: 900px;
-}
+ .chatpage {
+   display: flex; 
+  justify-content: space-around;  
+   /* height: 50%; */
+  width: 50%;  
+  border: 1px solid red;
+ }
 
-.currentChat {
-  height: 300px;
-  width: 300px;
-}
+ /* .currentChat { */
+   /* height: 300px;
+  width: 300px;  */
+  /* height: 50%;
+  width: 50%; */
+/* } */
+
 .actualChat {
   display: flex;
   flex-direction: column;
@@ -20,4 +24,42 @@
 
 .userMessages {
   align-self: flex-end;
+} 
+
+.openChat{
+ display: flex;
+ flex-direction: column;
+}
+
+.Chat{
+  display: flex;
+  justify-content: space-around;
+}
+
+.friendslist{
+  list-style-type: none;
+}
+/* 
+.listItem{
+  
+} */
+
+.actualChat{
+  list-style-type: none;
+}
+
+.participantList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.groups{
+   /* display: flex;
+  flex-wrap: wrap;  */
+  margin-bottom: 8px;
+  cursor: pointer; 
+}
+
+.chatMembers{
+  display: flex;
 }
