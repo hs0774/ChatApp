@@ -187,15 +187,24 @@ export default function Chat() {
     setNewChat(prev => prev.filter(friendName => friendName !== friend));
   }
 
-  function removeChat(id: number){
+  async function removeChat(id: string){
     console.log(id);
-    
-    const removeChat = exampleChat.filter((chatId => chatId.id !== id ))
+    const res = await fetch(`/api/v1/Chat`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify(id),
+    }); //we do another check for the single user chat 
+    if (res.ok) {
+    const removeChat = exampleChat.filter((chatId => chatId._id !== id ))
     setExampleChat(removeChat);
     // have a condition that sees if the deleted chat is open if yes set this 
-    if(currentChat?.id === id) {
+    if(currentChat?._id === id) {
     setChatIsOpen(false);
     }
+   }
     //when using db delete the chat reference in chat array
     // maybe only use leave or find a way for leave to make you leave and no chat update
     //while x keeps you in chat but not visible idk not practical either leave or x 
@@ -236,17 +245,18 @@ export default function Chat() {
         return;
       }
     }
-    const token = localStorage.getItem("token");
+    
     const res = await fetch(`/api/v1/Chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${user?.token}`,
       },
       body: JSON.stringify({title:chatTitle,newChat}),
     }); //we do another check for the single user chat 
     if (res.ok) {
-      const response = await res.json();
+      const {newChatObj} = await res.json();
+      console.log(newChatObj);
       // const newUserObj = {id:user?.id,username:user?.username};
       // const updatedChatParticipants = [...newChat, newUserObj];
       //no need for these two since since this was an obj to be 
@@ -257,6 +267,7 @@ export default function Chat() {
       //   participants: updatedChatParticipants,
       //   messages:[],
       // } return chat obj 
+
       setExampleChat(prev => [...prev,newChatObj]) //returned obj is added 
       setCurrentChat(newChatObj);
       changeSettings();
@@ -295,18 +306,11 @@ export default function Chat() {
               </div>
             ))}
             <button onClick={changeSettings}>Create a new Chat</button>
-            {chatCreateOpen && <><select id="chatCreate" onChange={handleChange} value={currentFriendSelected} username="chatCreate" >
-                  {/* onChange={} value={} */}
+            {chatCreateOpen && <><select id="chatCreate" onChange={handleChange} value={currentFriendSelected} name="chatCreate" >
               <option value="">Select a friend</option>
               {userFriends.map((friend) => (
                 <option key={friend._id} value={JSON.stringify(friend)}>
                   {friend.username}
-                  {/* so what i am going to do is i click a friend and have it right under
-                  the select and then a user can select another one, and it gets added,
-                  then there will a be a button that says create chat and the chat is created 
-                  and it opens up where the user can type hey whats up and once there
-                  is a message only then does the chat schema get created and added to
-                  all users chat array. */}
                 </option>
               ))}
             </select> 

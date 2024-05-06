@@ -5,38 +5,30 @@ import User from "@/app/(models)/user.ts";
 import Details from "../../../../(models)/details.ts";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import { z } from "zod";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 import Friendship from "@/app/(models)/friendship.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
+import { profileZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 
+interface DecodedToken {
+  id: string;
+  email: string;
+  username:string;
+}
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
-
-    // if (!authHeader) {
-    //     return NextResponse.json({ message: 'Unauthorized' });
-    // }
-
-    // const token = authHeader.split(' ')[1];
-
     if (!token) {
       return NextResponse.json({ message: "Unauthorized" });
     }
 
-    // jwt.verify(token, env.SECRET, (err: any, decodedToken: any) => {
-    //     if (err) {
-    //         return NextResponse.json({ message: 'Invalid token' });
-    //     }
-    // });
-
     await dbConnect(); // Ensure database connection
     const body = req.url.slice(req.url.lastIndexOf("/") + 1);
     console.log(body);
-    const decodedToken = jwtDecode(token);
+    const decodedToken = jwtDecode(token) as DecodedToken;
     console.log;
     console.log(decodedToken);
     const user = await User.findById(body).populate("details").exec();
@@ -92,52 +84,26 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
-const zodschema = z.object({
-  username: z.string().min(2, "Name is required").max(50).trim(),
-  age: z.number().int().min(18).max(120),
-  bio: z.string().max(50),
-  occupation: z.string().max(50),
-  location: z.string().max(100),
-  sex: z.string().max(7),
-});
 
 export async function PUT(req: NextRequest, res: NextResponse) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
 
-    // if (!authHeader) {
-    //     return NextResponse.json({ message: 'Unauthorized' });
-    // }
-
-    // const token = authHeader.split(' ')[1];
-
     if (!token) {
       return NextResponse.json({ message: "Unauthorized" });
     }
 
-    // jwt.verify(token, env.SECRET, (err: any, decodedToken: any) => {
-    //     if (err) {
-    //         return NextResponse.json({ message: 'Invalid token' });
-    //     }
-    // });
 
     await dbConnect();
     const body = await req.json();
     //console.log(body.editDetails)
-    const validation = zodschema.safeParse(body.editDetails);
+    const validation = profileZodSchema.safeParse(body.editDetails);
 
     if (!validation.success) {
       return NextResponse.json(validation.error.errors, { status: 404 });
     }
     const sanitizedData = sanitizeData(validation);
-    // const sanitizedData : { [key: string]: string | number } = {};
-    // for (const [key, value] of Object.entries(validation.data)) {
-    //     if (typeof value === 'string') {
-    //         sanitizedData[key] = validator.escape(value.trim());
-    //     } else {
-    //         sanitizedData[key] = validator.escape(String(value).trim());
-    //     }
-    // }
+    
     if (!sanitizedData) {
       return NextResponse.json(
         { message: "Issue with validating data" },
@@ -187,16 +153,3 @@ export async function PUT(req: NextRequest, res: NextResponse) {
   }
 }
 
-//         const authHeader = req.headers['authorization']
-//         const token = authHeader && authHeader.split(' ')[1];
-
-//         if(!token) {
-//             return res.status(401).json({message:'Unauthorized'});
-//         }
-
-//         jwt.verify(token, process.env.SECRET, (err,decodedToken) => {
-//             if(err) {
-//             return res.status(403).json({message: "Invalid token"});
-//             }
-//             req.user = decodedToken;
-//         });

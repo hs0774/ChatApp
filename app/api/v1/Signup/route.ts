@@ -3,7 +3,7 @@ import env from "../../../utils/validateEnv.ts";
 import User from "../../../(models)/user";
 import Details from "../../../(models)/details";
 import bcrypt from "bcryptjs";
-import { z } from "zod";
+import { signupZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import validator from "validator";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
@@ -14,38 +14,31 @@ const createToken = (email: string | number) => {
   return jwt.sign({ email: email }, env.SECRET);
 };
 
-const zodschema = z.object({
-  email: z.string().email().max(50),
-  username: z.string().min(2, "Name is required").max(50).trim(),
-  password: z.string().min(8, "Password must be atleast 8 characters").max(50),
-  occupation: z.string().max(50),
-  hobbies: z.array(z.string()),
-  bio: z.string().max(50),
-  interests: z.string().max(240),
-  location: z.string().max(100),
-  sex: z.string().max(6),
-  age: z.number().int().min(18).max(120),
-});
+// const zodschema = z.object({
+//   email: z.string().email().max(50),
+//   username: z.string().min(2, "Name is required").max(50).trim(),
+//   password: z.string().min(8, "Password must be atleast 8 characters").max(50),
+//   occupation: z.string().max(50),
+//   hobbies: z.array(z.string()),
+//   bio: z.string().max(50),
+//   interests: z.string().max(240),
+//   location: z.string().max(100),
+//   sex: z.string().max(6),
+//   age: z.number().int().min(18).max(120),
+// });
 
 export async function POST(req: Request, res: Response) {
   try {
     await dbConnect();
     const body = await req.json();
-    const validation = zodschema.safeParse(body);
+    const validation = signupZodSchema.safeParse(body);
 
     //we can make this a function
     if (!validation.success) {
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
     const sanitizedData = sanitizeData(validation);
-    // const sanitizedData : { [key: string]: string | number } = {};
-    // for (const [key, value] of Object.entries(validation.data)) {
-    //     if (typeof value === 'string') {
-    //         sanitizedData[key] = validator.escape(value.trim());
-    //     } else {
-    //         sanitizedData[key] = validator.escape(String(value).trim());
-    //     }
-    // }
+
     if (!sanitizedData) {
       return NextResponse.json(
         { message: "Issue with validating data" },

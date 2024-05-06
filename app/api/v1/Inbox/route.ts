@@ -4,7 +4,7 @@ import User from "../../../(models)/user.ts";
 import Details from "../../../(models)/details.ts";
 import Inbox from "../../../(models)/inbox.ts";
 import Friendship from "@/app/(models)/friendship.ts";
-import { z } from "zod";
+import { inboxZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
 import jwt from "jsonwebtoken";
@@ -37,12 +37,6 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
   }
 }
 
-const zodschema = z.object({
-  sender: z.string().min(2, "Name is required").max(50).trim(),
-  receiver: z.string().min(2, "Name is required").max(50).trim(),
-  message: z.string().max(300),
-}); //change schema
-
 //this is the post that creates a message for a user
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
@@ -55,7 +49,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     await dbConnect();
     const body = await req.json();
     console.log(body);
-    const validation = zodschema.safeParse(body.formData);
+    const validation = inboxZodSchema.safeParse(body.formData);
 
     if (!validation.success) {
       console.log(validation.error.errors);

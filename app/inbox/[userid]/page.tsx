@@ -2,7 +2,7 @@ import { useAuth } from "@/app/(stores)/authContext";
 
 export default function InboxMessage({ message }) {
   const { user } = useAuth();
-  console.log(user.id);
+  console.log(user?.id);
 
   async function handleFriendReq(
     action: string,

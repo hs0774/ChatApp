@@ -13,6 +13,11 @@ import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 
 //friend request
+interface DecodedToken {
+  id: string;
+  email: string;
+  username:string;
+}
 export async function POST(req: Request, res: Response) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
@@ -24,7 +29,7 @@ export async function POST(req: Request, res: Response) {
     await dbConnect(); // Ensure database connection
     const body = await req.json(); //requested users id
     console.log("requested", body); //
-    const decodedToken = jwtDecode(token); //token.id
+    const decodedToken = jwtDecode(token) as DecodedToken; //token.id
     console.log("requestor", decodedToken.id);
     const [requestor, requestee] = await Promise.all([
       User.findById(decodedToken.id),
@@ -81,7 +86,7 @@ export async function DELETE(req: Request, res: Response) {
 
     await dbConnect();
     const body = await req.json(); //friend you want to remove id 
-    const decodedToken = jwtDecode(token); //user who is removing id 
+    const decodedToken = jwtDecode(token) as DecodedToken; //user who is removing id 
     console.log(decodedToken);
 
     const user = await User.findById(decodedToken.id);

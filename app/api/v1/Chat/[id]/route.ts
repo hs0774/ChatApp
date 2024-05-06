@@ -4,7 +4,7 @@ import User from "../../../../(models)/user.ts";
 import Details from "../../../../(models)/details.ts";
 import Inbox from "../../../../(models)/inbox.ts";
 import Friendship from "@/app/(models)/friendship.ts";
-import { z } from "zod";
+import { chatZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import validator from "validator";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
@@ -16,7 +16,11 @@ import Chat from "@/app/(models)/chat.ts";
 
 //GET chats for user who is logged in 
   // o basically get the token info and return the user chats array but populated
- 
+  interface DecodedToken {
+    id: string;
+    email: string;
+    username:string;
+}
 export async function GET(req: NextRequest, res: NextResponse) {
     try {
         //we use our token function, get the id, find and pass back the users
@@ -29,7 +33,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         }
 
         await dbConnect();
-        const decodedToken = jwtDecode(token); 
+        const decodedToken = jwtDecode(token) as DecodedToken; 
 
         const chat = await Chat;
         const user = await User.findById(decodedToken.id)
@@ -54,8 +58,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         .select("username _id") // Select only username and _id for the main user
         .exec();
 
-
-        console.log(user);
+        
         return NextResponse.json({ user }, { status: 200 });
     } catch (error) {
         console.log(error);
@@ -63,6 +66,45 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
 }
 
+export async function PATCH(req: NextRequest, res: NextResponse) {
+    try {
+        const token = verifyToken(req.headers.get("authorization"));
+
+        if (!token) {
+          return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+    
+        await dbConnect(); // Ensure database connection
+        const body = await req.json(); //requested users id
+        
+        const validation = chatZodSchema.safeParse({title:body.newTitle});
+        
+        //we can make this a function
+        if (!validation.success) {
+          return NextResponse.json(validation.error.errors, { status: 400 });
+        }
+        const sanitizedData = sanitizeData(validation);
+        
+        if (!sanitizedData) {
+          return NextResponse.json(
+            { message: "Issue with validating data" },
+            { status: 400 }
+          );
+        }
+        const chat = await Chat.findById(body.currentChat);
+        if(!chat){
+            return NextResponse.json({message:'Chat does not exist'}, { status: 404 });
+        }
+       // console.log(sanitizedData)
+        chat.title = sanitizedData.title as string
+        await chat.save();
+        //const decodedToken = jwtDecode(token); //user.id tho not needed since its title change
+        return NextResponse.json({ message:'success' }, { status: 200 });
+    } catch(error) {
+        console.log(error);
+        return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
+    }
+}    
 
 //PUT LEAVE CHAT OR NEW MEMBER 
 // remove the user from the chat schema and remove the reference. 

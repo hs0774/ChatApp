@@ -25,13 +25,13 @@ import { useAuth } from "@/app/(stores)/authContext";
 
 
 export default function OpenChat({currentChat,userFriends,setCurrentChat,setExampleChat,exampleChat}) { //{ params }: chatParams
-  const {user} =useAuth();
+  const {user} = useAuth();
   const [count, setCount] = useState(90);
   const [addUserOpen,setAddUserOpen] = useState(false);
   const [currentFriendSelected, setCurrentFriendSelected] = useState();
   const [message, setMessage] = useState({
     id: count, // count was temporary, mongodb will create id 
-    sender: "You", //user?.username
+    sender: user?.username, //user?.username
     content: "",
     createdAt:Date.now(),
   });
@@ -39,6 +39,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   const [editing,setEditing] = useState(false);
   const [addedUsers,setAddedUsers] = useState([])
   console.log(currentChat);
+
   useEffect(() => {
     setAddedUsers([]);
     setCurrentFriendSelected('');
@@ -61,7 +62,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     // Clear the message input field
     setMessage({
       id: count + 1, // Use the next id
-      sender: 'You', // user.username 
+      sender: user?.username, // user.username 
       content: "", // Clear the message content
       createdAt:Date.now(),
     });
@@ -122,7 +123,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   // }
   
 
-  function addUserToChat(event: MouseEvent<HTMLButtonElement, MouseEvent>){
+  async function addUserToChat(event: MouseEvent<HTMLButtonElement, MouseEvent>){
 
     console.log(currentChat);
     const existingParticipants = addedUsers.filter(user => 
@@ -133,14 +134,25 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
       console.log("User(s) already exist in the chat:", existingParticipants);
       return; 
     }  
+    const res = await fetch(`/api/v1/Chat/${currentChat._id.toString()}/patch`, {
+      method:'PATCH',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify({addedUsers,id:currentChat._id})
+    })
 
+    if (!res.ok) {
+      throw new Error('Failed to update Chat Title');
+    } 
     const updatedChat = {
       ...currentChat,
       participants: [...currentChat.participants, ...addedUsers]
     };
 
     const updatedExampleChat = exampleChat.map(chat =>
-      chat.id === currentChat.id ? updatedChat : chat
+      chat._id === currentChat._id ? updatedChat : chat
     );
   
     // Update the state
@@ -160,18 +172,34 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     setEditDetails(value)
   }
 
-  function newTitle(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  async function newTitle(event: MouseEvent<HTMLButtonElement, MouseEvent>) {
+
     if (!editDetails.trim()) {
       return;
     }
-  
+
+    const res = await fetch(`/api/v1/Chat/${currentChat._id.toString()}`, {
+      method:'PATCH',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify({currentChat:currentChat._id,newTitle:editDetails.trim()})
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to update Chat Title');
+    } 
+    const response = await res.json();
+    console.log(response);
+    
     setCurrentChat((prev) => ({
       ...prev,
       title: editDetails.trim(), // Set the new title and trim any leading/trailing whitespace
     }));
   
     const updatedExampleChat = exampleChat.map((chat) => {
-      if (chat.id === currentChat.id) {
+      if (chat._id === currentChat._id) {
         return {
           ...chat,
           title: editDetails.trim(), // Update the title in the exampleChat array
@@ -182,8 +210,37 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   
     setExampleChat(updatedExampleChat); // Update the exampleChat state with the modified chat title
     setEditing(false); // Exit edit mode
+    //in the backend we pass the token of the user and we pass the id of the chat, we find the chat
+    //update its new title to the title we also pass. 
   }
   
+
+  async function leaveChat(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    const res = await fetch(`/api/v1/Chat/${currentChat._id.toString()}/put`, {
+      method:'PUT',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user?.token}`,
+      },
+      body: JSON.stringify({currentChat})
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to update Chat Title');
+    } 
+    const {copyChat} = await res.json();
+    console.log('gi')
+    console.log(copyChat);
+    
+    const updatedExampleChat = exampleChat.map((chat) => {
+      if (chat._id === currentChat._id) {
+        return copyChat; // replace currentchat with copychat
+      }
+      return chat;
+    });
+    setCurrentChat(copyChat);
+    setExampleChat(updatedExampleChat);
+  }
 
   return (
      <div className="currentChat"> 
@@ -197,7 +254,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
           onChange={handleTitleChange}
         /> <button onClick={newTitle}>Change</button> <button onClick={()=>{setEditing(false);setEditDetails(currentChat.title)}}>Cancel</button></>}
       <div className="actualChat">
-        <button>Leave</button>
+        <button onClick={leaveChat}>Leave</button>
         <button onClick={() => setAddUserOpen(!addUserOpen)}>Add User</button>
         {addUserOpen && <><select id="chatCreate" onChange={handleChangee} value={currentFriendSelected} username="chatCreate" >
                   {/* onChange={} value={} */}
@@ -205,7 +262,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
               {userFriends
               .filter(friend => !currentChat.participants.some(participant => participant.username === friend.username))
               .map((friend) => (
-                <option key={friend.id} value={JSON.stringify(friend)}>
+                <option key={friend._id} value={JSON.stringify(friend)}>
                   {friend.username}
                   {/* so what i am going to do is i click a friend and have it right under
                   the select and then a user can select another one, and it gets added,
@@ -218,13 +275,13 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
             </select> 
             <button onClick={addUser}>Add to List</button> 
             {addedUsers.map(friend => (
-              <li key={`${friend.id}`}>{friend.username} <button onClick={()=> removeChatFriend(friend)}>&times;</button></li>
+              <li key={`${friend._id}`}>{friend.username} <button onClick={()=> removeChatFriend(friend)}>&times;</button></li>
             ))}</>}
             {addedUsers.length > 0 && <button onClick={addUserToChat}>Add user{addedUsers.length>1 ? 's' : null} to chat</button>}
         {currentChat.messages.map((chat) => (
             <li
               className={chat.sender.username !== user?.username ? "friendMessages" : "userMessages"}
-              key={chat.id}
+              key={chat._id} //change this to message.id chat.content._id
             >
               {chat.sender.username} : {chat.content}
             </li>

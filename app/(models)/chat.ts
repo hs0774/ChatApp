@@ -1,4 +1,5 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
+import { boolean } from "zod";
 
 interface IChat extends Document {
   title:string;
@@ -10,6 +11,7 @@ interface IChat extends Document {
     createdAt: Date;
 
   }[];
+  leftChatCopy:boolean;
 }
 
 const ChatSchema: Schema<IChat> = new Schema({
@@ -27,6 +29,7 @@ const ChatSchema: Schema<IChat> = new Schema({
       createdAt: { type: Date, default: Date.now },
     },
   ],
+  leftChatCopy:{type:Boolean, default:false},
 });
 
 const Chat: Model<IChat> =

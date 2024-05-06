@@ -86,8 +86,9 @@ async function main() {
     console.log("Debug: About to connect");
     await mongoose.connect(mongoDB);
 // await updateUserFriends();
-await chatCreate();
-await messageCreate();
+// await chatCreate();
+// await messageCreate();
+//await updateChatsCopy();
  //await createDetails();
 // await createFriendship();
 // await createInbox();
@@ -115,6 +116,19 @@ await messageCreate();
 //       await chat.save();
 //     }
     
+// }
+// async function updateChatsCopy() {
+//     // Find chats without a title
+//     const chatsToUpdate = await Chat.find({ leftChatCopy: { $exists: false } });
+
+//     // Update each chat to include a title
+
+//   // Update each chat to include a title
+//   for (const chat of chatsToUpdate) {
+//     chat.leftChatCopy = false; // Set the default title with a sequential number
+//     await chat.save();
+//   }
+  
 // }
 // async function updateFriends() {
 //     const [user1, user2] = await Promise.all([

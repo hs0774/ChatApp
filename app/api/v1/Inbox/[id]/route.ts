@@ -13,6 +13,12 @@ import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 import { jwtDecode } from "jwt-decode";
 
 //get inbox page 
+interface DecodedToken {
+  id: string;
+  email: string;
+  username:string;
+}
+
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
@@ -24,7 +30,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     //const body = await req.json();
     //const body = req.url.slice(req.url.lastIndexOf('/') + 1);
-    const decodedToken = jwtDecode(token); //token.id
+    const decodedToken = jwtDecode(token) as DecodedToken; //token.id
     // console.log('requestor',decodedToken.id);
     const inbox = await Inbox;
     const user = await User.findById(decodedToken.id)
@@ -115,7 +121,7 @@ export async function POST(req: Request, res: Response) {
     if(body.action === 'accept') {
       friendship.status = 'accepted';
       await friendship.save();
-      
+
       user.friends.push(user2._id);
       user2.friends.push(user._id); // Add reciprocal friendship
       await Promise.all([user.save(), user2.save()]);
