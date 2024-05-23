@@ -46,3 +46,7 @@ export const signupZodSchema = z.object({
   export const chatZodSchema = z.object({
     title: z.string().min(2, "Title is required").max(75).trim(),
   });
+
+  export const messageZodSchema = z.object({
+    message: z.string().min(1, "Message is required ").max(3000).trim(),
+  });

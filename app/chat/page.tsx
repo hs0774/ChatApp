@@ -13,109 +13,6 @@ interface Chat {
   messages: { id: number; sender: string; content: string; createdAt: number; }[];
 }
 
-const dummyFriends = [{id:1,username:'Friend 43'},{id:2,username:'Friend 3'},{id:3,username:'Friend 2'},{id:400,username:'Friend 44'},
-{id:5,username:'Friend 4'},{id:34,username:'Friend 45'},{id:7,username:'Friend 5'},{id:8,username:'Friend 6'},
-{id:9,username: 'Friend 69'},{id:10,username:'Friend 420'}]
-
-
-//since one of the usernames is going to be you we have to change 
-// the front end rendering of where it says "You"
-const eexampleChat: Chat[] = [
-  { 
-    id:100,
-    title:"Chat 1",
-    participants: [
-      { id: 1, username: "Friend 43" },
-      { id: 2, username: "Friend 3" },
-      { id: 3, username: "Friend 2" },
-      { id: 4, username: "You" }
-    ],
-    messages: [
-      { id: 5, sender: "Friend 3", content: "message 1", createdAt: Date.now() },
-      { id: 6, sender: "Friend 2", content: "message 2", createdAt: Date.now() },
-      { id: 7, sender: "Friend 43", content: "message 3", createdAt: Date.now() },
-      { id: 8, sender: "Friend 2", content: "message 4", createdAt: Date.now() },
-      { id: 9, sender: "You", content: "message 5", createdAt: Date.now() },
-      { id: 10, sender: "Friend 3", content: "message 6", createdAt: Date.now() },
-      { id: 11, sender: "You", content: "message 7", createdAt: Date.now() },
-    ]
-  },
-  {
-    id:200,
-    title:"Chat 2",
-    participants: [
-      { id: 12, username: "Friend 44" },
-      { id: 13, username: "Friend 4" },
-      { id: 14, username: "Friend 3" },
-      { id: 15, username: "You" }
-    ],
-    messages: [
-      { id: 16, sender: "Friend 4", content: "message 1", createdAt: Date.now() },
-      { id: 17, sender: "Friend 3", content: "message 2", createdAt: Date.now() },
-      { id: 18, sender: "Friend 44", content: "message 3", createdAt: Date.now() },
-      { id: 19, sender: "Friend 3", content: "message 4", createdAt: Date.now() },
-      { id: 20, sender: "You", content: "message 5", createdAt: Date.now() },
-      { id: 21, sender: "Friend 4", content: "message 6", createdAt: Date.now() },
-      { id: 22, sender: "You", content: "message 7", createdAt: Date.now() },
-    ]
-  },
-  {
-    id:300,
-    title:"Chat 3",
-    participants: [
-      { id: 23, username: "Friend 45" },
-      { id: 24, username: "Friend 5" },
-      { id: 25, username: "Friend 6" },
-      { id: 26, username: "You" }
-    ],
-    messages: [
-      { id: 27, sender: "Friend 6", content: "message 1", createdAt: Date.now() },
-      { id: 28, sender: "Friend 5", content: "message 2", createdAt: Date.now() },
-      { id: 29, sender: "Friend 45", content: "message 3", createdAt: Date.now() },
-      { id: 30, sender: "Friend 5", content: "message 4", createdAt: Date.now() },
-      { id: 31, sender: "You", content: "message 5", createdAt: Date.now() },
-      { id: 32, sender: "Friend 6", content: "message 6", createdAt: Date.now() },
-      { id: 33, sender: "You", content: "message 7", createdAt: Date.now() },
-    ]
-  },
-  {
-    id:400,
-    title:"Chat 4",
-    participants: [
-      { id: 34, username: "Friend 45" },
-      { id: 35, username: "You" }
-    ],
-    messages: [
-      { id: 36, sender: "You", content: "message 1", createdAt: Date.now() },
-      { id: 37, sender: "Friend 45", content: "message 2", createdAt: Date.now() },
-      { id: 38, sender: "Friend 45", content: "message 3", createdAt: Date.now() },
-      { id: 39, sender: "You", content: "manny is gay", createdAt: Date.now() },
-      { id: 40, sender: "You", content: "message 5", createdAt: Date.now() },
-      { id: 41, sender: "Friend 45", content: "message 6", createdAt: Date.now() },
-      { id: 42, sender: "You", content: "message 7", createdAt: Date.now() },
-    ]
-  }
-];
-
-// how to display chats, with just the username of particpants
-// get an array of user chats with just particpant names separted by commas if applicable
-
-//onclick the chat opens with messages. then have to figure out websockets 
-// id:{string}
-// participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-// messages: [
-//   {
-//     sender: {
-//       type: mongoose.Schema.Types.ObjectId,
-//       ref: "User",
-//       required: true,
-//     },
-//     content: { type: String, required: true },
-//     image: { type: Buffer },
-//     createdAt: { type: Date, default: Date.now },
-//   },
-// ],
-
 const getData = async () => {
   const id = localStorage.getItem("id");
   const token = localStorage.getItem("token");
@@ -205,10 +102,6 @@ export default function Chat() {
     setChatIsOpen(false);
     }
    }
-    //when using db delete the chat reference in chat array
-    // maybe only use leave or find a way for leave to make you leave and no chat update
-    //while x keeps you in chat but not visible idk not practical either leave or x 
-    //should suffice
   }
 
   function handleChange(event: ChangeEvent<HTMLSelectElement>): void {
@@ -220,19 +113,6 @@ export default function Chat() {
   }
 
   async function createChat(){
-    // ok now this is going to change the db but only for the user that created this 
-    // chat, so we need title and participants. 
-    // we make a request to the server and create a chat schema, how do we do this?
-    // we first pass the list of participants as well as the token, 
-    // the token will be the user that requested the chat creation, we then find the 
-    // participants by id or name depending on how the data is passed here dont remember,
-    // we then also trim and sanitize the chat title, we then add the users ids as members,
-    // but since the chat is new only add the chat reference to the created users array,
-    // that way users dont have a chat and dont know where it came from, 
-    // in the other component when the user sends the first message, ill enable websockets,
-    // as well as check if the size of the messages array. once the first message comes in 
-    // thats when i will add the chat reference to the users chat arrays.
-    //conditional to not create duplicate 1 on 1 chats only duplicate groups
     if(newChat.length < 2) { 
       const singleUserName = newChat[0].username;
       const existingChat = exampleChat.filter(chat =>
@@ -257,17 +137,6 @@ export default function Chat() {
     if (res.ok) {
       const {newChatObj} = await res.json();
       console.log(newChatObj);
-      // const newUserObj = {id:user?.id,username:user?.username};
-      // const updatedChatParticipants = [...newChat, newUserObj];
-      //no need for these two since since this was an obj to be 
-      //added in participants but i have it in backend 
-      // const newChatObj:Chat = {
-      //   id:uuidv4(),
-      //   title:chatTitle,
-      //   participants: updatedChatParticipants,
-      //   messages:[],
-      // } return chat obj 
-
       setExampleChat(prev => [...prev,newChatObj]) //returned obj is added 
       setCurrentChat(newChatObj);
       changeSettings();

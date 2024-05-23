@@ -1,6 +1,5 @@
 import "dotenv/config";
 import env from "../../../../utils/validateEnv.ts";
-//import User from "../../../../(models)/user.ts";
 import User from "@/app/(models)/user.ts";
 import Details from "../../../../(models)/details.ts";
 import { NextResponse, NextRequest } from "next/server";
@@ -17,7 +16,7 @@ interface DecodedToken {
   id: string;
   email: string;
   username:string;
-}
+} 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const token = verifyToken(req.headers.get("authorization"));

@@ -10,6 +10,7 @@ interface IUser extends Document {
   chats: Types.ObjectId[];
   status: boolean;
   inbox: Types.ObjectId[];
+  wall: Types.ObjectId[];
   nonFriendsChat: boolean;
   url: string;
 }
@@ -22,6 +23,7 @@ const UserSchema: Schema<IUser> = new Schema({
   profilePic: { type: Buffer },
   friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
   chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
+  wall: [{ type: Schema.Types.ObjectId, ref: "Wall" }],
   status: { type: Boolean, default: false },
   inbox: [{ type: Schema.Types.ObjectId, ref: "Inbox" }],
   nonFriendsChat: { type: Boolean, default: false },

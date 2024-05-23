@@ -2,78 +2,75 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import "../../(styles)/chat.css";
 import { useAuth } from "@/app/(stores)/authContext";
+import { v4 as uuidv4 } from "uuid";
 
-// interface Chat {
-//   id:number;
-//   participants: { id: number; username: string; }[];
-//   messages: { id: number; sender: string; content: string; createdAt: number; }[];
-// }
-
-// participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-//   messages: [
-//     {
-//       sender: {
-//         type: mongoose.Schema.Types.ObjectId,
-//         ref: "User",
-//         required: true,
-//       },
-//       content: { type: String, required: true },
-//       image: { type: Buffer },
-//       createdAt: { type: Date, default: Date.now },
-//     },
-//   ],
-
+import io from 'socket.io-client';
+//const socket = io('http://localhost:3001');
 
 export default function OpenChat({currentChat,userFriends,setCurrentChat,setExampleChat,exampleChat}) { //{ params }: chatParams
   const {user} = useAuth();
-  const [count, setCount] = useState(90);
   const [addUserOpen,setAddUserOpen] = useState(false);
   const [currentFriendSelected, setCurrentFriendSelected] = useState();
-  const [message, setMessage] = useState({
-    id: count, // count was temporary, mongodb will create id 
-    sender: user?.username, //user?.username
-    content: "",
-    createdAt:Date.now(),
-  });
+  const [sentMessage, setSentMessage] = useState('');
+
   const [editDetails,setEditDetails] = useState()
   const [editing,setEditing] = useState(false);
   const [addedUsers,setAddedUsers] = useState([])
-  console.log(currentChat);
+  const [socket,setSocket] = useState();
 
-  useEffect(() => {
+
+  useEffect(() => { 
     setAddedUsers([]);
     setCurrentFriendSelected('');
-    setEditDetails(currentChat.title)
-  }, [currentChat]);
-
-  //soon we have a conditional that checks the size of the chat, if the size is 0,
-  //we go to server and create chat document and add the reference to each users array
-  //tldr when first message is submitted actually create the chat
+    setEditDetails(currentChat.title);
+    const socket = io('http://localhost:3001');
+    setSocket(socket);
+  
+    // Join all chat rooms the user is part of
+    exampleChat.forEach(chatId => {
+      socket.emit('joinChat', { chatId: chatId._id, userId: user?.id });
+    });
+  
+    socket.on('get-message', (message,chatId) => {
+      setExampleChat((prevChats) => {
+        return prevChats.map(chat => {
+          if (chat._id === chatId) {
+            return {
+              ...chat,
+              messages: [...chat.messages, message]
+            };
+          }
+          return chat;
+        });
+      });
+  
+      if (chatId === currentChat._id) {
+        setCurrentChat((prevChat) => ({
+          ...prevChat,
+          messages: [...prevChat.messages, message],
+        }));
+      }
+    });
+  
+    return () => {
+      socket.disconnect();
+    };
+  }, [setExampleChat, currentChat._id, setCurrentChat, exampleChat, user?.id, currentChat.title]);
+  
+  
   function handleSubmit(event: FormEvent<HTMLFormElement>){
     event.preventDefault();
-    if(message.content ==='') {
+    
+    if(sentMessage ==='') {
       return;
     }
-    //exampleChat[0].messages.push(message);
-    currentChat.messages.push(message); 
-    // Update the count for the next message id wont need after hooked to backend?
-    setCount((prevCount) => prevCount + 1); 
-  
-    // Clear the message input field
-    setMessage({
-      id: count + 1, // Use the next id
-      sender: user?.username, // user.username 
-      content: "", // Clear the message content
-      createdAt:Date.now(),
-    });
-  }  //remove count since that was just for unique id 
+    socket.emit('get-message', {message:sentMessage,currentChatId:currentChat._id,token: `Bearer ${user?.token}`});
+    setSentMessage('')
+  } 
 
   function handleChange(event: ChangeEvent<HTMLInputElement>){
-    const { value, name } = event.target;
-    setMessage((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    const { value } = event.target;
+    setSentMessage(value);
   }
 
   function handleChangee(event: ChangeEvent<HTMLSelectElement>): void {
@@ -96,31 +93,6 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   function removeChatFriend(friend:string){
     setAddedUsers(prev => prev.filter(friendName => friendName !== friend));
   }
-
-
-  // function addUserToChat(event: MouseEvent<HTMLButtonElement, MouseEvent>) {
-  //   const existingParticipants = addedUsers.filter(user =>
-  //     currentChat.participants.some(participant => participant.username === user.username)
-  //   );
-  
-  //   if (existingParticipants.length > 0) {
-  //     console.log("User(s) already exist in the chat:", existingParticipants);
-  //     return; // Exit the function early
-  //   }
-  
-    // Create a new copy of the chat object with added users
-
-  
-    // Update the exampleChat state with the modified chat object
-    // const updatedExampleChat = exampleChat.map(chat =>
-    //   chat.id === currentChat.id ? currentChat : chat
-    // );
-  
-    // // Update the state
-    // setExampleChat(updatedExampleChat);
-    // setAddedUsers([]);
-    // setCurrentChat(updatedChat);
-  // }
   
 
   async function addUserToChat(event: MouseEvent<HTMLButtonElement, MouseEvent>){
@@ -209,9 +181,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     });
   
     setExampleChat(updatedExampleChat); // Update the exampleChat state with the modified chat title
-    setEditing(false); // Exit edit mode
-    //in the backend we pass the token of the user and we pass the id of the chat, we find the chat
-    //update its new title to the title we also pass. 
+    setEditing(false); // Exit edit mode 
   }
   
 
@@ -264,12 +234,6 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
               .map((friend) => (
                 <option key={friend._id} value={JSON.stringify(friend)}>
                   {friend.username}
-                  {/* so what i am going to do is i click a friend and have it right under
-                  the select and then a user can select another one, and it gets added,
-                  then there will a be a button that says create chat and the chat is created 
-                  and it opens up where the user can type hey whats up and once there
-                  is a message only then does the chat schema get created and added to
-                  all users chat array. */}
                 </option>
               ))}
             </select> 
@@ -281,8 +245,9 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
         {currentChat.messages.map((chat) => (
             <li
               className={chat.sender.username !== user?.username ? "friendMessages" : "userMessages"}
-              key={chat._id} //change this to message.id chat.content._id
+              key={uuidv4()} //change this to message.id chat.content._id
             >
+              
               {chat.sender.username} : {chat.content}
             </li>
         ))}
@@ -292,15 +257,14 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
         <input
           type="text"
           id="messageSubmit"
-          name="content"
+          name="message"
           onChange={handleChange}
-          value={message.content || ""}
+          value={sentMessage || ""}
         />
         <button type="submit">Send</button>
       </form>
     </div> 
   )
-
 }
 
 //todo 

@@ -66,7 +66,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         
         body.newChat.push({_id:user._id.toString(),username:user.username})
         participantIds.push(user._id.toString())
-
+        
         if(body.newChat.length < 2) {
             const existingChat = await Chat.findOne({$and: [{ participants: body.newChat[0]._id }, { participants: body.newChat[1]._id }]});
             if(existingChat) {
@@ -89,6 +89,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
             messages:[],
             leftChatCopy: false,
         }    
+        
         return NextResponse.json({ newChatObj }, { status: 200 });
     } catch (error) {
         console.log(error);
