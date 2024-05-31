@@ -37,6 +37,9 @@ export default function Navbar() {
             <Link href={`/profile/${user.id}`}>
               <p>Hello, {user.username}</p>
             </Link>
+            <Link href="/post">
+              <p>Wall</p>
+            </Link>
             <button onClick={handleClick}>Logout</button>
           </>
         )}
