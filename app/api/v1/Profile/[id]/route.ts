@@ -46,11 +46,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
       return NextResponse.json({ message: "User not found" });
     }
 
-    const binaryData = Buffer.from(user.profilePic);
+   // const binaryData = Buffer.from(user.profilePic);
 
     // Convert binary data into Base64 string
-    const base64Image = binaryData.toString("base64");
-    const imageDataURL = `data:image/jpeg;base64,${base64Image}`;
+    // const base64Image = binaryData.toString("base64");
+    // const imageDataURL = `data:image/jpeg;base64,${base64Image}`;
     const populatedFriends = await Promise.all(
       user.friends.map(async (friend) => {
         const friendUser = await User.findById(friend).exec();
@@ -58,6 +58,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
           username: friendUser?.username,
           url: `/profile/${friendUser?._id}`,
           _id: friendUser?._id,
+          profilePic: friendUser?.profilePic,
         };
       })
     );
@@ -71,10 +72,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
       inbox: user.inbox,
       nonFriendsChat: user.nonFriendsChat,
       status: user.status,
+      profilePic:user.profilePic
     };
 
     return NextResponse.json(
-      { filteredUser, imageDataURL, populatedFriends, status },
+      { filteredUser, populatedFriends, status },
       { status: 200 }
     );
   } catch (error) {

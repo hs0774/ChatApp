@@ -2,17 +2,18 @@ import validator from "validator";
 import { z } from "zod";
 
 export const signupZodSchema = z.object({
-    email: z.string().email().max(50),
-    username: z.string().min(2, "Name is required").max(50).trim(),
-    password: z.string().min(8, "Password must be atleast 8 characters").max(50),
-    occupation: z.string().max(50),
-    hobbies: z.array(z.string()),
-    bio: z.string().max(50),
-    interests: z.string().max(240),
-    location: z.string().max(100),
-    sex: z.string().max(6),
-    age: z.number().int().min(18).max(120),
-  });
+  email: z.string().email().max(50),
+  username: z.string().min(2, "Name is required").max(50).trim(),
+  password: z.string().min(8, "Password must be at least 8 characters").max(50),
+  occupation: z.optional(z.string().max(50)), 
+  hobbies: z.optional(z.array(z.string())), 
+  bio: z.optional(z.string().max(50)), 
+  interests: z.optional(z.string().max(240)), 
+  location: z.optional(z.string().max(100)), 
+  sex: z.optional(z.string().max(6)), 
+  age: z.number().gte(18).optional(),
+  image: z.optional(z.any()),
+});
 
   export const profileZodSchema = z.object({
     username: z.string().min(2, "Name is required").max(50).trim(),
@@ -49,4 +50,17 @@ export const signupZodSchema = z.object({
 
   export const messageZodSchema = z.object({
     message: z.string().min(1, "Message is required ").max(3000).trim(),
+    image: z.optional(z.any()),
+  });
+
+  export const wallZodSchema = z.object({
+    post: z.string().min(1, "Post is required ").max(1000).trim(),
+    image: z.optional(z.any()),
+  });
+  export const wallPostZodSchema = z.object({
+    post: z.string().min(1, "Post is required ").max(1000).trim(),
+  });
+  export const commentZodSchema = z.object({
+    comment: z.string().min(1, "Comment is required ").max(1000).trim(),
+    image: z.optional(z.any()),
   });

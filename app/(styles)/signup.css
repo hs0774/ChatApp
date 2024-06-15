@@ -3,3 +3,8 @@ form {
   flex-direction: column;
   gap: 4px;
 }
+
+.preview{
+   height:200px;
+   width: 200px;
+}

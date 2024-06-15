@@ -35,7 +35,7 @@ export default function CreateMessage({ friends, paramName}) {
         receiver:paramName.username || '',
       }));
     }
-  }, [paramName.username, user]);
+  }, []); //[paramName.username, user]);
 
   function handleChange(
     event: ChangeEvent<

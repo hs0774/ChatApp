@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "../(stores)/authContext";
+import '../(styles)/nav.css'
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -34,9 +35,23 @@ export default function Navbar() {
             <Link href="/inbox">
               <p>Inbox</p>
             </Link>
-            <Link href={`/profile/${user.id}`}>
+              <Link href={`/profile/${user.id}`}>
+              <div className="navProfileHolder">
               <p>Hello, {user.username}</p>
-            </Link>
+                {user.profilePic && (
+                    <img className="navProfilePic"
+                      src={user.profilePic}
+                    />
+                  )}
+                  {/* {user.profilePic && (
+                    <img className="navProfilePic"
+                      src={user.profilePic}
+                      // `data:image/jpeg;base64,${base64Image}`
+                    />
+                  )} */}
+                </div>
+              </Link>
+
             <Link href="/post">
               <p>Wall</p>
             </Link>

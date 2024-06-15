@@ -44,3 +44,55 @@
     cursor: pointer;
   }
   
+  .openModal:hover{
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .img{
+     height: 50%;
+     width:50%;
+  }
+
+  .imgHolder{
+    display: flex;
+    justify-content: center;
+  }
+
+  .picAndName{
+    display: flex;
+    gap: 4px;
+    padding-bottom: 4px;
+    align-items: center;
+    
+  }
+  .picAndName:hover{
+    text-decoration: underline;
+  }
+
+  .replyimg{
+    height: 150px;
+    width:150px;
+  }
+
+  .profilePic{
+     height: 40px;
+     width:40px;
+     border-radius: 50%;
+  }
+
+
+  .picAndNamee{
+     display: flex;
+     align-items: center;
+     gap:5px;
+  }
+
+  .postPreview{
+    height:100px;
+    width:100px;
+  }
+
+  .commentPreview{
+
+  }

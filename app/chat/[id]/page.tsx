@@ -1,22 +1,29 @@
 "use client";
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import "../../(styles)/chat.css";
 import { useAuth } from "@/app/(stores)/authContext";
 import { v4 as uuidv4 } from "uuid";
-
 import io from 'socket.io-client';
+import Resizer from 'react-image-file-resizer';
+
+
 //const socket = io('http://localhost:3001');
 
 export default function OpenChat({currentChat,userFriends,setCurrentChat,setExampleChat,exampleChat}) { //{ params }: chatParams
   const {user} = useAuth();
   const [addUserOpen,setAddUserOpen] = useState(false);
   const [currentFriendSelected, setCurrentFriendSelected] = useState();
-  const [sentMessage, setSentMessage] = useState('');
+  const [sentMessage, setSentMessage] = useState({
+    message:'',
+    image:null,
+  });
 
   const [editDetails,setEditDetails] = useState()
   const [editing,setEditing] = useState(false);
   const [addedUsers,setAddedUsers] = useState([])
   const [socket,setSocket] = useState();
+  const [imgURL,setImgURL] = useState<string | undefined>();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
 
   useEffect(() => { 
@@ -32,6 +39,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     });
   
     socket.on('get-message', (message,chatId) => {
+      console.log(message);
       setExampleChat((prevChats) => {
         return prevChats.map(chat => {
           if (chat._id === chatId) {
@@ -57,21 +65,52 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     };
   }, [setExampleChat, currentChat._id, setCurrentChat, exampleChat, user?.id, currentChat.title]);
   
-  
+
   function handleSubmit(event: FormEvent<HTMLFormElement>){
     event.preventDefault();
     
-    if(sentMessage ==='') {
-      return;
-    }
+    // if(sentMessage.message === '' || (sentMessage.image === null || sentMessage.image === undefined) ) {
+    //   return;
+    // }
+    console.log(sentMessage);
     socket.emit('get-message', {message:sentMessage,currentChatId:currentChat._id,token: `Bearer ${user?.token}`});
-    setSentMessage('')
+    setSentMessage({
+      message:'',
+      image:null,
+    })
+  if (fileInputRef.current) {
+    fileInputRef.current.value = '';
+  }
   } 
 
   function handleChange(event: ChangeEvent<HTMLInputElement>){
-    const { value } = event.target;
-    setSentMessage(value);
-  }
+    const { value, name ,files} = event.target;
+    if (name === 'image' && files) {
+      if (imgURL) {
+        URL.revokeObjectURL(imgURL);
+      }
+      const url = URL.createObjectURL(files[0]);
+      setImgURL(url);
+      Resizer.imageFileResizer(
+        files[0],
+        150,
+        150,
+        'JPEG',
+        100,
+        0,
+        (uri) => {
+          setSentMessage((prev) => ({
+            ...prev,
+            image: uri as string,
+          }));
+        },
+        'base64'
+      );        
+      } else {
+        setSentMessage((prev) => ({ ...prev, message: value }));
+      }
+  };
+  
 
   function handleChangee(event: ChangeEvent<HTMLSelectElement>): void {
     const {value} = event.target;
@@ -243,29 +282,75 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
             ))}</>}
             {addedUsers.length > 0 && <button onClick={addUserToChat}>Add user{addedUsers.length>1 ? 's' : null} to chat</button>}
         {currentChat.messages.map((chat) => (
+          <div key={uuidv4()}>
             <li
               className={chat.sender.username !== user?.username ? "friendMessages" : "userMessages"}
-              key={uuidv4()} //change this to message.id chat.content._id
+               //change this to message.id chat.content._id
             >
               
-              {chat.sender.username} : {chat.content}
+              {chat.sender.username} : {chat.content} 
+              {/* && (chat.image ? <img className="preview" src={chat.image} alt="Profile Preview" /> : null)} */}
             </li>
+            { chat.image && (<img className="chatImage" src={chat.image} />)}
+            </div>
         ))}
       </div>
+      
       <form onSubmit={handleSubmit}>
-        <label htmlFor="messageSubmit"></label>
+      <div className="messageItems"> 
+      <div className="messageImgItems"> 
+      {sentMessage.image && <img className="chatImgPreview" src={imgURL} alt="Profile Preview" />}
+      <input type="file" id="image" name="image" accept="image/jpeg" ref={fileInputRef} onChange={handleChange}/>
+ 
+      {/* <img className="chatImgPreview" src={`https://newchatapp.s3.amazonaws.com/replyImages/664ecb6769cd69d62332cc2d`} alt="Profile Preview" />
+       <input type="file" id="image" name="image" accept="image/jpeg"  onChange={handleChange}/> */}
+       
+       {/* {formData.image && <img className="preview" src={imgURL} alt="Profile Preview" />} */}
+       </div><div>
+                <label htmlFor="messageSubmit"></label>
         <input
           type="text"
           id="messageSubmit"
           name="message"
           onChange={handleChange}
-          value={sentMessage || ""}
+          value={sentMessage.message || ""}
         />
-        <button type="submit">Send</button>
+        <button type="submit">Send</button></div></div>
       </form>
     </div> 
   )
 }
+
+// else if (name === 'image' && files) {
+//   //     image:null,
+// // });
+// // const [imgURL,setImgURL] = useState<string | undefined>();
+
+
+
+
+//   if (imgURL) {
+//     URL.revokeObjectURL(imgURL);
+//   }
+//   const url = URL.createObjectURL(files[0]);
+//   setImgURL(url);
+//   const reader = new FileReader();
+//   reader.readAsDataURL(files[0]);
+//   reader.onload = () => {
+//     const str = reader.result?.toString();
+//     if (str) {
+//       const buffer = Buffer.from(str.split(',')[1], 'base64');
+//       setFormData((prev) => ({
+//         ...prev,
+//         image: buffer,
+//       }));
+//     }
+//   };
+
+
+//   <label htmlFor="image">Add a picture:</label>
+//        <input type="file" id="image" name="image" accept="image/jpeg" value={sentMessage.image} onChange={handleChange}/>
+//        {sentMessage.image && <img className="preview" src={imgURL} alt="Profile Preview" />}
 
 //todo 
 //find way to load up array of participants/make an array of more objects,
@@ -299,14 +384,14 @@ to implement since i dont know much about websockets
       Add create chat button 
       Group Chats Implementation
       Chat Existence Checking for One-on-One Chats
-
-      //todo
       Allow users to be added to an existing chat
       Utilize User Property for Non-Friend Chats 
       Save and Trim Messages
       Chat Button Functionality on profile page 
-      Add Friend to Chat Feature same as inbox search but also adds users who have nonfriendchat to true
-      
       Title Property for Chats
       WebSocket Integration
+      //todo
+      Add Friend to Chat Feature same as inbox search but also adds users who have nonfriendchat to true
+      
+      
 */

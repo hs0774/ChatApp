@@ -6,8 +6,8 @@ interface IChat extends Document {
   participants: mongoose.Types.ObjectId[];
   messages: {
     sender: mongoose.Types.ObjectId;
-    content: string;
-    image?: Buffer;
+    content: string | null;
+    image?: string | null;
     createdAt: Date;
 
   }[];
@@ -24,8 +24,8 @@ const ChatSchema: Schema<IChat> = new Schema({
         ref: "User",
         required: true,
       },
-      content: { type: String, required: true },
-      image: { type: Buffer },
+      content: { type: String},
+      image: { type: String },
       createdAt: { type: Date, default: Date.now },
     },
   ],

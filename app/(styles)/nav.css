@@ -1,0 +1,10 @@
+.navProfilePic{
+  border-radius: 50%;
+  height:20px;
+  width:20px;
+}
+
+.navProfileHolder{
+    display: flex;
+    gap: 4px;
+}

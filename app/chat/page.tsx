@@ -62,6 +62,7 @@ export default function Chat() {
     fetchData();
   }, [user]);
 
+
   function openChat(obj: Chat | SetStateAction<undefined>) {
     setCurrentChat(obj);
     setChatIsOpen(true);

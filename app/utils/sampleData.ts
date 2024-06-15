@@ -9,7 +9,7 @@ import Details from "../(models)/details.ts";
 import Friendship from "../(models)/friendship.ts";
 import Inbox from "../(models)/inbox.ts";
 import User from "../(models)/user.ts";
-import Wall from "../(models)/wall.ts"
+import {Wall} from "../(models)/wall.ts"
 
 // interface IChat {
 //     participants: mongoose.Types.ObjectId[];
@@ -19,7 +19,12 @@ import Wall from "../(models)/wall.ts"
 //       timestamp: Date;
 //     }[];
 // }
-
+interface IComment extends Document {
+  sender:mongoose.Types.ObjectId;
+  message:string;
+  image?:string;
+  time:Date;
+}
 // interface IDetails {
 //     hobbies: string[];
 //     job: string;
@@ -86,6 +91,7 @@ main().catch((err) => console.log(err));
 async function main() {
     console.log("Debug: About to connect");
     await mongoose.connect(mongoDB);
+    await checkWallReplies();
     //await addWallPosts();
     //await updateUserWall();
 // await updateUserFriends();
@@ -106,6 +112,17 @@ async function main() {
     mongoose.connection.close();
  }
 
+
+async function checkWallReplies() {
+  const walls = await Wall.find({ image: { $exists: true, $ne: null } });
+    for (const wall of walls) {
+      for (const reply of wall.replies) {
+        if (reply.image) {
+          console.log(reply);
+        }
+      }
+    }
+}
 //  async function updateReplyTimes() {
 //     try {
 //         // Fetch all wall posts

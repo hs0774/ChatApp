@@ -63,3 +63,26 @@
 .chatMembers{
   display: flex;
 }
+
+.chatImgPreview {
+  height: 50px;
+  width: 50px;
+}
+
+.messageItems{
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+  border-top: solid 1px red;
+}
+
+.messageImgItems{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+chatImage{
+  height:100px;
+  width:100px;
+}

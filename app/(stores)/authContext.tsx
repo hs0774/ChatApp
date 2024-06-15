@@ -6,6 +6,7 @@ interface User {
   token: string;
   username: string;
   id: string;
+  profilePic: string;
 }
 
 interface AuthContextType {
@@ -23,13 +24,18 @@ export const AuthProvider = ({ children }: { children: any }) => {
     const token = localStorage.getItem("token");
     const username = localStorage.getItem("username");
     const id = localStorage.getItem("id");
-    if (token && username && id) {
-      setUser({ token, username, id });
+    const profilePic = localStorage.getItem("profilePic");
+    if (token && username && id && profilePic) {
+      setUser({ token, username, id, profilePic: profilePic});
     }
   }, []);
 
   const login = (userData: User) => {
     setUser(userData);
+    localStorage.setItem("token", userData.token);
+    localStorage.setItem("username", userData.username);
+    localStorage.setItem("id", userData.id);
+    localStorage.setItem("profilePic", userData.profilePic);
   };
 
   const logout = () => {

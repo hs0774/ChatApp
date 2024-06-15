@@ -24,7 +24,7 @@ export async function POST(req: Request, res: Response) {
     if (!validation.success) {
       return NextResponse.json(validation.error.errors, { status: 400 });
     }
-
+   
     const sanitizedData = sanitizeData(validation);
 
     if (!sanitizedData) {
@@ -51,6 +51,10 @@ export async function POST(req: Request, res: Response) {
     }
 
     const token = createToken(user.email, user._id,user.username);
+    // const imageBuffer = Buffer.from(user.profilePic.buffer);
+    // const base64Image = imageBuffer.toString('base64');
+    // const imageDataURL = `data:image/jpeg;base64,${base64Image}`;
+
     return NextResponse.json(
       {
         message: `User Created`,
@@ -58,6 +62,7 @@ export async function POST(req: Request, res: Response) {
         username: user.username,
         email: user.email,
         id: user._id,
+        profilePic:user.profilePic,
       },
       { status: 201 }
     );

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/(stores)/authContext";
 import { country_list } from "@/app/utils/countries";
+//import { handleAddFriend } from "@/app/utils/helperFunctions/handleAddFriend";
 import "../../(styles)/profile.css";
 
 interface ProfileParams {
@@ -66,7 +67,7 @@ export default function Profile({ params }: ProfileParams) {
     fetchData();
   }, [username]); //because of next naming conventions this is the id
 
-  async function handleAddFriend(_id: string) {
+   async function handleAddFriend(_id: string) {
     //automatic inbox request to the user, friendship schema created,
     //in the inbox it would confirm the adding and add both ids to respective
     //array
@@ -193,7 +194,7 @@ export default function Profile({ params }: ProfileParams) {
             <li>Location: {data?.filteredUser.details.location}</li>
             <li>Sex: {data?.filteredUser.details.sex}</li>
           </ul>
-          <img src={data?.imageDataURL} />
+          <img className='profileImg'src={data?.filteredUser.profilePic} />
           {/* {console.log(data)} */}
         </>
       ) : (
@@ -315,7 +316,14 @@ export default function Profile({ params }: ProfileParams) {
         <ul>
           {data?.populatedFriends.map((friend) => (
             <li key={friend.username} className="namePlusDropdown">
-              <Link href={friend.url}>{friend.username}</Link>
+              {/* <Link ><img className='friendsProfilePic'src={data?.filteredUser.profilePic} />
+              {friend.username}</Link> */}
+              <Link href={friend.url}>
+                <div className="picAndName">
+                  <img className='friendsProfilePic' src= {friend.profilePic} />
+                  <p>{friend.username}</p>
+                </div>
+              </Link>
               {user?.id === data?.filteredUser._id && (
                 <div className="dropdown">
                   {/* <button className="dropdown-toggle" onClick={friendSetting}>

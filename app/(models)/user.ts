@@ -5,7 +5,7 @@ interface IUser extends Document {
   password: string;
   email: string;
   details: Types.ObjectId;
-  profilePic: Buffer;
+  profilePic: string;
   friends: Types.ObjectId[];
   chats: Types.ObjectId[];
   status: boolean;
@@ -20,7 +20,7 @@ const UserSchema: Schema<IUser> = new Schema({
   password: { type: String, required: true },
   email: { type: String, required: true },
   details: { type: Schema.Types.ObjectId, ref: "Details" },
-  profilePic: { type: Buffer },
+  profilePic: { type: String },
   friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
   chats: [{ type: Schema.Types.ObjectId, ref: "Chat" }],
   wall: [{ type: Schema.Types.ObjectId, ref: "Wall" }],

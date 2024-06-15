@@ -19,3 +19,21 @@
 .namePlusDropdown{
     display: flex;
 } */
+
+.profileImg{
+  height:400px;
+  width:400px;
+  /* border-radius: 50%; */
+}
+
+.friendsProfilePic{
+    border-radius: 50%;
+    height:20px;
+    width:20px;
+  }
+
+  .picAndName{
+    display: flex;
+    gap:4px;
+    align-items: center;
+  }

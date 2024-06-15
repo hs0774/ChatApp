@@ -10,8 +10,10 @@ import React, {
 import { useAuth } from "../(stores)/authContext";
 import { useRouter } from "next/navigation";
 import { country_list } from "../utils/countries";
+import Image from 'next/image'
 
 interface FormData {
+  image: File | null | Buffer;
   email: string;
   username: string;
   password: string;
@@ -21,8 +23,10 @@ interface FormData {
   interests: string;
   location: string;
   sex: string;
-  age: number;
+  age: number|null;
 }
+
+
 export default function Signup() {
   const { login } = useAuth();
   const router = useRouter();
@@ -36,12 +40,14 @@ export default function Signup() {
     interests: "",
     location: "United States of America",
     sex: "Male",
-    age: 0,
+    age: null,
+    image:null,
   });
-
+  const [imgURL,setImgURL] = useState<string | undefined>();
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    console.log(formData);
+
+
     const res = await fetch("/api/v1/Signup", {
       method: "POST",
       headers: {
@@ -53,10 +59,14 @@ export default function Signup() {
     if (!res.ok) {
       throw new Error("failed to create");
     }
-    const { token, username, id } = await res.json();
+    const { token, username, id,profilePic } = await res.json();
     localStorage.setItem("token", token);
     localStorage.setItem("id", id);
-    login({ token, username, id });
+    
+    login({
+      token, username, id,
+      profilePic,
+    });
     router.push(`/profile/${id}`);
   }
 
@@ -65,7 +75,7 @@ export default function Signup() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ): void {
-    const { value, name } = event.target;
+    const { value, name ,files} = event.target;
     if (name === "hobbies") {
       const hobbies = value.split(",").map((hobby) => hobby.trim());
 
@@ -75,11 +85,29 @@ export default function Signup() {
       }));
     } else if (name === "age") {
       const age = parseInt(value);
-      setFormData((prev) => ({
-        ...prev,
-        age: isNaN(age) ? 0 : age,
-      }));
-    } else {
+        setFormData((prev) => ({
+          ...prev,
+          age: isNaN(age) ? null : age,
+        }));
+    } else if (name === 'image' && files) {
+    
+    if (imgURL) {
+      URL.revokeObjectURL(imgURL);
+    }
+    const url = URL.createObjectURL(files[0]);
+    setImgURL(url);
+    const reader = new FileReader();
+    reader.readAsDataURL(files[0]);
+    reader.onload = () => {
+      const str = reader.result?.toString();
+      if (str) {
+        const buffer = Buffer.from(str.split(',')[1], 'base64');
+        setFormData((prev) => ({
+          ...prev,
+          image: buffer,
+        }));
+      }
+    };} else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
@@ -182,15 +210,26 @@ export default function Signup() {
           <option value="Other">Other</option>
         </select>
 
-        <label htmlFor="age">Age:</label>
+        <label htmlFor="age">*Age:</label>
         <input
-          type="number"
-          id="age"
-          name="age"
-          value={formData.age === 0 ? "" : formData.age}
-          onChange={handleChange}
-        />
+        type="number"
+        id="age"
+        name="age"
+        value={formData.age === null ? "" : formData.age.toString()}
+        onChange={handleChange}
+        min="18"
+      />
 
+       <label htmlFor="image">Profile Picture:</label>
+       <input 
+       type="file" 
+       id="image" 
+       name="image" 
+       accept="image/jpeg" 
+      //  value={formData.image}
+       onChange={handleChange}
+       />
+       {formData.image && <img className="preview" src={imgURL} alt="Profile Preview" />}
         <button type="submit">Sign up!</button>
         <p>* Required fields</p>
       </form>

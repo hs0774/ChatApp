@@ -49,7 +49,7 @@ export default function Inbox({searchParams}) {
       }
     };
     fetchData();
-  }, [messages, searchParams, user]);
+  }, []); //[messages, searchParams, user]);
 
   function openInbox(message: React.SetStateAction<{}>) {
     setOpenMessage(false);
