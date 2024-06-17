@@ -97,17 +97,16 @@ export default function Signup() {
     const url = URL.createObjectURL(files[0]);
     setImgURL(url);
     const reader = new FileReader();
-    reader.readAsDataURL(files[0]);
-    reader.onload = () => {
-      const str = reader.result?.toString();
-      if (str) {
-        const buffer = Buffer.from(str.split(',')[1], 'base64');
+      reader.onload = () => {
+        const base64String = reader.result as string;
+
         setFormData((prev) => ({
           ...prev,
-          image: buffer,
+          image: base64String,
         }));
-      }
-    };} else {
+      };
+      reader.readAsDataURL(files[0]);
+  } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,

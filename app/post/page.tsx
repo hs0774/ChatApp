@@ -267,20 +267,14 @@ export default function Post() {
       if (postImgURL) {
         URL.revokeObjectURL(postImgURL);
       }
+
       const url = URL.createObjectURL(files[0]);
       setPostImgURL(url);
-      // const reader = new FileReader();
-      // reader.readAsDataURL(files[0]);
-      // reader.onload = () => {
-      //   const str = reader.result?.toString();
-      //   if (str) {
-      //     const buffer = Buffer.from(str.split(',')[1], 'base64');
-      
-          setNewPostContent((prev) => ({
-            ...prev,
-            image: files[0],
-          }));
-        
+
+      setNewPostContent((prev) => ({
+        ...prev,
+        image: files[0],
+      }));
       } else {
         setNewPostContent((prev) => ({ ...prev, post: value }));
       }

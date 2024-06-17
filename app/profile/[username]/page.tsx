@@ -6,6 +6,7 @@ import { useAuth } from "@/app/(stores)/authContext";
 import { country_list } from "@/app/utils/countries";
 //import { handleAddFriend } from "@/app/utils/helperFunctions/handleAddFriend";
 import "../../(styles)/profile.css";
+import { profile } from "console";
 
 interface ProfileParams {
   params: {
@@ -40,10 +41,11 @@ export default function Profile({ params }: ProfileParams) {
     occupation: "",
     location: "",
     sex: "",
-    // image:'' work on this after other things work
+    profilePic:null,
   });
+  const [imgURL,setImgURL] = useState<string | undefined>();;
   const router = useRouter();
-  const { user } = useAuth();
+  const { user,login } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +61,7 @@ export default function Profile({ params }: ProfileParams) {
           occupation: userData?.filteredUser.details.job,
           location: userData?.filteredUser.details.location,
           sex: userData?.filteredUser.details.sex,
+          profilePic: userData?.filteredUser.profilePic,
         }));
       } catch (error) {
         console.error("Error:", error);
@@ -134,15 +137,57 @@ export default function Profile({ params }: ProfileParams) {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditDetails((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+    const { name, value,files } = e.target;
+ 
+    if (name === 'profilePic' && files) {
+      if (imgURL) {
+        URL.revokeObjectURL(imgURL);
+      }
+      const url = URL.createObjectURL(files[0]);
+      setImgURL(url);
+      
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+
+        setEditDetails((prevState) => ({
+          ...prevState,
+          profilePic: base64String,
+        }));
+      };
+      reader.readAsDataURL(files[0]);
+    } else if (name === 'job'){ 
+      setEditDetails((prevState) => ({
+        ...prevState,
+        occupation: value,
+      }));
+    }
+    else if (name === 'age'){ 
+      const editedAge = parseInt(value, 10);
+      setEditDetails((prevState) => ({
+          ...prevState,
+          [name]: editedAge,
+      }));
+    }
+    else {
+      setEditDetails((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    //check if image is edited
+    //if yes get url 
+    //put req for img s3,
+    //send post req with url to backend
+    //update ui
+    if(editDetails.profilePic !== data?.filteredUser.profilePic) {
+      console.log('hi')
+    }
+    console.log(editDetails)
     const token = localStorage.getItem("token");
     const id = localStorage.getItem("id");
     try {
@@ -158,21 +203,26 @@ export default function Profile({ params }: ProfileParams) {
       if (!response.ok) {
         throw new Error(responseData.message || "Failed to save details");
       }
+      console.log(responseData);
       setData((prevData) => ({
         ...prevData,
         filteredUser: {
           ...prevData.filteredUser,
-          username: editDetails.username,
+          username: responseData.newlyEditedData.username,
           details: {
             ...prevData.filteredUser.details,
-            age: editDetails.age,
-            bio: editDetails.bio,
-            job: editDetails.occupation,
-            location: editDetails.location,
-            sex: editDetails.sex,
+            age: responseData.newlyEditedData.age,
+            bio: responseData.newlyEditedData.bio,
+            job: responseData.newlyEditedData.job,
+            location: responseData.newlyEditedData.location,
+            sex: responseData.newlyEditedData.sex,
           },
+          profilePic:responseData.newlyEditedData.profilePic,
         },
       }));
+      localStorage.setItem("profilePic", responseData.newlyEditedData.profilePic);
+      localStorage.setItem("username",responseData.newlyEditedData.username);
+      login({ ...user, profilePic: responseData.newlyEditedData.profilePic, username:responseData.newlyEditedData.username}); // Update user context
       setEditing(false);
     } catch (error) {
       console.error(error, "failed to reach server");
@@ -270,7 +320,12 @@ export default function Profile({ params }: ProfileParams) {
                 <option value="Other">Other</option>
               </select>
             </div>
-
+            <div>
+            { imgURL ? <img className="profileImg" src={imgURL} alt="Profile Preview" /> :
+            <img className='profileImg'src={data?.filteredUser.profilePic} /> }
+            {/* {sentMessage.image && <img className="chatImgPreview" src={imgURL} (MOVE DOWNref={fileInputRef}) alt="Profile Preview" />} */}
+            <input type="file" id="profilePic" name="profilePic" accept="image/jpeg"  onChange={handleChange}/>
+            </div>
             <button type="submit">Save</button>
             <button type="button" onClick={() => setEditing(false)}>
               Cancel

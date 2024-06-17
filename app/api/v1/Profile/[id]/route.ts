@@ -9,8 +9,11 @@ import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 import Friendship from "@/app/(models)/friendship.ts";
+import Wall from "@/app/(models)/wall.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import { profileZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
+import { uploadToS3 } from "@/app/utils/helperFunctions/s3ImgUpload.ts";
+import { string } from "zod";
 
 interface DecodedToken {
   id: string;
@@ -30,7 +33,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const decodedToken = jwtDecode(token) as DecodedToken;
     // console.log;
     console.log(decodedToken);
-    const user = await User.findById(body).populate("details").exec();
+    const wall = await Wall;
+    const user = await User.findById(body).populate("details wall").exec();
 
     let status;
     if (body !== decodedToken.id) {
@@ -46,11 +50,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
       return NextResponse.json({ message: "User not found" });
     }
 
-   // const binaryData = Buffer.from(user.profilePic);
-
-    // Convert binary data into Base64 string
-    // const base64Image = binaryData.toString("base64");
-    // const imageDataURL = `data:image/jpeg;base64,${base64Image}`;
     const populatedFriends = await Promise.all(
       user.friends.map(async (friend) => {
         const friendUser = await User.findById(friend).exec();
@@ -72,7 +71,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
       inbox: user.inbox,
       nonFriendsChat: user.nonFriendsChat,
       status: user.status,
-      profilePic:user.profilePic
+      profilePic:user.profilePic,
+      wall:user.wall,
     };
 
     return NextResponse.json(
@@ -94,10 +94,8 @@ export async function PUT(req: NextRequest, res: NextResponse) {
       return NextResponse.json({ message: "Unauthorized" });
     }
 
-
     await dbConnect();
     const body = await req.json();
-    //console.log(body.editDetails)
     const validation = profileZodSchema.safeParse(body.editDetails);
 
     if (!validation.success) {
@@ -137,17 +135,35 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         { status: 400 }
       );
     }
-
+    console.log(sanitizedData.occupation);
     user.username = sanitizedData.username as string;
     details.age = sanitizedData.age as number;
     details.bio = sanitizedData.bio as string;
     details.job = sanitizedData.occupation as string;
     details.location = sanitizedData.location as string;
     details.sex = sanitizedData.sex as "Male" | "Female" | "Other";
-
+    if (body.editDetails.profilePic && !body.editDetails.profilePic.startsWith('https')) {
+       console.log(body.editDetails.profilePic);
+       const s3Url = await uploadToS3(body.editDetails.profilePic, 'profilePics', user._id);
+       console.log(s3Url);
+       user.profilePic = s3Url;
+       await user.save();
+    }
+    
+   // await user.save();
+    //await details.save();
+   const newlyEditedData = {
+    username:user.username,
+    age:details.age,
+    bio:details.bio,
+    job:details.job,
+    location:details.location,
+    sex:details.sex,
+    profilePic:user.profilePic,
+   }
     await user.save();
     await details.save();
-    return NextResponse.json({ message: "Success" }, { status: 200 });
+    return NextResponse.json({ newlyEditedData }, { status: 200 });
   } catch (error) {
     console.error("Error:", error);
     return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });

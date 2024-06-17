@@ -191,7 +191,7 @@ io.on('connection', (socket) => {
     }
   
     if (message.image) {
-      //const imageBuffer = Buffer.from(message.image, 'base64');
+    
       const imgLink = await uploadToS3(message.image, 'chatImages', uuidv4());
       newMessage.image = imgLink;
     }

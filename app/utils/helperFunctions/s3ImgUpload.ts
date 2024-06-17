@@ -25,7 +25,7 @@ export async function uploadToS3(base64: string, keyPrefix: string, _id: string)
     bufferStream.end(buffer);
 
     // Construct parameters for S3 upload
-    const key = `${keyPrefix}/${_id}.jpg`; // Ensure the key has .jpg extension
+    const key = `${keyPrefix}/${uuidv4()}`; // Ensure the key has .jpg extension
     const params = {
       Bucket: env.AWS_BUCKET_NAME,
       Key: key,

@@ -198,8 +198,8 @@ export async function POST(req: Request, res: Response) {
     await newUser.save();
 
     if(body.image) {
-      const buffer = Buffer.from(body.image);
-      const s3Url = await uploadToS3(buffer, 'profilePics', newUser._id);
+      //const buffer = Buffer.from(body.image);
+      const s3Url = await uploadToS3(body.image, 'profilePics', newUser._id);
       newUser.profilePic=s3Url;
       console.log(s3Url);
       await newUser.save();

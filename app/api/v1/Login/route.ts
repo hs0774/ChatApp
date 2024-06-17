@@ -19,6 +19,26 @@ export async function POST(req: Request, res: Response) {
   try {
     await dbConnect();
     const body = await req.json();
+    console.log(body);
+    if(body === '') {
+      let num;
+      do {
+        num = Math.floor(Math.random() * 20) + 1; // Random number between 1 and 20
+      } while (num === 1 || num === 9);
+      const user = await User.find().skip(1).skip(9).limit(20);
+      const token = createToken(user[num].email, user[num]._id,user[num].username);
+      return NextResponse.json(
+        {
+          message: `User Created`,
+          token,
+          username: user[num].username,
+          email: user[num].email,
+          id: user[num]._id,
+          profilePic:user[num].profilePic,
+        },
+        { status: 201 }
+      );
+    }
     const validation = loginZodSchema.safeParse(body);
 
     if (!validation.success) {
@@ -50,10 +70,7 @@ export async function POST(req: Request, res: Response) {
       );
     }
 
-    const token = createToken(user.email, user._id,user.username);
-    // const imageBuffer = Buffer.from(user.profilePic.buffer);
-    // const base64Image = imageBuffer.toString('base64');
-    // const imageDataURL = `data:image/jpeg;base64,${base64Image}`;
+    const token = createToken(user.email, user._id,user.username,);
 
     return NextResponse.json(
       {

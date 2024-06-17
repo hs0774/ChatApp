@@ -51,6 +51,28 @@ export default function Login() {
     router.push(`/profile/${id}`);
   }
 
+  async function handleRandomLogin(event: MouseEvent<HTMLButtonElement, MouseEvent>) {
+    const res = await fetch("/api/v1/Login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(''),
+    });
+
+    if (!res.ok) {
+      throw new Error("failed to Login");
+    }
+
+    const { token, username, id,profilePic } = await res.json();
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", username);
+    localStorage.setItem("id", id);
+    localStorage.setItem("profilePic", profilePic);
+    login({ token, username, id, profilePic });
+    router.push(`/profile/${id}`);
+  }
+
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -73,8 +95,9 @@ export default function Login() {
           onChange={handleChange}
           required
         />
-        <button type="submit">Log in!</button>
+        <button type="submit">Log in!</button> 
       </form>
+     <button onClick={handleRandomLogin}>Login from 1 of 20 sample accounts!</button>
       <p>
         Don&apos;t have an acount? <Link href="/signup">Sign up</Link>
       </p>
