@@ -79,7 +79,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     newWall.save();
     user.wall.push(newWall._id);
     user.save();
-
+    
     console.log(body.hasImage)
     if(!body.hasImage) {
         return NextResponse.json({ url:null,wallId:newWall._id },{status:200});

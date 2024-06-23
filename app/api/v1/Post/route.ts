@@ -77,14 +77,17 @@ export async function POST(req: NextRequest, res: NextResponse) { //this is for 
         const decodedToken = jwtDecode(token) as DecodedToken; //id username email
         const user = await User.findById(decodedToken.id);
     
-        if(!user) {
+        if(!user ) {
             return NextResponse.json({ message: "User not found" },{status:404});
         }
         const body = await req.json();
         console.log(body);
         let validation;
         let sanitizedData;
-        if (body.comment !== '') {
+        if(!body.comment && body.hasImage === false) {
+            return NextResponse.json({ message: "Enter a comment or post a picture" },{status:401});
+        }
+        if (body.comment) {
           validation = commentZodSchema.safeParse(body);
           
           if (!validation.success) {
@@ -107,16 +110,22 @@ export async function POST(req: NextRequest, res: NextResponse) { //this is for 
                 { status: 404 }
               );
         }
-        // const newWall = new Wall({
-        //     user:decodedToken.id,
-        //     content:sanitizedData?.post,
-        // })
-        let comment = new Comment({
-            _id: new mongoose.Types.ObjectId(),
-            sender: new mongoose.Types.ObjectId(decodedToken.id),
-            message: sanitizedData?.comment as string,
-            time: new Date(),
-          });
+        let comment;
+        if(sanitizedData === undefined && validation === undefined) {
+            comment = new Comment({
+                _id: new mongoose.Types.ObjectId(),
+                sender: new mongoose.Types.ObjectId(decodedToken.id),
+                time: new Date(),
+              });
+        } else {
+            comment = new Comment({
+                _id: new mongoose.Types.ObjectId(),
+                sender: new mongoose.Types.ObjectId(decodedToken.id),
+                message: sanitizedData?.comment as string,
+                time: new Date(),
+              });
+        }
+
 
         wall.replies.push(comment);
         await wall.save();

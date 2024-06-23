@@ -122,9 +122,9 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
             return NextResponse.json({ message: 'Chat not found' }, { status: 400 });
         }
 
-        if(chat.participants.length === 0) {
+        if(chat.participants.length === 0 || chat.messages.length === 0) {
             await chat.deleteOne();
-            return NextResponse.json({ message: 'Chat deleted successfully' }, { status: 204 });
+            return NextResponse.json({ message: 'Chat deleted successfully' }, { status: 200 });
         }
         return NextResponse.json({ message: 'success' }, { status: 200 });
     } catch (error) {

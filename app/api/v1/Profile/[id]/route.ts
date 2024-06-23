@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 import Friendship from "@/app/(models)/friendship.ts";
-import Wall from "@/app/(models)/wall.ts";
+import {Wall} from "@/app/(models)/wall.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import { profileZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import { uploadToS3 } from "@/app/utils/helperFunctions/s3ImgUpload.ts";
@@ -34,7 +34,22 @@ export async function GET(req: NextRequest, res: NextResponse) {
     // console.log;
     console.log(decodedToken);
     const wall = await Wall;
-    const user = await User.findById(body).populate("details wall").exec();
+    const user = await User.findById(body).populate("details").populate({ 
+      path: "wall", 
+      populate: {
+          path: "content likes replies image user replies.sender",
+          select: "username _id profilePic",
+      },
+    }).populate({ 
+      path: "friends", 
+      select: "username _id profilePic",
+    }).populate({ 
+      path: "chats", 
+      populate: {
+        path: "participants",
+        select: "username _id",
+    },
+    }).select("-password");
 
     let status;
     if (body !== decodedToken.id) {
@@ -75,8 +90,20 @@ export async function GET(req: NextRequest, res: NextResponse) {
       wall:user.wall,
     };
 
+    // content: "ayyyy" //CHECK
+    // createdAt: "2024-06-13T17:23:05.739Z" //CHECK
+    // image:"https://newchatapp.s3.amazonaws.com/wallImages/666b2af9d684ded13ad0070c" //CHECK
+
+    // likes: Array(2)
+    //   0:{_id,username,profilePic} //CHECK
+
+    // replies: Array(1)
+    //   0{message,image,sender:{profilepic,username,id},time,_id}, //CHECK
+    // user:{profilePic,username,_id}  //CHECK
+    // _id:   populatedFriends, 
+
     return NextResponse.json(
-      { filteredUser, populatedFriends, status },
+      { status,user },
       { status: 200 }
     );
   } catch (error) {

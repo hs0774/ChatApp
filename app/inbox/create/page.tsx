@@ -20,7 +20,7 @@ interface FormData {
 
 export default function CreateMessage({ friends, paramName}) {
   const { user } = useAuth();
- //console.log(paramName.username);
+ console.log(friends);
   const [formData, setFormData] = useState<FormData>({
     sender: user?.username || null,
     receiver:paramName.username || '',
@@ -32,10 +32,10 @@ export default function CreateMessage({ friends, paramName}) {
       setFormData((prev) => ({
         ...prev,
         sender: user.username || null,
-        receiver:paramName.username || '',
+        receiver:paramName.username,
       }));
     }
-  }, []); //[paramName.username, user]);
+  }, [paramName.username, user]); //[paramName.username, user]);
 
   function handleChange(
     event: ChangeEvent<
@@ -96,8 +96,8 @@ export default function CreateMessage({ friends, paramName}) {
             {friends &&
               friends
                 .filter((item) => {
-                  const searchTerm = formData.receiver.toLowerCase();
-                  const arrayItemName = item.username.toLowerCase();
+                  const searchTerm = formData.receiver?.toLowerCase();
+                  const arrayItemName = item.username?.toLowerCase();
                   return (
                     searchTerm &&
                     arrayItemName.startsWith(searchTerm) &&

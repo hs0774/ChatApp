@@ -20,7 +20,7 @@ import mongoose, { Model, Schema, Document, Types } from "mongoose";
 
     const CommentSchema :Schema<IComment> = new Schema({
             sender: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
-            message: { type: String, required: true },
+            message: { type: String },
             image: { type: String },
             time: { type: Date, default: Date.now },
     })

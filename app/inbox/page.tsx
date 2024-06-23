@@ -44,6 +44,7 @@ export default function Inbox({searchParams}) {
         setFriends(userData.friends);
         //console.log(userData.friends);
         setParamName(searchParams);
+        
       } catch (error) {
         console.error("Error:", error);
       }

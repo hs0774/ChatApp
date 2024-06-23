@@ -29,7 +29,9 @@ const getData = async () => {
   return res.json();
 };
 
-export default function Chat() {
+
+
+export default function Chat({searchParams}) {
   const { user } = useAuth(); 
 
   const [exampleChat,setExampleChat] = useState();
@@ -41,6 +43,7 @@ export default function Chat() {
   const [newChat,setNewChat] = useState([]);
   const [chatTitle,setChatTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [paramName,setParamName] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +54,19 @@ export default function Chat() {
 
         setExampleChat(userData.user.chats);
         setUserFriends(userData.user.friends);
+        console.log(searchParams);
+        const existingChat = userData.user.chats.filter(chat =>
+          chat.participants.length === 2
+           &&
+          chat.participants.some(participant => participant.username === searchParams.username)
+          && 
+          chat.participants.some(participant => participant.username === user?.username)
+        );
+        if(existingChat.length === 1) {
+          console.log(existingChat);
+          setCurrentChat(existingChat[0]);
+          setChatIsOpen(true);
+        }
         // setMessages({ ...messages, message: userData.message });
         // setFriends(userData.friends);
         // //console.log(userData.friends);
@@ -60,7 +76,7 @@ export default function Chat() {
       }
     };
     fetchData();
-  }, [user]);
+  }, [searchParams, user]);
 
 
   function openChat(obj: Chat | SetStateAction<undefined>) {
@@ -70,6 +86,7 @@ export default function Chat() {
   }
 
   function addFriend(){
+    console.log(currentFriendSelected)
     if(currentFriendSelected) {
       const friendObject = JSON.parse(currentFriendSelected);
       console.log(friendObject);

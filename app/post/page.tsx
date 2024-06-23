@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from "uuid";
 import '../(styles)/post.css'
 import io from 'socket.io-client';
 import Modal from "../(components)/Modal";
-import { log } from "console";
 
 const getData = async () => {
   const token = localStorage.getItem("token");
@@ -138,7 +137,7 @@ export default function Post() {
     };
 
   }, [user?.id]);
-
+ 
   const toggleComments = (postId) => {
     setVisibleComments((prevState) => ({
       ...prevState,
@@ -153,7 +152,7 @@ export default function Post() {
     }));
   }; //increments the number of comments shown for a specific post
 
-  const handleWallSubmit = async (event: FormEvent<HTMLFormElement>): void => {
+  const handleWallSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!user) return;  //user must be logged in to submit a post
@@ -235,8 +234,8 @@ export default function Post() {
       throw new Error("Failed to fetch data");
     }
 
-    console.log(newComment.comment)
-    console.log(newComment.image)
+   // console.log(newComment.comment)
+   // console.log(newComment.image)
     const {url,comment,commentId} = await res.json();
     let imageURL = null;
     if(url) {
@@ -289,21 +288,13 @@ export default function Post() {
       }
       const url = URL.createObjectURL(files[0]);
       setCommentImgURL(url);
-      // const reader = new FileReader();
-      // reader.readAsDataURL(files[0]);
-      // reader.onload = () => {
-      //   const str = reader.result?.toString();
-      //     if (str) {
-      //       const buffer = Buffer.from(str.split(',')[1], 'base64');
-            setNewComments(prevComments => ({
-              ...prevComments,
-              [postId]: {
-                ...prevComments[postId],
-                image: files[0],
-              }
-            }));
-        //   }
-        // }
+      setNewComments(prevComments => ({
+        ...prevComments,
+        [postId]: {
+        ...prevComments[postId],
+        image: files[0],
+        }
+      }));
     } else {
       setNewComments(prevComments => ({
         ...prevComments,
@@ -316,24 +307,11 @@ export default function Post() {
   }; 
 
 
+  
   const addOrRemoveLike = (postId: string, action: string) => {
-    if (!user) return; //no login no like
-
+    if (!user) return; //no login no likeZ
     socket.emit('toggle-like', {action,wallId:postId,token: `Bearer ${user?.token}`});
-    // setPosts((prevPosts) =>
-    //   prevPosts.map((post) => {
-    //     if (post._id === postId) { //find post by its id
-    //       if (action === 'add') { //if clicked like button 
-    //         const newLikes = [...post.likes, { _id: user.id, username: user.username }]; //add users like to current likes 
-    //         return { ...post, likes: newLikes }; //update the likes 
-    //       } else { //if clicked unlike
-    //         const newLikes = post.likes.filter((like) => like._id !== user.id); //remove users like 
-    //         return { ...post, likes: newLikes }; //update the likes  
-    //       }
-    //     }
-    //     return post;
-    //   })
-    // );
+
   }; //handles liking and unliking a post
 
   function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivElement> {
@@ -353,25 +331,25 @@ export default function Post() {
     <>
       <div className="wallPage">
         <div>
-        <form onSubmit={handleWallSubmit} className="wallPostForm">
-          <label htmlFor="newPost"> What's on your mind? </label>
-          <textarea
-            id="newPost"
-            placeholder="What's on your mind?"
-            value={newPostContent.post}
-            onChange={handleNewPostChange}
-          />
-          <label htmlFor="image">Add a picture:</label>
-          <input type="file" 
-            id="image" 
-            name="image" 
-            accept="image/jpeg" 
-            ref={fileInputRef}
-            onChange={handleNewPostChange}
-          />
-          {newPostContent.image && <img className="postPreview" src={postImgURL} alt="Preview" />}
-          <button type="submit">Post</button>
-        </form>
+          <form onSubmit={handleWallSubmit} className="wallPostForm">
+            <label htmlFor="newPost"> What&apos;s on your mind? </label>
+            <textarea
+              id="newPost"
+              placeholder="What's on your mind?"
+              value={newPostContent.post}
+              onChange={handleNewPostChange}
+            />
+            <label htmlFor="image">Add a picture:</label>
+            <input type="file" 
+              id="image" 
+              name="image" 
+              accept="image/jpeg" 
+              ref={fileInputRef}
+              onChange={handleNewPostChange}
+            />
+            {newPostContent.image && <img className="postPreview" src={postImgURL} alt="Preview" />}
+            <button type="submit">Post</button>
+          </form>
         </div>
         <div>
           {posts.map((post) => (
@@ -464,7 +442,6 @@ export default function Post() {
       {openModal && (
         <Modal likes={modalLikes} setOpenModal={setOpenModal} />
       )}
-
     </>
   );
 }

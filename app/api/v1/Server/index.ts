@@ -210,6 +210,7 @@ io.on('connection', (socket) => {
   });
   
   socket.on('create-wallPost', async ({imageURL,wallId,token}) => {
+
     const verifiedToken = verifyToken(token);
     console.log(imageURL);
     if (!verifiedToken) {
@@ -248,11 +249,13 @@ io.on('connection', (socket) => {
     // })
     
   // await newWall.save();
+
+  
   const wall = await Wall.findById(wallId);
   
   if(!wall) {
     return;
-   }
+  }
 
   if(imageURL) {
    wall.image=imageURL;

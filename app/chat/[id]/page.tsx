@@ -69,9 +69,9 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   function handleSubmit(event: FormEvent<HTMLFormElement>){
     event.preventDefault();
     
-    // if(sentMessage.message === '' || (sentMessage.image === null || sentMessage.image === undefined) ) {
-    //   return;
-    // }
+    if(sentMessage.message === '' && (sentMessage.image === null || sentMessage.image === undefined) ) {
+      return;
+    }
     console.log(sentMessage);
     socket.emit('get-message', {message:sentMessage,currentChatId:currentChat._id,token: `Bearer ${user?.token}`});
     setSentMessage({
