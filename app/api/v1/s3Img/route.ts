@@ -13,7 +13,7 @@ import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import { wallPostZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import {Wall} from "@/app/(models)/wall.ts";
 import AWS from 'aws-sdk';
-import {generateUploadURL} from "../../../utils/helperFunctions/s3ImgUpload.ts"
+import {generateUploadURL, uploadToS3} from "../../../utils/helperFunctions/s3ImgUpload.ts"
 
 interface DecodedToken {
   id: string;
@@ -84,7 +84,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     if(!body.hasImage) {
         return NextResponse.json({ url:null,wallId:newWall._id },{status:200});
     }
-    const url = await generateUploadURL(newWall._id.toString(),'wallImages');
+   // const url = await generateUploadURL(newWall._id.toString(),'wallImages');
+    const url = await uploadToS3(body.image, 'wallImages', newWall._id.toString());
+    
     console.log(url);
     return NextResponse.json({ url,wallId:newWall._id },{status:200});
     } catch(error) {

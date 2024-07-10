@@ -9,7 +9,7 @@ import { useAuth } from "../(stores)/authContext";
 interface Chat {
   id:number | string;
   title:string;
-  participants: { id: number; username: string; }[];
+  participants: { id: string; username: string; }[];
   messages: { id: number; sender: string; content: string; createdAt: number; }[];
 }
 
@@ -43,7 +43,7 @@ export default function Chat({searchParams}) {
   const [newChat,setNewChat] = useState([]);
   const [chatTitle,setChatTitle] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [paramName,setParamName] = useState('');
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +55,7 @@ export default function Chat({searchParams}) {
         setExampleChat(userData.user.chats);
         setUserFriends(userData.user.friends);
         console.log(searchParams);
-        const existingChat = userData.user.chats.filter(chat =>
+        const existingChat = userData.user.chats.filter((chat: { participants: { id: string; username: string; }[]; })  =>
           chat.participants.length === 2
            &&
           chat.participants.some(participant => participant.username === searchParams.username)
@@ -67,10 +67,6 @@ export default function Chat({searchParams}) {
           setCurrentChat(existingChat[0]);
           setChatIsOpen(true);
         }
-        // setMessages({ ...messages, message: userData.message });
-        // setFriends(userData.friends);
-        // //console.log(userData.friends);
-        // setParamName(searchParams);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -113,7 +109,7 @@ export default function Chat({searchParams}) {
       body: JSON.stringify(id),
     }); //we do another check for the single user chat 
     if (res.ok) {
-    const removeChat = exampleChat.filter((chatId => chatId._id !== id ))
+    const removeChat = exampleChat.filter(((chatId: { _id: string; }) => chatId._id !== id ))
     setExampleChat(removeChat);
     // have a condition that sees if the deleted chat is open if yes set this 
     if(currentChat?._id === id) {
@@ -133,7 +129,7 @@ export default function Chat({searchParams}) {
   async function createChat(){
     if(newChat.length < 2) { 
       const singleUserName = newChat[0].username;
-      const existingChat = exampleChat.filter(chat =>
+      const existingChat = exampleChat.filter(chat  =>
         chat.participants.length === 2
          &&
         chat.participants.some(participant => participant.username === singleUserName)

@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 import '../(styles)/post.css'
 import io from 'socket.io-client';
 import Modal from "../(components)/Modal";
+import DalleModal from "../(components)/dalleModal";
 
 const getData = async () => {
   const token = localStorage.getItem("token");
@@ -38,6 +39,9 @@ export default function Post() {
   const [modalLikes,setModalLikes] = useState();
   const [postImgURL,setPostImgURL] = useState<string | undefined>();
   const [commentImgURL,setCommentImgURL] = useState<string | undefined>();
+  const [showModal1, setShowModal1] = useState(false);
+  const [showModal2, setShowModal2] = useState(false);
+  const [showModal3, setShowModal3] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -152,6 +156,35 @@ export default function Post() {
     }));
   }; //increments the number of comments shown for a specific post
 
+
+  // const handleNewPostChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    function handleNewPostChange(
+      event: ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+      >
+    ): void {
+    const { value, name ,files} = event.target;
+    if (name === 'image' && files) {
+      if (postImgURL) {
+        URL.revokeObjectURL(postImgURL);
+      }
+
+      const url = URL.createObjectURL(files[0]);
+      setPostImgURL(url);
+
+      const base64Conversion = new FileReader();
+      base64Conversion.onloadend = () => {
+        setNewPostContent((prev) => ({
+          ...prev,
+          image: base64Conversion.result as string,
+        }));
+      };
+      base64Conversion.readAsDataURL(files[0]);
+      } else {
+        setNewPostContent((prev) => ({ ...prev, post: value }));
+      }
+  }; //on change value of wall post form
+
   const handleWallSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -169,27 +202,15 @@ export default function Post() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${user.token}`,
       },
-      body: JSON.stringify({ post: newPostContent.post,hasImage})
+      body: JSON.stringify({ post: newPostContent.post,image:newPostContent.image,hasImage})
     });
     if (!res.ok) {
       throw new Error("Failed to fetch data");
     }
     const {url,wallId} = await res.json();
     
-    let imageURL = null;
-    if(url) {
-      const uploadRes = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          "Content-Type": "image/jpeg",
-        },
-        body: newPostContent.image,
-      });
-      if (!uploadRes.ok) {
-        throw new Error("Failed to upload image");
-      }
-      imageURL = url.split("?")[0];
-   }
+     let imageURL = url;
+  
    
     console.log(imageURL);
     socket.emit('create-wallPost', ({imageURL,wallId,token: `Bearer ${user?.token}`}));
@@ -206,6 +227,37 @@ export default function Post() {
       fileInputRef.current.value = '';
   }
   }; //creates a new post and adds it to the posts state, ws later
+
+  const handleNewCommentChange = (postId: string, event: ChangeEvent<HTMLInputElement>) => {
+    console.log(newComments);
+    const {name,value,files} = event.target;
+    if(name === 'image' && files) {
+      if (commentImgURL) {
+        URL.revokeObjectURL(commentImgURL);
+      }
+      const url = URL.createObjectURL(files[0]);
+      setCommentImgURL(url);
+      const base64Conversion = new FileReader();
+      base64Conversion.onloadend = () => {
+        setNewComments(prevComments => ({
+          ...prevComments,
+          [postId]: {
+            ...prevComments[postId],
+            image: base64Conversion.result as string,
+          }
+        }));
+      };
+      base64Conversion.readAsDataURL(files[0]);
+    } else {
+      setNewComments(prevComments => ({
+        ...prevComments,
+        [postId]: {
+          ...prevComments[postId],
+          [name]: value,
+        }
+      }));
+    }
+  }; 
 
   const handleCommentSubmit = async (postId: string, event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -228,85 +280,17 @@ export default function Post() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${user.token}`,
       },
-      body: JSON.stringify({ comment: newComment,hasImage,wallId:postId})
+      body: JSON.stringify({ comment: newComment,image:newComments[postId].image,hasImage,wallId:postId})
     });
     if (!res.ok) {
       throw new Error("Failed to fetch data");
     }
-
-   // console.log(newComment.comment)
-   // console.log(newComment.image)
     const {url,comment,commentId} = await res.json();
-    let imageURL = null;
-    if(url) {
-      const uploadRes = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          "Content-Type": "image/jpeg",
-        },
-        body: newComments[postId].image,
-      });
-      if (!uploadRes.ok) {
-        throw new Error("Failed to upload image");
-      }
-      imageURL = url.split("?")[0];
-   } 
+    let imageURL = url;
+  
    console.log(imageURL);
    socket.emit('create-comment', ({imageURL,comment,wallId:postId,token: `Bearer ${user?.token}`}));
   };
-
-  // const handleNewPostChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    function handleNewPostChange(
-      event: ChangeEvent<
-        HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      >
-    ): void {
-    const { value, name ,files} = event.target;
-    if (name === 'image' && files) {
-      if (postImgURL) {
-        URL.revokeObjectURL(postImgURL);
-      }
-
-      const url = URL.createObjectURL(files[0]);
-      setPostImgURL(url);
-
-      setNewPostContent((prev) => ({
-        ...prev,
-        image: files[0],
-      }));
-      } else {
-        setNewPostContent((prev) => ({ ...prev, post: value }));
-      }
-  }; //on change value of wall post form
-
-  const handleNewCommentChange = (postId: string, event: ChangeEvent<HTMLInputElement>) => {
-    console.log(newComments);
-    const {name,value,files} = event.target;
-    if(name === 'image' && files) {
-      if (commentImgURL) {
-        URL.revokeObjectURL(commentImgURL);
-      }
-      const url = URL.createObjectURL(files[0]);
-      setCommentImgURL(url);
-      setNewComments(prevComments => ({
-        ...prevComments,
-        [postId]: {
-        ...prevComments[postId],
-        image: files[0],
-        }
-      }));
-    } else {
-      setNewComments(prevComments => ({
-        ...prevComments,
-        [postId]: {
-          ...prevComments[postId],
-          [name]: value,
-        }
-      }));
-    }
-  }; 
-
-
   
   const addOrRemoveLike = (postId: string, action: string) => {
     if (!user) return; //no login no likeZ
@@ -350,6 +334,10 @@ export default function Post() {
             {newPostContent.image && <img className="postPreview" src={postImgURL} alt="Preview" />}
             <button type="submit">Post</button>
           </form>
+          <button onClick={() => setShowModal2(!showModal2)}>
+              {showModal2 ? 'Cancel' : 'Add an ai Image to your post'}
+          </button>
+          {showModal2 && <DalleModal imgURL={postImgURL}  setFormData={setNewPostContent} setImgURL={setPostImgURL} fileInputRef={fileInputRef} setEditDetails={undefined} showModal={showModal2} setShowModal={setShowModal2}/>}
         </div>
         <div>
           {posts.map((post) => (
@@ -432,9 +420,13 @@ export default function Post() {
                       onChange={(e) => handleNewCommentChange(post._id, e)}
                     />
                     <input type="file" id="image" name="image" accept="image/jpeg" onChange={(e) => handleNewCommentChange(post._id, e)} />
+                    <button type="button" onClick={() => setShowModal3(!showModal3)}>
+                      {showModal3 ? 'Cancel' : 'Add an ai Image to your post'}
+                    </button>
                     <button type="submit">Post</button>
                      {newComments[post._id]?.image && <img className="postPreview" src={commentImgURL} alt="Preview" />} 
               </form>
+              {showModal3 && <DalleModal imgURL={commentImgURL} postId={post._id} setFormData={undefined} setNewComments={setNewComments} setImgURL={setCommentImgURL} fileInputRef={undefined} setEditDetails={undefined} showModal={showModal3} setShowModal={setShowModal3} fromChat={undefined}/>}
             </div>
           ))}
         </div>
@@ -478,3 +470,9 @@ export default function Post() {
 //   <label htmlFor="image">Add a picture:</label>
 //        <input type="file" id="image" name="image" accept="image/jpeg" value={formData.image} onChange={handleChange}/>
 //        {formData.image && <img className="preview" src={imgURL} alt="Profile Preview" />}
+
+
+
+
+//comment and post reply images will be turned into base64 and a link 
+//will be genned and passed from the server

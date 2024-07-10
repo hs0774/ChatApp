@@ -20,6 +20,8 @@ const DetailsSchema: Schema<IDetails> = new Schema({
   location: { type: String },
 });
 
+DetailsSchema.index({ hobbies: 1 });
+
 const Details: Model<IDetails> =
   mongoose.models.Details || mongoose.model<IDetails>("Details", DetailsSchema);
 

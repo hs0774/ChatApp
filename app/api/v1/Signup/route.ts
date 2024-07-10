@@ -208,7 +208,7 @@ export async function POST(req: Request, res: Response) {
       await newUser.save();
     }
     
-    const token = createToken(sanitizedData.email);
+    const token = createToken(sanitizedData.email as string);
     return NextResponse.json(
       {
         message: `User Created`,

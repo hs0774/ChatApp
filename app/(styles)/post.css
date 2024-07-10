@@ -1,97 +1,99 @@
 .wallPage{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .wallPostForm{
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 24px;
 }
 
 .wallPosts{
-    border: solid 1px red;
-    margin-bottom:24px ;
-    display: flex;
-    flex-direction: column;
+  border: solid 1px red;
+  margin-bottom:24px ;
+  display: flex;
+  flex-direction: column;
+  background-color: black;
 }
 
 .comments{
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
 
 .xButton {
-    float: right;
-    cursor: pointer;
-    font-size: 24px;
-    color: red;
+  float: right;
+  cursor: pointer;
+  font-size: 24px;
+  color: red;
 }
   
 .wallPostInfo{
-   display: flex;
-   flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
+
 .wallPosts {
-    position: relative;
-  }
+  position: relative;
+}
   
-  .xButtonn {
-    position: absolute;
-    top: -5px;
-    right: 0px;
-    cursor: pointer;
-  }
+.xButtonn {
+  position: absolute;
+  top: -5px;
+  right: 0px;
+  cursor: pointer;
+}
   
-  .openModal:hover{
-    text-decoration: underline;
-    cursor: pointer;
-  }
+.openModal:hover{
+  text-decoration: underline;
+  cursor: pointer;
+}
 
-  .img{
-     height: 50%;
-     width:50%;
-  }
+.img{
+  height: 50%;
+  width:50%;
+}
 
-  .imgHolder{
-    display: flex;
-    justify-content: center;
-  }
+.imgHolder{
+  display: flex;
+  justify-content: center;
+}
 
-  .picAndName{
-    display: flex;
-    gap: 4px;
-    padding-bottom: 4px;
-    align-items: center;
-    
-  }
-  .picAndName:hover{
-    text-decoration: underline;
-  }
+.picAndName{
+  display: flex;
+  gap: 4px;
+  padding-bottom: 4px;
+  align-items: center;    
+}
 
-  .replyimg{
-    height: 150px;
-    width:150px;
-  }
+.picAndName:hover{
+  text-decoration: underline;
+}
 
-  .profilePic{
-     height: 40px;
-     width:40px;
-     border-radius: 50%;
-  }
+.replyimg{
+  height: 150px;
+  width:150px;
+}
+
+.profilePic{
+  height: 40px;
+  width:40px;
+  border-radius: 50%;
+}
 
 
-  .picAndNamee{
-     display: flex;
-     align-items: center;
-     gap:5px;
-  }
+.picAndNamee{
+  display: flex;
+  align-items: center;
+  gap:5px;
+}
 
-  .postPreview{
-    height:100px;
-    width:100px;
-  }
+.postPreview{
+  height:100px;
+  width:100px;
+}
 
   /* .commentPreview{
 

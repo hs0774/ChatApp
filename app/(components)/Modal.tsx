@@ -56,7 +56,7 @@ export default function Modal({ likes, setOpenModal }) {
           throw new Error("Failed to handle friend request");
         }
         setData((prev) =>
-            prev.map((like) => {
+            prev?.map((like) => {
             if (like._id === _id) {
                 return { ...like, status: 'pending' };
             }

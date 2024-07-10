@@ -1,16 +1,30 @@
 import "dotenv/config";
 import env from "./validateEnv.ts";
-import mongoose from "mongoose";
-import * as fs from "fs";
-import { faker } from "@faker-js/faker";
-import bcrypt from "bcryptjs";
-import Chat from "../(models)/chat.ts";
-import Details from "../(models)/details.ts";
-import Friendship from "../(models)/friendship.ts";
-import Inbox from "../(models)/inbox.ts";
-import User from "../(models)/user.ts";
-import {Wall} from "../(models)/wall.ts"
+// import mongoose from "mongoose";
+// import * as fs from "fs";
+// import { faker } from "@faker-js/faker";
+// import bcrypt from "bcryptjs";
+// import Chat from "../(models)/chat.ts";
+// import Details from "../(models)/details.ts";
+// import Friendship from "../(models)/friendship.ts";
+// import Inbox from "../(models)/inbox.ts";
+// import User from "../(models)/user.ts";
+// import {Wall} from "../(models)/wall.ts"
 
+import OpenAI from "openai";
+
+const openai = new OpenAI({ apiKey: env.OPEN_AI_SECRET_KEY });
+
+async function main() {
+  const completion = await openai.chat.completions.create({
+    messages: [{ role: "system", content: "Explain recursion with the movie inception " }],
+    model: "gpt-3.5-turbo",
+  });
+
+  console.log(completion.choices[0]);
+}
+
+main();
 // interface IChat {
 //     participants: mongoose.Types.ObjectId[];
 //     messages: {
@@ -19,12 +33,12 @@ import {Wall} from "../(models)/wall.ts"
 //       timestamp: Date;
 //     }[];
 // }
-interface IComment extends Document {
-  sender:mongoose.Types.ObjectId;
-  message:string;
-  image?:string;
-  time:Date;
-}
+// interface IComment extends Document {
+//   sender:mongoose.Types.ObjectId;
+//   message:string;
+//   image?:string;
+//   time:Date;
+// }
 // interface IDetails {
 //     hobbies: string[];
 //     job: string;
@@ -82,16 +96,17 @@ interface IComment extends Document {
 //     messages: IMessage[];
 // }
 
-console.log('This script populates some test items to your database');
+// console.log('This script populates some test items to your database');
 
-const mongoDB = env.MONGODB_URI;
+// const mongoDB = env.MONGODB_URI;
 
-main().catch((err) => console.log(err));
+// main().catch((err) => console.log(err));
 
-async function main() {
-    console.log("Debug: About to connect");
-    await mongoose.connect(mongoDB);
-    await checkWallReplies();
+// async function main() {
+//     console.log("Debug: About to connect");
+//     await mongoose.connect(mongoDB);
+    //await Details.createIndexes();
+   // await checkWallReplies();
     //await addWallPosts();
     //await updateUserWall();
 // await updateUserFriends();
@@ -108,21 +123,54 @@ async function main() {
   //await updateChats();
   //await updateAntonetta();
  //await updateReplyTimes();
-    console.log("Debug: Closing Mongoose");
-    mongoose.connection.close();
- }
+//  await changeDetails();
+// await findUsersByHobby('cooking');
+//     console.log("Debug: Closing Mongoose");
+//     mongoose.connection.close();
+//  }
 
 
-async function checkWallReplies() {
-  const walls = await Wall.find({ image: { $exists: true, $ne: null } });
-    for (const wall of walls) {
-      for (const reply of wall.replies) {
-        if (reply.image) {
-          console.log(reply);
-        }
-      }
-    }
-}
+//  const findUsersByHobby = async (hobby: string) => {
+//   try {
+//     const users = await Details.find({ hobbies: hobby.trim() });
+//     console.log('Users with hobby:', users);
+//   } catch (error) {
+//     console.error('Error finding users by hobby:', error);
+//   }
+// };
+
+// //findUsersByHobby('gaming');
+// async function changeDetails() {
+//   const newHobbies = ['sports', 'coding', 'brewing', 'sewing', 'video games', 'thrifting', 'cooking', 'photography', 'gardening', 'art'];
+
+//   try {
+//    // const details = await Details.find();
+
+//     //for (const detail of details) {
+//      // if (detail.hobbies.length > 0) { // Ensure there's at least one hobby to replace
+//         //const randomIndex = Math.floor(Math.random() * newHobbies.length);
+//         // console.log(detail.hobbies[0]);
+//         const indexes = await Details.listIndexes();
+//     console.log('Indexes on Details collection:', indexes);
+//        // await detail.save();
+//     //  }
+    
+
+//     console.log('Details updated successfully!');
+//   } catch (error) {
+//     console.error('Error updating details:', error);
+//   }
+// }
+// async function checkWallReplies() {
+//   const walls = await Wall.find({ image: { $exists: true, $ne: null } });
+//     for (const wall of walls) {
+//       for (const reply of wall.replies) {
+//         if (reply.image) {
+//           console.log(reply);
+//         }
+//       }
+//     }
+// }
 //  async function updateReplyTimes() {
 //     try {
 //         // Fetch all wall posts
@@ -148,6 +196,7 @@ async function checkWallReplies() {
 //         console.error('Error updating reply times:', error);
 //     }
 // }
+
 
 
 // async function updateChats() {

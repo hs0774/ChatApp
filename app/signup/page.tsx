@@ -6,11 +6,12 @@ import React, {
   FormEvent,
   useState,
   ChangeEventHandler,
+  useRef,
 } from "react";
 import { useAuth } from "../(stores)/authContext";
 import { useRouter } from "next/navigation";
 import { country_list } from "../utils/countries";
-import Image from 'next/image'
+import DalleModal from "../(components)/dalleModal";
 
 interface FormData {
   image: File | null | Buffer;
@@ -44,6 +45,9 @@ export default function Signup() {
     image:null,
   });
   const [imgURL,setImgURL] = useState<string | undefined>();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [showModal, setShowModal] = useState(false);
+ 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -226,7 +230,8 @@ export default function Signup() {
        name="image" 
        accept="image/jpeg" 
       //  value={formData.image}
-       onChange={handleChange}
+      ref={fileInputRef}
+      onChange={handleChange}
        />
        {formData.image && <img className="preview" src={imgURL} alt="Profile Preview" />}
         <button type="submit">Sign up!</button>
@@ -235,6 +240,10 @@ export default function Signup() {
       <p>
         Have an account? <Link href="/login">Log In</Link>
       </p>
+      <button onClick={() => setShowModal(!showModal)}>
+                {showModal ? 'Cancel' : 'Create a profile Picture with AI!'}
+            </button>
+      {showModal && <DalleModal  setFormData={setFormData} imgURL={imgURL} setImgURL={setImgURL} fileInputRef={fileInputRef} showModal={showModal} setShowModal={setShowModal} setEditDetails={undefined} setNewComments={undefined} postId={undefined} fromChat={undefined}/>}
     </div>
   );
 }

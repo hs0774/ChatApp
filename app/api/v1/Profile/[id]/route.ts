@@ -2,6 +2,7 @@ import "dotenv/config";
 import env from "../../../../utils/validateEnv.ts";
 import User from "@/app/(models)/user.ts";
 import Details from "../../../../(models)/details.ts";
+import Chat from "@/app/(models)/chat.ts";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
 import validator from "validator";
@@ -13,15 +14,17 @@ import {Wall} from "@/app/(models)/wall.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import { profileZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import { uploadToS3 } from "@/app/utils/helperFunctions/s3ImgUpload.ts";
-import { string } from "zod";
+// import { string } from "zod";
 
 interface DecodedToken {
   id: string;
   email: string;
   username:string;
 } 
+//add suggested friends if token matches body 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
+
     const token = verifyToken(req.headers.get("authorization"));
     if (!token) {
       return NextResponse.json({ message: "Unauthorized" });
@@ -29,11 +32,10 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     await dbConnect(); // Ensure database connection
     const body = req.url.slice(req.url.lastIndexOf("/") + 1);
-    console.log(body);
     const decodedToken = jwtDecode(token) as DecodedToken;
-    // console.log;
-    console.log(decodedToken);
+
     const wall = await Wall;
+    const chat = await Chat;
     const user = await User.findById(body).populate("details").populate({ 
       path: "wall", 
       populate: {
@@ -64,46 +66,35 @@ export async function GET(req: NextRequest, res: NextResponse) {
     if (!user) {
       return NextResponse.json({ message: "User not found" });
     }
-
-    const populatedFriends = await Promise.all(
-      user.friends.map(async (friend) => {
-        const friendUser = await User.findById(friend).exec();
-        return {
-          username: friendUser?.username,
-          url: `/profile/${friendUser?._id}`,
-          _id: friendUser?._id,
-          profilePic: friendUser?.profilePic,
-        };
+   
+    let suggestedFriends;
+    if (decodedToken.id === user._id.toString()) {
+      // Find details documents with matching hobbies, excluding the current user
+      const matchingDetails = await Details.find({
+        _id: { $ne: user.details._id },
+        hobbies: { $in: user.details.hobbies },
       })
-    );
-    const filteredUser = {
-      _id: user._id,
-      username: user.username,
-      chats: user.chats,
-      details: user.details,
-      email: user.email,
-      friends: user.friends,
-      inbox: user.inbox,
-      nonFriendsChat: user.nonFriendsChat,
-      status: user.status,
-      profilePic:user.profilePic,
-      wall:user.wall,
-    };
+      .select("_id");
 
-    // content: "ayyyy" //CHECK
-    // createdAt: "2024-06-13T17:23:05.739Z" //CHECK
-    // image:"https://newchatapp.s3.amazonaws.com/wallImages/666b2af9d684ded13ad0070c" //CHECK
+      const matchingDetailIds = matchingDetails.map((detail) => detail._id);
 
-    // likes: Array(2)
-    //   0:{_id,username,profilePic} //CHECK
+      suggestedFriends = await User.find({
+        _id: { $nin: user.friends },
+        details: { $in: matchingDetailIds },
+      })
+      .populate({
+        path: "details",
+        select: "hobbies",
+      }).select("profilePic _id username");
 
-    // replies: Array(1)
-    //   0{message,image,sender:{profilepic,username,id},time,_id}, //CHECK
-    // user:{profilePic,username,_id}  //CHECK
-    // _id:   populatedFriends, 
+      console.log(suggestedFriends);
+      let allSuggestedFriends = suggestedFriends.sort(() => Math.random() - 0.5);
 
+      suggestedFriends = allSuggestedFriends.slice(0, 5);
+    }
+    
     return NextResponse.json(
-      { status,user },
+      { status,user,suggestedFriends },
       { status: 200 }
     );
   } catch (error) {
@@ -112,7 +103,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
-
+//add an multikey index  to hobbies 
 export async function PUT(req: NextRequest, res: NextResponse) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
@@ -123,9 +114,11 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
     await dbConnect();
     const body = await req.json();
-    const validation = profileZodSchema.safeParse(body.editDetails);
+    console.log(body);
+    const validation = profileZodSchema.safeParse(body.updatedDetails);
 
     if (!validation.success) {
+      console.log(validation.error)
       return NextResponse.json(validation.error.errors, { status: 404 });
     }
     const sanitizedData = sanitizeData(validation);
@@ -162,16 +155,18 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         { status: 400 }
       );
     }
-    console.log(sanitizedData.occupation);
+    console.log(sanitizedData.hobbies);
     user.username = sanitizedData.username as string;
     details.age = sanitizedData.age as number;
     details.bio = sanitizedData.bio as string;
+    details.hobbies = sanitizedData.hobbies as unknown as string[];
     details.job = sanitizedData.occupation as string;
     details.location = sanitizedData.location as string;
     details.sex = sanitizedData.sex as "Male" | "Female" | "Other";
-    if (body.editDetails.profilePic && !body.editDetails.profilePic.startsWith('https')) {
-       console.log(body.editDetails.profilePic);
-       const s3Url = await uploadToS3(body.editDetails.profilePic, 'profilePics', user._id);
+    
+    if (body.updatedDetails.profilePic && !body.updatedDetails.profilePic.startsWith('https')) {
+       //console.log(body.editDetails.profilePic);
+       const s3Url = await uploadToS3(body.updatedDetails.profilePic, 'profilePics', user._id);
        console.log(s3Url);
        user.profilePic = s3Url;
        await user.save();
@@ -184,6 +179,7 @@ export async function PUT(req: NextRequest, res: NextResponse) {
     age:details.age,
     bio:details.bio,
     job:details.job,
+    hobbies:details.hobbies,
     location:details.location,
     sex:details.sex,
     profilePic:user.profilePic,

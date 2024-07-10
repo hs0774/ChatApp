@@ -5,6 +5,7 @@ import { useAuth } from "@/app/(stores)/authContext";
 import { v4 as uuidv4 } from "uuid";
 import io from 'socket.io-client';
 import Resizer from 'react-image-file-resizer';
+import DalleModal from "@/app/(components)/dalleModal";
 
 
 //const socket = io('http://localhost:3001');
@@ -25,6 +26,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   const [imgURL,setImgURL] = useState<string | undefined>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => { 
     setAddedUsers([]);
@@ -41,7 +43,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     socket.on('get-message', (message,chatId) => {
       console.log(message);
       setExampleChat((prevChats) => {
-        return prevChats.map(chat => {
+        return prevChats.map((chat: { _id: any; messages: any; }) => {
           if (chat._id === chatId) {
             return {
               ...chat,
@@ -138,7 +140,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
 
     console.log(currentChat);
     const existingParticipants = addedUsers.filter(user => 
-      currentChat.participants.some(participant => participant.username === user.username)
+      currentChat.participants.some((participant: { username: string; }) => participant.username === user.username)
     );
 
     if (existingParticipants.length > 0) {
@@ -162,7 +164,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
       participants: [...currentChat.participants, ...addedUsers]
     };
 
-    const updatedExampleChat = exampleChat.map(chat =>
+    const updatedExampleChat = exampleChat.map((chat: { _id: String; }) =>
       chat._id === currentChat._id ? updatedChat : chat
     );
   
@@ -241,7 +243,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     console.log('gi')
     console.log(copyChat);
     
-    const updatedExampleChat = exampleChat.map((chat) => {
+    const updatedExampleChat = exampleChat.map((chat: { _id: string; }) => {
       if (chat._id === currentChat._id) {
         return copyChat; // replace currentchat with copychat
       }
@@ -269,7 +271,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
                   {/* onChange={} value={} */}
               <option value="">Select a friend</option>
               {userFriends
-              .filter(friend => !currentChat.participants.some(participant => participant.username === friend.username))
+              .filter(friend => !currentChat.participants.some((participant: { username: string; }) => participant.username === friend.username))
               .map((friend) => (
                 <option key={friend._id} value={JSON.stringify(friend)}>
                   {friend.username}
@@ -300,12 +302,10 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
       <div className="messageItems"> 
       <div className="messageImgItems"> 
       {sentMessage.image && <img className="chatImgPreview" src={imgURL} alt="Profile Preview" />}
+      <button onClick={() => setShowModal(!showModal)}>
+            {showModal ? 'Cancel' : 'Chat using ai images'}
+      </button>
       <input type="file" id="image" name="image" accept="image/jpeg" ref={fileInputRef} onChange={handleChange}/>
- 
-      {/* <img className="chatImgPreview" src={`https://newchatapp.s3.amazonaws.com/replyImages/664ecb6769cd69d62332cc2d`} alt="Profile Preview" />
-       <input type="file" id="image" name="image" accept="image/jpeg"  onChange={handleChange}/> */}
-       
-       {/* {formData.image && <img className="preview" src={imgURL} alt="Profile Preview" />} */}
        </div><div>
                 <label htmlFor="messageSubmit"></label>
         <input
@@ -315,8 +315,11 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
           onChange={handleChange}
           value={sentMessage.message || ""}
         />
+      
         <button type="submit">Send</button></div></div>
+        
       </form>
+      {showModal && <DalleModal imgURL={imgURL} setFormData={setSentMessage} setImgURL={setImgURL} fileInputRef={fileInputRef} setEditDetails={undefined} setNewComments={undefined} postId={undefined} fromChat={true} showModal={showModal} setShowModal={setShowModal}/>}
     </div> 
   )
 }
@@ -395,3 +398,4 @@ to implement since i dont know much about websockets
       
       
 */
+

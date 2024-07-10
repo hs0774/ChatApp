@@ -10,7 +10,7 @@ import Friendship from "@/app/(models)/friendship.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import { commentZodSchema, profileZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import {Wall,Comment} from "@/app/(models)/wall.ts";
-import { generateUploadURL } from "@/app/utils/helperFunctions/s3ImgUpload.ts";
+import { uploadToS3 } from "@/app/utils/helperFunctions/s3ImgUpload.ts";
 import mongoose from "mongoose";
 
 interface DecodedToken {
@@ -36,11 +36,13 @@ export async function GET(req: NextRequest, res: NextResponse) {
         if (!user) {
             throw new Error('User not found');
         }
+
         let allWalls = [...user.wall];
 
         user.friends.forEach(friend => {
           allWalls = allWalls.concat(friend.wall);
         });
+
        // console.log(allWalls)
         let allWallDetails = await Wall.find(
             { _id: { $in: allWalls } },
@@ -134,7 +136,8 @@ export async function POST(req: NextRequest, res: NextResponse) { //this is for 
         if(!body.hasImage) {
             return NextResponse.json({ url:null,comment,wallId:wall._id},{status:200});
         }
-        const url = await generateUploadURL(comment._id.toString(),'replyImages');
+        //const url = await generateUploadURL(comment._id.toString(),'replyImages');
+        const url = await uploadToS3(body.image, 'replyImages', comment._id.toString());
         console.log(url);
         return NextResponse.json({ url,comment,wallId:wall._id},{status:200});
         } catch(error) {

@@ -19,6 +19,7 @@ export const signupZodSchema = z.object({
     username: z.string().min(2, "Name is required").max(50).trim(), //
     age: z.number().int().min(18).max(120), //
     bio: z.string().max(50),
+    hobbies: z.array(z.string()), 
     occupation: z.string().max(50), //
     location: z.string().max(100),
     sex: z.string().max(7),
