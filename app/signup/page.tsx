@@ -12,9 +12,10 @@ import { useAuth } from "../(stores)/authContext";
 import { useRouter } from "next/navigation";
 import { country_list } from "../utils/countries";
 import DalleModal from "../(components)/dalleModal";
+import Image from 'next/image';
 
 interface FormData {
-  image: File | null | Buffer;
+  image: File | null | Buffer |string;
   email: string;
   username: string;
   password: string;
@@ -44,7 +45,7 @@ export default function Signup() {
     age: null,
     image:null,
   });
-  const [imgURL,setImgURL] = useState<string | undefined>();
+  const [imgURL,setImgURL] = useState<string | null | undefined>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [showModal, setShowModal] = useState(false);
  
@@ -79,7 +80,7 @@ export default function Signup() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ): void {
-    const { value, name ,files} = event.target;
+    const { value, name ,files} = event.target as HTMLInputElement;
     if (name === "hobbies") {
       const hobbies = value.split(",").map((hobby) => hobby.trim());
 
@@ -233,7 +234,7 @@ export default function Signup() {
       ref={fileInputRef}
       onChange={handleChange}
        />
-       {formData.image && <img className="preview" src={imgURL} alt="Profile Preview" />}
+       {formData.image && <Image className="preview" src={imgURL || ""} height={200} width={200} alt="Profile Preview" />}
         <button type="submit">Sign up!</button>
         <p>* Required fields</p>
       </form>
@@ -243,9 +244,8 @@ export default function Signup() {
       <button onClick={() => setShowModal(!showModal)}>
                 {showModal ? 'Cancel' : 'Create a profile Picture with AI!'}
             </button>
-      {showModal && <DalleModal  setFormData={setFormData} imgURL={imgURL} setImgURL={setImgURL} fileInputRef={fileInputRef} showModal={showModal} setShowModal={setShowModal} setEditDetails={undefined} setNewComments={undefined} postId={undefined} fromChat={undefined}/>}
+      {showModal && <DalleModal imgURL={null} setFormData={setFormData} setImgURL={setImgURL} fileInputRef={fileInputRef} showModal={showModal} setShowModal={setShowModal} setEditDetails={null} setNewComments={null} postId={null} fromChat={false}/>}
     </div>
   );
 }
 
-//   profilePic: { type: Buffer },

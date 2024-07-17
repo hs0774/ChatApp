@@ -1,17 +1,7 @@
-import "dotenv/config";
-import env from "../../../../../utils/validateEnv.ts";
 import User from "../../../../../(models)/user.ts";
-import Details from "../../../../../(models)/details.ts";
-import Inbox from "../../../../../(models)/inbox.ts";
-import Friendship from "@/app/(models)/friendship.ts";
-import { chatZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
-import validator from "validator";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import jwt from "jsonwebtoken";
-import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
-import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import Chat from "@/app/(models)/chat.ts";
 
 //add users 

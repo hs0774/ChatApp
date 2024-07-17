@@ -1,15 +1,13 @@
 import http from 'http';
 import { Server } from 'socket.io';
-import cors from 'cors'; // Import cors package
+import cors from 'cors'; 
 import "dotenv/config";
 import env from "../../../utils/validateEnv.ts";
- import User from '../../../(models)/user.ts';
-// import Details from "../../../(models)/details.ts";
+import User from '../../../(models)/user.ts';
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "../../../utils/dbConnect.ts";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "../../../utils/helperFunctions/verifyToken.ts";
-// import Friendship from "@/app/(models)/friendship.ts";
 import sanitizeData from "../../../utils/helperFunctions/sanitizeData.ts";
 import { messageZodSchema,wallZodSchema,commentZodSchema } from "../../../utils/helperFunctions/zodSchemas.ts"
 import Chat from '../../../(models)/chat.ts';
@@ -57,89 +55,6 @@ io.on('connection', (socket) => {
     console.log(`${userId} joined their wall room`);
   });
 
-  // socket.on('get-message',async ({message,currentChatId,token}) => {
-  //   console.log(message)
-
-
-  //   const verifiedToken = verifyToken(token);
-   
-  //   if (!verifiedToken) {
-  //       console.log('unverified')
-  //     return; 
-  //     //NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  //   } //verify token 
-
-  //   await dbConnect(); // Ensure database connection
-  //   const decodedToken = jwtDecode(verifiedToken) as DecodedToken; //extract token
-  //   const chat = await Chat.findById(currentChatId)
-  //   console.log(decodedToken)
-  //   if (!chat) {
-  //       return;
-  //       //NextResponse.json({ message: "Chat not found" }, { status: 404 });
-  //   } // find chat or return 
-  //   //console.log({message:message});
-  //   const senderObjectId = new mongoose.Types.ObjectId(decodedToken.id);
-  //   let validation;
-  //   let sanitizedData;
-  //   let newMessage;
-  //   if(message.message !== '') {
-  //   validation = messageZodSchema.safeParse(message);
-    
-  //   if (!validation.success) {
-  //       console.log(validation.error)
-  //     return;
-  //     //NextResponse.json(validation.error.errors, { status: 400 });
-  //   }
-    
-  //   sanitizedData = sanitizeData(validation); 
-
-  //   if (!sanitizedData) {
-  //     return;
-  //   } 
-  //  }
-  //   if(chat.messages.length === 0) {
-  //       for (const participantId of chat.participants) {
-  //           if (participantId.toString() !== decodedToken.id) {
-  //               const user = await User.findById(participantId);
-  //               if (user) {
-  //                   user.chats.push(chat._id);
-  //                   await user.save();
-  //               }
-  //           }
-  //       }
-  //   }
-    
-  //   if(message.message !== '') {
-  //   newMessage = {
-  //       sender: senderObjectId ,
-  //       content: sanitizedData?.message as string,
-  //       createdAt: new Date(),
-  //   } //make sure to modify after creation and add user name to sender 
-  //   chat.messages.push(newMessage);
-  //   await chat.save();
-  //  } else {
-  //   newMessage = {
-  //     sender: senderObjectId ,
-  //     createdAt: new Date(),
-  //   }  //make sure to modify after creation and add user name to sender 
-  //   chat.messages.push(newMessage);
-  //   await chat.save();
-  // }
-  //   const imgLink = message.image ? await uploadToS3(message.image,'chatImages',uuidv4()) : undefined;
-  //   console.log(imgLink);
-  //   chat.messages[chat.messages.length-1].image = imgLink;
-  //   await chat.save();
-  //   const newlySavedMessage = {
-  //      // _id:chat.messages[chat.messages.length-1]._id,
-  //       sender: {_id:senderObjectId.toString(),username:decodedToken.username},
-  //       content: sanitizedData?.message as string,
-  //       createdAt: chat.messages[chat.messages.length-1].createdAt,
-  //       image:imgLink,
-  //   }
-    
-  //  // console.log(username)
-  //   io.to(currentChatId).emit('get-message', newlySavedMessage,currentChatId); // Broadcast the message to all connected clients
-  // });
   socket.on('get-message', async ({ message, currentChatId, token }) => {
     console.log(message);
   
@@ -441,10 +356,10 @@ io.on('connection', (socket) => {
         await wall.save();
     }
 
-    io.to(`wall_${decodedToken.id}`).emit('toggle-like', action,wallId,user._id,user.username);
+    io.to(`wall_${decodedToken.id}`).emit('toggle-like', action,wallId,user._id,user.username,user.profilePic);
     const friends = user.friends; // Assuming user has a friends field which is an array of user IDs
     friends.forEach(friendId => {
-        io.to(`wall_${friendId}`).emit('toggle-like', action,wallId,user._id,user.username);
+        io.to(`wall_${friendId}`).emit('toggle-like', action,wallId,user._id,user.username,user.profilePic);
     });
   })
 

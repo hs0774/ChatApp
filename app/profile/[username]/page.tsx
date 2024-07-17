@@ -4,19 +4,94 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/app/(stores)/authContext";
 import { country_list } from "@/app/utils/countries";
-//import { handleAddFriend } from "@/app/utils/helperFunctions/handleAddFriend";
 import "../../(styles)/profile.css"
-import { error, profile } from "console";
 import "../../(styles)/post.css"
+import Image from "next/image";
 import React from "react";
-import io from "socket.io-client"
+import io, { Socket } from "socket.io-client"
 import Modal from "@/app/(components)/Modal";
 import DalleModal from "@/app/(components)/dalleModal";
+
+interface User {
+  user: any;
+  _id: string;
+  username?: string;
+  password?: string;
+  email?: string;
+  details: EditDetails;
+  profilePic?: string;
+  status: string;
+  nonFriendsChat?: boolean;
+  friends: Friend[];
+  suggestedFriends?: Friend[];
+  wall: Wall[];
+  chats: Chat[];
+}
 
 interface ProfileParams {
   params: {
     username: string; // Assuming username is actually the user ID
   };
+}
+
+interface Comment {
+  _id:string;
+  sender:{_id:string,username:string,profilePic:string};
+  message:string;
+  image?:string;
+  time:Date;
+}
+
+interface Wall {
+  _id:string
+  user:{_id:string,username:string,profilePic:string};
+  content:string;
+  likes: {_id:string,username:string,profilePic:string}[];
+  replies:Comment[],
+  image?: string;
+  createdAt:Date;
+}
+
+interface Post {
+  post:string | number | readonly string[] | undefined;
+  image:string | undefined | null;
+}
+
+ interface Like  {
+  _id: string;
+  username: string;
+  profilePic: string;
+  status?: string;
+}
+
+interface EditDetails {
+  username: string;
+  age: string| number;
+  bio: string;
+  hobbies: string;
+  job: string;
+  location: string;
+  sex: string;
+  profilePic: string | null;
+}
+
+interface Friend {
+  _id: string;
+  username: string;
+  profilePic: string;
+}
+
+interface Chat{
+  title:string;
+  participants: Friend[];
+  messages: {
+    sender: Friend;
+    content: string | null;
+    image?: string | null;
+    createdAt: Date;
+
+  }[];
+  leftChatCopy:boolean;
 }
 
 const getData = async (id: string) => {
@@ -37,36 +112,36 @@ const getData = async (id: string) => {
 
 export default function Profile({ params }: ProfileParams) {
   const { username } = params;
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<User | undefined>(undefined);
   const [editing, setEditing] = useState(false);
-  const [editDetails, setEditDetails] = useState({
+  const [editDetails, setEditDetails] = useState<EditDetails>({
     username: "",
     age: "",
     bio: "",
     hobbies:"",
-    occupation: "",
+    job: "",
     location: "",
     sex: "",
     profilePic:null,
   });
-  const [imgURL,setImgURL] = useState<string | undefined>();
-  const [visibleComments, setVisibleComments] = useState({}); //tracks which posts have their comments visible
-  const [commentsToShow, setCommentsToShow] = useState({}); //tracks how many comments to show for each post 
+  const [imgURL,setImgURL] = useState<string | null |undefined>(undefined);
+  const [visibleComments, setVisibleComments] = useState<Record<string, boolean>>({}); //tracks which posts have their comments visible
+  const [commentsToShow, setCommentsToShow] = useState<Record<string, number>>({}); //tracks how many comments to show for each post 
   const router = useRouter();
   const { user,login } = useAuth();
 
  
-  const [newPostContent, setNewPostContent] = useState({
+  const [newPostContent, setNewPostContent] = useState<Post>({
     post:"",
-    image:null,
+    image:undefined,
   }); //content of a new wall post
-  const [newComments, setNewComments] = useState({}); //holds new comments for each post, identified by post ID 
-  const [socket,setSocket] = useState();
+  const [newComments, setNewComments] = useState<Record<string, { comment: string; image: string | null }>>({}); //holds new comments for each post, identified by post ID 
+  const [socket, setSocket] = useState<Socket | undefined>();
   const [openModal,setOpenModal] = useState(false);
-  const [modalLikes,setModalLikes] = useState();
-  const [postImgURL,setPostImgURL] = useState<string | undefined>();
-  const [commentImgURL,setCommentImgURL] = useState<string | undefined>();
-  const [posts, setPosts] = useState([]);
+  const [modalLikes,setModalLikes] = useState<Like[] | undefined>();
+  const [postImgURL,setPostImgURL] = useState<string | null | undefined>();
+  const [commentImgURL,setCommentImgURL] = useState<string | null | undefined>();
+  const [posts, setPosts] = useState<Wall[]>([]);
   const [showModal1, setShowModal1] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
@@ -87,7 +162,7 @@ export default function Profile({ params }: ProfileParams) {
           age: userData?.user.details.age,
           bio: userData?.user.details.bio,
           hobbies:userData?.user.details.hobbies.join(', '),
-          occupation: userData?.user.details.job,
+          job: userData?.user.details.job,
           location: userData?.user.details.location,
           sex: userData?.user.details.sex,
           profilePic: userData?.user.profilePic,
@@ -112,7 +187,7 @@ export default function Profile({ params }: ProfileParams) {
 
     socket.on('delete-comment', (commentId) => {
       setPosts((prevPosts) => {
-        const updatedPosts = prevPosts.map((post) => {
+        const updatedPosts = prevPosts?.map((post) => {
           if (post.replies.some((reply) => reply._id === commentId)) {
             const updatedReplies = post.replies.filter((reply) => reply._id !== commentId);
             return { ...post, replies: updatedReplies };
@@ -125,17 +200,17 @@ export default function Profile({ params }: ProfileParams) {
 
     socket.on('delete-wallPost', (wallId) => {
       setPosts((prev) => {
-        const updatedPosts = prev.filter(posts => posts._id !== wallId);
+        const updatedPosts = prev?.filter(posts => posts._id !== wallId);
         return updatedPosts;
       })
     })
 
-    socket.on('toggle-like', (action,wallId,userId,username) => {
+    socket.on('toggle-like', (action,wallId,userId,username,profilePic) => {
       setPosts((prevPosts) =>
-      prevPosts.map((post) => {
+      prevPosts?.map((post) => {
         if (post._id === wallId) { //find post by its id
           if (action === 'add') { //if clicked like button 
-            const newLikes = [...post.likes, { _id: userId, username: username }]; //add users like to current likes 
+            const newLikes = [...post.likes, { _id: userId, username: username, profilePic:profilePic }]; //add users like to current likes 
             return { ...post, likes: newLikes }; //update the likes 
           } else { //if clicked unlike
             const newLikes = post.likes.filter((like) => like._id !== userId); //remove users like 
@@ -154,14 +229,14 @@ export default function Profile({ params }: ProfileParams) {
     }));
 
       setPosts((prevPosts) => {
-        const updatedPosts = prevPosts.map((post) => {
+        const updatedPosts = prevPosts?.map((post) => {
           if (post._id === wallId) {
             return { ...post, replies: [...post.replies, newComment] };
           }
           return post;
         });
 
-        const updatedPost = updatedPosts.find((post) => post._id === wallId);
+        const updatedPost = updatedPosts?.find((post) => post._id === wallId);
         if (updatedPost && user?.id === userId) {
           setCommentsToShow((prevState) => ({
             ...prevState,
@@ -185,14 +260,14 @@ export default function Profile({ params }: ProfileParams) {
   }, [username,user?.id]); //because of next naming conventions this is the id
 
   
-  const toggleComments = (postId) => {
+  const toggleComments = (postId: string) => {
     setVisibleComments((prevState) => ({
       ...prevState,
-      [postId]: !prevState[postId],
+      [postId]: !prevState[Number(postId) ],
     }));
   }; //toggles the visibility of comments for a specific post (postId)
 
-  const loadMoreComments = (postId) => {
+  const loadMoreComments = (postId:string) => {
     setCommentsToShow((prevState) => ({
       ...prevState,
       [postId]: (prevState[postId] || 3) + 3,
@@ -200,9 +275,7 @@ export default function Profile({ params }: ProfileParams) {
   }; //increments the number of comments shown for a specific post
 
    async function handleAddFriend(_id: string) {
-    //automatic inbox request to the user, friendship schema created,
-    //in the inbox it would confirm the adding and add both ids to respective
-    //array
+
     const token = localStorage.getItem("token");
     const response = await fetch("/api/v1/Friendship", {
       method: "POST",
@@ -217,15 +290,15 @@ export default function Profile({ params }: ProfileParams) {
       throw new Error("Failed to handle friend request");
     }
     setData((prev) => ({
-      ...prev,
+      ...prev!,
       status: "pending",
     }));
   }
 
   async function goToChat(username: string,id: string) {
     //go chat with them, and open up the chat page in the list of chats
-    console.log(data?.user.chats);
-    const existingChat = data?.user.chats.some(chat =>
+    
+    const existingChat = data?.user.chats.some((chat: Chat) =>
       chat.participants.length === 2
        &&
       chat.participants.some(participant => participant.username === username)
@@ -258,9 +331,7 @@ export default function Profile({ params }: ProfileParams) {
     router.push(`/chat/?username=${username}&_id=${id}`);
   }
 
-  async function removeFriend(_id) {
-    //so here we want to open a tiny modal with three options to go the the
-    //persons page, chat with them or defriend them
+  async function removeFriend(_id: string) {
     console.log(_id);
 
     const token = localStorage.getItem("token");
@@ -276,28 +347,27 @@ export default function Profile({ params }: ProfileParams) {
       throw new Error("Failed to remove friend");
     }
     
-    setData((data) => ({
-      ...data,
-      friends: data.friends.filter(friend => friend._id !== _id)
-  }));
-  
-     //since we are removing a friend we should pass back the list of friends
+    setData((prevData) => {
+      if (!prevData) {
+        return prevData;
+      }
+      return {
+        ...prevData,
+        friends: prevData.friends.filter(friend => friend._id !== _id),
+      };
+    });
   }
 
   function goToInbox(username:string){
-    // your inbox opens with them on the header and a message form to send
-    //them a message, similar to chat it should open in the list of messages,
-    //you know sort of like an email system
-    console.log(username);
     router.push(`/inbox/?username=${username}`);  
   }
 
-  function detailsEdit(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  function detailsEdit(event: React.MouseEvent<HTMLButtonElement>): void {
     setEditing(true);
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value,files } = e.target;
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value,files } = e.target as HTMLInputElement;
  
     if (name === 'profilePic' && files) {
       if (imgURL) {
@@ -319,7 +389,7 @@ export default function Profile({ params }: ProfileParams) {
     } else if (name === 'job'){ 
       setEditDetails((prevState) => ({
         ...prevState,
-        occupation: value,
+        job: value,
       }));
     }else if (name === 'hobbies') {
       setEditDetails((prevState) => ({
@@ -344,11 +414,7 @@ export default function Profile({ params }: ProfileParams) {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    //check if image is edited
-    //if yes get url 
-    //put req for img s3,
-    //send post req with url to backend
-    //update ui
+
     if(editDetails.profilePic !== data?.user.profilePic) {
       console.log('hi')
     }
@@ -357,8 +423,8 @@ export default function Profile({ params }: ProfileParams) {
       hobbies: editDetails.hobbies.split(',').map((hobby) => hobby.trim()),
     };
     console.log(updatedDetails)
-    const token = localStorage.getItem("token");
-    const id = localStorage.getItem("id");
+    const token = localStorage.getItem("token") as string
+    const id = localStorage.getItem("id") as string
     try {
       const response = await fetch(`/api/v1/Profile/${id}`, {
         method: "PUT",
@@ -373,26 +439,35 @@ export default function Profile({ params }: ProfileParams) {
         throw new Error(responseData.message || "Failed to save details");
       }
       console.log(responseData);
-      setData((prevData) => ({
-        ...prevData,
-        user: {
-          ...prevData.user,
-          username: responseData.newlyEditedData.username,
-          details: {
-            ...prevData.user.details,
-            age: responseData.newlyEditedData.age,
-            bio: responseData.newlyEditedData.bio,
-            hobbies:responseData.newlyEditedData.hobbies,
-            job: responseData.newlyEditedData.job,
-            location: responseData.newlyEditedData.location,
-            sex: responseData.newlyEditedData.sex,
+      setData((prevData) => {
+        if (!prevData) {
+          // If prevData is undefined, return it as-is
+          return prevData;
+        }
+      
+        // Ensure the returned object conforms to the User type
+        return {
+          ...prevData,
+          user: {
+            ...prevData.user,
+            username: responseData.newlyEditedData.username,
+            details: {
+              ...prevData.user.details,
+              age: responseData.newlyEditedData.age,
+              bio: responseData.newlyEditedData.bio,
+              hobbies: responseData.newlyEditedData.hobbies,
+              job: responseData.newlyEditedData.job,
+              location: responseData.newlyEditedData.location,
+              sex: responseData.newlyEditedData.sex,
+            },
+            profilePic: responseData.newlyEditedData.profilePic,
           },
-          profilePic:responseData.newlyEditedData.profilePic,
-        },
-      }));
+        };
+      });
+      
       localStorage.setItem("profilePic", responseData.newlyEditedData.profilePic);
       localStorage.setItem("username",responseData.newlyEditedData.username);
-      login({ ...user, profilePic:responseData.newlyEditedData.profilePic, username:responseData.newlyEditedData.username}); // Update user context
+      login({token:token,id:id, profilePic:responseData.newlyEditedData.profilePic, username:responseData.newlyEditedData.username}); // Update user context
       setEditing(false);
       if (editfileInputRef.current) {
         editfileInputRef.current.value = '';
@@ -405,22 +480,22 @@ export default function Profile({ params }: ProfileParams) {
 
 
 function deletePost(_id:string): void {
-  socket.emit('delete-wallPost', {wallId:_id,token: `Bearer ${user?.token}`});
+  socket?.emit('delete-wallPost', {wallId:_id,token: `Bearer ${user?.token}`});
 }
 
-function openModalList(likes): void {
+function openModalList(likes: { _id: string; username: string; profilePic: string; }[]) {
   setModalLikes(likes.reverse());
   setOpenModal(true);
 }
 
 const addOrRemoveLike = (postId: string, action: string) => {
   if (!user) return; //no login no likeZ
-  socket.emit('toggle-like', {action,wallId:postId,token: `Bearer ${user?.token}`});
+  socket?.emit('toggle-like', {action,wallId:postId,token: `Bearer ${user?.token}`});
 
 }; //handles liking and unliking a post
 
-function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivElement> {
-  socket.emit('delete-comment', {wallId,commentId:_id,token: `Bearer ${user?.token}`});
+function deleteComment(_id: string,wallId: string) {
+  socket?.emit('delete-comment', {wallId,commentId:_id,token: `Bearer ${user?.token}`});
 }
 
   function handleNewPostChange(
@@ -428,7 +503,8 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
       >
     ): void {
-    const { value, name ,files} = event.target;
+    const { value, name , files} = event.target as HTMLInputElement;
+
     if (name === 'image' && files) {
       if (postImgURL) {
         URL.revokeObjectURL(postImgURL);
@@ -477,7 +553,7 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
     let imageURL = url;
   
     console.log(imageURL);
-    socket.emit('create-wallPost', ({imageURL,wallId,token: `Bearer ${user?.token}`}));
+    socket?.emit('create-wallPost', ({imageURL,wallId,token: `Bearer ${user?.token}`}));
     setNewPostContent({
       post:"",
       image:null,
@@ -506,7 +582,7 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
         setNewComments(prevComments => ({
           ...prevComments,
           [postId]: {
-            ...prevComments[postId],
+            ...prevComments[Number(postId)],
             image: base64Conversion.result as string,
           }
         }));
@@ -516,14 +592,14 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
       setNewComments(prevComments => ({
         ...prevComments,
         [postId]: {
-          ...prevComments[postId],
+          ...prevComments[Number(postId)],
           [name]: value,
         }
       }));
     }
   }; 
 
-  const handleCommentSubmit = async (postId: string, event: FormEvent<HTMLFormElement>): void => {
+  const handleCommentSubmit = async (postId: string, event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!user) return;//user must be logged in to submit a comment
 
@@ -553,14 +629,14 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
     let imageURL = url;
   
    console.log(imageURL);
-   socket.emit('create-comment', ({imageURL,comment,wallId:postId,token: `Bearer ${user?.token}`}));
+   socket?.emit('create-comment', ({imageURL,comment,wallId:postId,token: `Bearer ${user?.token}`}));
   };
 
   return (
     <div>
       {!editing ? (
         <>
-          <img className='profileImg'src={data?.user.profilePic} />
+          <Image className='profileImg' height={400} width={400} src={data?.user.profilePic} alt={"Profile Image"} />
           <ul>
             <li>{data?.user.username}</li>
             <li>Age: {data?.user.details.age}</li>
@@ -573,21 +649,17 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
               <button onClick={detailsEdit}>Edit</button>
             )}
           </ul>
-          
-          {/* {console.log(data)} */}
         </>
       ) : (
         <> 
-          {/* {user?.id === data?.filteredUser._id && <button onClick={()=>setEditing(false)}>Cancel</button>} */}
           <button onClick={() => setShowModal1(!showModal1)}>
               {showModal1 || 'Edit pfp with AI'}
           </button>
-          {showModal1 && <DalleModal imgURL={imgURL} setEditDetails={setEditDetails} setImgURL={setImgURL} fileInputRef={editfileInputRef} showModal={showModal1} setShowModal={setShowModal1} />}
+          {showModal1 && <DalleModal imgURL={imgURL} setEditDetails={setEditDetails} setImgURL={setImgURL} fileInputRef={editfileInputRef} showModal={showModal1} setShowModal={setShowModal1} setFormData={null} setNewComments={null} postId={null} fromChat={false} />}
           <form onSubmit={handleSubmit}>
               <div>
-            {imgURL ? <img className="profileImg" src={imgURL} alt="Profile Preview" /> :
-            <img className='profileImg'src={data?.user.profilePic} /> }
-            {/* {sentMessage.image && <img className="chatImgPreview" src={imgURL} (MOVE DOWNref={fileInputRef}) alt="Profile Preview" />} */}
+            {imgURL ? <Image className="profileImg" src={imgURL} height={400} width={400} alt="Profile Preview" /> :
+            <Image className='profileImg' height={400} width={400} src={data?.user.profilePic} alt={"Profile Preview"} /> }
             <input type="file" id="profilePic" name="profilePic" accept="image/jpeg" ref={editfileInputRef} onChange={handleChange}/>
             </div>
             <div>
@@ -634,7 +706,7 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
                 type="text"
                 id="job"
                 name="job"
-                value={editDetails.occupation}
+                value={editDetails.job}
                 onChange={handleChange}
               />
             </div>
@@ -674,11 +746,8 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
               Cancel
             </button>
           </form>
-
-          <img src={data?.imageDataURL} />
         </>
       )}
-      {/* {console.log(data)} */}
       <div>
       <div>
         {user?.id !== data?.user._id &&
@@ -687,7 +756,7 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
         )}
 
         {user?.id !== data?.user._id &&
-          (data?.user.friends.some(friend => friend._id === user?.id) ? (
+          (data?.user.friends.some((friend: Friend) => friend._id === user?.id) ? (
             <>
               <button onClick={() => goToChat(data?.user.username,data?.user._id)}>Chat</button>
               <p>
@@ -712,13 +781,11 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
           ))}
         <h2>Friends list </h2>
         <ul>
-          {data?.user.friends.map((friend) => (
+          {data?.user.friends.map((friend:Friend) => (
             <li key={friend.username} className="namePlusDropdown">
-              {/* <Link ><img className='friendsProfilePic'src={data?.filteredUser.profilePic} />
-              {friend.username}</Link> */}
               <Link href={`/profile/${friend._id}`}>
                 <div className="picAndName">
-                  <img className='friendsProfilePic' src= {friend.profilePic} />
+                  <Image className='friendsProfilePic' height={20} width={20} src={friend.profilePic} alt={"friends profile pics"} />
                   <p>{friend.username}</p>
                 </div>
               </Link>
@@ -742,7 +809,7 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
             {data?.suggestedFriends?.map((sFriend) => (
               <Link key={sFriend._id} href={`/profile/${sFriend._id}`}>
                 <div className="picAndName">
-                  <img className="friendsProfilePic" src={sFriend.profilePic} alt={`${sFriend.username}'s profile picture`} />
+                  <Image className="friendsProfilePic" src={sFriend.profilePic} height={20} width={20} alt={`${sFriend.username}'s profile picture`} />
                   <p>
                     {sFriend.username} <button>View Profile</button>
                   </p>
@@ -764,6 +831,8 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
 
 
 
+
+        
       <div className="wallPage">
         {/* so you can actually pass the filteredId and the token if match good else return */}
           {user?.id === data?.user._id && (<form onSubmit={handleWallSubmit} className="wallPostForm">
@@ -782,21 +851,21 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
               ref={fileInputRef}
               onChange={handleNewPostChange}
             />
-            {newPostContent?.image && <img className="postPreview" src={postImgURL} alt="Preview" />}
+            {newPostContent.image && <Image className="postPreview" src={postImgURL || ''} alt="Preview" height={100} width={100} />}
             <button type="submit">Post</button>
           </form>)}
-          <button onClick={() => setShowModal2(!showModal2)}>
+          {user?.id === data?.user._id && <button onClick={() => setShowModal2(!showModal2)}>
               {showModal2 || 'Add an ai Image to your post'}
-          </button>
-          {showModal2 && <DalleModal imgURL={postImgURL} setFormData={setNewPostContent} setImgURL={setPostImgURL} fileInputRef={fileInputRef} setEditDetails={undefined} showModal={showModal2} setShowModal={setShowModal2} setNewComments={undefined} postId={undefined} fromChat={undefined}/>}
+          </button>}
+          {showModal2 && <DalleModal imgURL={postImgURL} setFormData={setNewPostContent} setImgURL={setPostImgURL} fileInputRef={fileInputRef} setEditDetails={null} showModal={showModal2} setShowModal={setShowModal2} setNewComments={null} postId={null} fromChat={false}/>}
         </div>
         <div>
-          {posts.map((post) => (
+          {posts?.map((post) => (
             <div key={post._id} className="wallPosts">
               {user?.id === post.user._id ? <div onClick={()=> deletePost(post._id)} className="xButtonn">&times;</div> : <div></div>}
                 <Link href={`/profile/${post.user._id}`}>
                   <div className="picAndName">
-                        <img className='profilePic' src={post.user.profilePic} />
+                        <Image className='profilePic' height={40} width={40} src={post.user.profilePic} alt={"Profile Pic"} />
                         <p>{post.user.username}</p>
                   </div>
                 </Link>
@@ -804,7 +873,7 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
                 <div className="wallPostInfo">
                 {post.image &&
                 <div className="imgHolder">
-                  <img className='img' src={post.image} /> 
+                  <Image className='img' height={300} width={300} src={post.image} alt="post img"/> 
                 </div>
                 }
                 <p>{new Date(post.createdAt).toLocaleString()}</p>
@@ -841,11 +910,11 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
                     <div>
                       <Link href={`/profile/${reply.sender._id}`}>
                         <div className="picAndName">
-                          <img className='profilePic' src={reply.sender.profilePic} alt="" />
+                          <Image className='profilePic' src={reply.sender.profilePic} height={40} width={40} alt={"Profile Pic"} />
                           <p>{reply.sender.username}</p>
                         </div>
                       </Link>
-                      {reply.image && <img className="replyimg" src={reply.image} /> }
+                      {reply.image && <Image className="replyimg" src={reply.image || ''} height={150} width={150} alt={"Image reply preview"} /> }
 
                       <p>{reply.message}</p>
                       <p>{new Date(reply.time).toLocaleString()}</p>
@@ -875,9 +944,9 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
                       {showModal3 || 'Add an ai Image to your comment'}
                     </button>
                     <button type="submit">Post</button>
-                     {newComments[post._id]?.image && <img className="postPreview" src={commentImgURL} alt="Preview" />} 
+                     {newComments[post._id]?.image && <Image className="postPreview" src={commentImgURL || ""} height={100} width={100} alt="Preview" />} 
               </form>
-              {showModal3 && <DalleModal imgURL={commentImgURL} postId={post._id} setFormData={undefined} setNewComments={setNewComments} setImgURL={setCommentImgURL} fileInputRef={undefined} setEditDetails={undefined} showModal={showModal3} setShowModal={setShowModal3}/>}
+              {showModal3 && <DalleModal imgURL={commentImgURL} postId={post._id} setFormData={null} setNewComments={setNewComments} setImgURL={setCommentImgURL} fileInputRef={undefined} setEditDetails={null} showModal={showModal3} setShowModal={setShowModal3} fromChat={false}/>}
             </div>
           ))}
         </div>
@@ -889,9 +958,3 @@ function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivEleme
     </div>
   );
 }
-
-//so what i should do is pass the token get the payload id
-// do the usual stuff i am getting but also check if there exists a friendship schema
-// pass something back for example like accepted, pending, null. if accepted change the button,
-//to friends, if pending it should say requested and maybe the change to unsend
-//and null shows the add as a friend button

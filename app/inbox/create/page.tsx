@@ -4,21 +4,27 @@ import { useAuth } from "@/app/(stores)/authContext";
 import React from "react";
 import "../../(styles)/inbox.css";
 
-//for now use auth but probably switch to params id same with
-//inbox page change it to user id
-
-//make fake list of friends will pass list of friends later when load up
-//message and friends array from db of user via params id
-
 interface FormData {
   sender: string | null;
   receiver: string;
   message: string;
 }
+interface Friend {
+  _id: string;
+  username: string;
+}
 
+interface ParamName {
+  username: string;
+}
+
+interface CreateMessageProps {
+  friends: Friend[];
+  paramName: ParamName;
+}
 //const friends = ['jim','bob','billy','bill','belle','dan','daniel','xsui','name'];
 
-export default function CreateMessage({ friends, paramName}) {
+export default function CreateMessage({friends, paramName} : CreateMessageProps) {
   const { user } = useAuth();
  console.log(friends);
   const [formData, setFormData] = useState<FormData>({
@@ -95,7 +101,7 @@ export default function CreateMessage({ friends, paramName}) {
           <div className="dropdown">
             {friends &&
               friends
-                .filter((item) => {
+                .filter((item: { username: string; }) => {
                   const searchTerm = formData.receiver?.toLowerCase();
                   const arrayItemName = item.username?.toLowerCase();
                   return (
@@ -105,7 +111,7 @@ export default function CreateMessage({ friends, paramName}) {
                   );
                 })
                 .slice(0, 10)
-                .map((item) => (
+                .map((item: { _id: string; username: string; }) => (
                   <div
                     className="dropdown-row"
                     key={item._id}
@@ -134,13 +140,3 @@ export default function CreateMessage({ friends, paramName}) {
     </main>
   );
 }
-
-//this is where there will be an input form and the sender will be the id/name of the
-//logged user using nav and token, verfied in backend
-// if a user arrived here via clicking inbox the person they want to send
-// will also be populated with their name, i will also try to have a list of users
-// they are friends with like a suggestion box on who to inbox
-//possibly mass inbox though since this isnt a super robust project
-//each message would be individual not groupped
-// a check in the backend for both sender and reciever for security purposes
-//also check if users exist.

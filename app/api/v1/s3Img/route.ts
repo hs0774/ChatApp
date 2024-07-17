@@ -1,19 +1,12 @@
 import "dotenv/config";
-import env from "../../../utils/validateEnv.ts";
 import User from "@/app/(models)/user.ts";
-import Details from "../../../(models)/details.ts";
 import { NextResponse, NextRequest } from "next/server";
-import dbConnect from "@/app/utils/dbConnect";
-import validator from "validator";
-import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
-import Friendship from "@/app/(models)/friendship.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import { wallPostZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import {Wall} from "@/app/(models)/wall.ts";
-import AWS from 'aws-sdk';
-import {generateUploadURL, uploadToS3} from "../../../utils/helperFunctions/s3ImgUpload.ts"
+import {uploadToS3} from "../../../utils/helperFunctions/s3ImgUpload.ts"
 
 interface DecodedToken {
   id: string;
@@ -21,23 +14,6 @@ interface DecodedToken {
   username:string;
 }
 
-// export async function GET(req: NextRequest, res: NextResponse) {
-//     try {
-
-//         const token = verifyToken(req.headers.get("authorization"));
-//         if (!token) {
-//             return NextResponse.json({ message: "Unauthorized" },{status:401});
-//         }
-
-//         const decodedToken = jwtDecode(token) as DecodedToken; //id username email
-//         const url = await generateUploadURL(decodedToken.id,'wallImages');
-//         return NextResponse.json({ url },{status:200});
-
-//     } catch (error){
-//         console.log(error);
-//         return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
-//     }
-// }
 
 export async function POST(req: NextRequest, res: NextResponse) { 
     try {

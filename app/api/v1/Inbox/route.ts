@@ -1,13 +1,8 @@
-import "dotenv/config";
-import env from "../../../utils/validateEnv.ts";
 import User from "../../../(models)/user.ts";
-import Details from "../../../(models)/details.ts";
 import Inbox from "../../../(models)/inbox.ts";
-import Friendship from "@/app/(models)/friendship.ts";
 import { inboxZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import jwt from "jsonwebtoken";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 
@@ -87,8 +82,3 @@ export async function POST(req: NextRequest, res: NextResponse) {
     return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
   }
 }
-
-//pass array of ids if not delete all
-//loop over and find inbox schemas and delete those schemas
-//delete the ids referred in user inbox aray too
-//if delete all find all references and delete them in inbox then delete in user

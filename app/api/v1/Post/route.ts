@@ -1,14 +1,10 @@
 import User from "@/app/(models)/user.ts";
-import Details from "../../../(models)/details.ts";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import validator from "validator";
-import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
-import Friendship from "@/app/(models)/friendship.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
-import { commentZodSchema, profileZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
+import { commentZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import {Wall,Comment} from "@/app/(models)/wall.ts";
 import { uploadToS3 } from "@/app/utils/helperFunctions/s3ImgUpload.ts";
 import mongoose from "mongoose";
@@ -18,6 +14,23 @@ interface DecodedToken {
   email: string;
   username:string;
 } 
+interface Comment {
+    _id:string;
+    sender:{_id:string,username:string,profilePic:string};
+    message:string;
+    image?:string;
+    time:Date;
+  }
+  
+interface Wall {
+    _id:string
+    user:{_id:string,username:string,profilePic:string};
+    content:string;
+    likes: {_id:string,username:string,profilePic:string}[];
+    replies:Comment[],
+    image?: string;
+    createdAt:Date;
+  }
 
 export async function GET(req: NextRequest, res: NextResponse) {
     try {
@@ -40,6 +53,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         let allWalls = [...user.wall];
 
         user.friends.forEach(friend => {
+            // @ts-ignore: Property 'wall' does not exist on type 'ObjectId'
           allWalls = allWalls.concat(friend.wall);
         });
 

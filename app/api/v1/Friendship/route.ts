@@ -1,14 +1,8 @@
-import "dotenv/config";
-import env from "../../../utils/validateEnv.ts";
 import User from "../../../(models)/user.ts";
-import Details from "../../../(models)/details.ts";
 import Inbox from "../../../(models)/inbox.ts";
 import Friendship from "@/app/(models)/friendship.ts";
-import { z } from "zod";
-import validator from "validator";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 
@@ -72,10 +66,8 @@ export async function POST(req: Request, res: Response) {
     console.log(error);
     return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
   }
-} //get user id, get requested persons id, create a friendship document
-//create an inbox and send it to the request persons inbox
+} 
 
-//remove friend
 export async function DELETE(req: Request, res: Response) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
@@ -130,10 +122,3 @@ export async function DELETE(req: Request, res: Response) {
     return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
   }
 }
-//so we get the id of the friend and we get the id of the user
-
- //then we search for the friendship schema, 
- //we then delete the schema and then we remove the user 
-//from their respective array 
-//return the id of the friend you remove or return the array list of friends, whichever
-//is used in the client and remove the friend from the front end 

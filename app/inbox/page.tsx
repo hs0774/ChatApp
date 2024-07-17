@@ -1,10 +1,34 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import "../../app/(styles)/inbox.css";
 import CreateMessage from "./create/page";
 import InboxMessage from "./[userid]/page";
 import { useAuth } from "../(stores)/authContext";
+
+// Define your interfaces here
+interface User {
+  username: string;
+}
+
+interface Message {
+  _id: string;
+  id:string
+  sender: User;
+  receiver: User;
+  createdAt: number;
+  message: string;
+  type:string;
+}
+
+interface Friend {
+  _id:string;
+  id: string;
+  username: string;
+}
+
+interface ParamName {
+  username: string;
+}
 
 const getData = async () => {
   const id = localStorage.getItem("id");
@@ -15,7 +39,6 @@ const getData = async () => {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    // body: JSON.stringify(id), // Pass id as part of an object
   });
   if (!res.ok) {
     throw new Error("Failed to fetch data");
@@ -23,36 +46,29 @@ const getData = async () => {
   return res.json();
 };
 
-export default function Inbox({searchParams}) {
+export default function Inbox({ searchParams }: { searchParams: ParamName }) {
   const { user } = useAuth();
- //console.log(paramName);
-  const [messages, setMessages] = useState();
-  const [paramName,setParamName] = useState('');
-  //console.log(paramName);
+  const [messages, setMessages] = useState<{ message: Message[]; friends: Friend[] }>({ message: [], friends: [] });
+  const [paramName, setParamName] = useState<ParamName>({ username: "" });
   const [openInboxMessage, setOpenInboxMessage] = useState(false);
   const [openMessage, setOpenMessage] = useState(true);
-  const [displayedMessage, setDisplayedMessage] = useState({});
+  const [displayedMessage, setDisplayedMessage] = useState<Message | null>(null);
   const [deleteAllChecked, setDeleteAllChecked] = useState(false);
-  const [friends, setFriends] = useState();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userData = await getData();
         setMessages(userData);
-        setMessages({ ...messages, message: userData.message });
-        setFriends(userData.friends);
-        //console.log(userData.friends);
         setParamName(searchParams);
-        
       } catch (error) {
         console.error("Error:", error);
       }
     };
     fetchData();
-  }, []); //[messages, searchParams, user]);
+  }, [searchParams]);
 
-  function openInbox(message: React.SetStateAction<{}>) {
+  function openInbox(message: Message) {
     setOpenMessage(false);
     setOpenInboxMessage(true);
     setDisplayedMessage(message);
@@ -61,11 +77,8 @@ export default function Inbox({searchParams}) {
   async function handleDelete() {
     try {
       const id = localStorage.getItem("id");
-      const messagesToDelete = messages?.message
-        .filter(
-          (message) =>
-            document.getElementById(`message-${message._id}`)?.checked
-        )
+      const messagesToDelete = messages.message
+        .filter((message) => document.getElementById(`message-${message._id}`) as HTMLInputElement | null)
         .map((message) => message._id);
 
       const response = await fetch(`/api/v1/Inbox`, {
@@ -80,10 +93,10 @@ export default function Inbox({searchParams}) {
         throw new Error("Failed to delete messages");
       }
 
-      const updatedMessages = messages?.message.filter(
-        (message) => !document.getElementById(`message-${message._id}`)?.checked
-      );
-      console.log(updatedMessages);
+      const updatedMessages = messages.message.filter((message) => {
+        const element = document.getElementById(`message-${message._id}`) as HTMLInputElement | null;
+        return !(element?.checked ?? false); 
+      });
       setMessages({ ...messages, message: updatedMessages });
 
       setOpenMessage(true);
@@ -94,21 +107,17 @@ export default function Inbox({searchParams}) {
     }
   }
 
-  function handleDeleteAll(event) {
+  function handleDeleteAll(event: React.ChangeEvent<HTMLInputElement>) {
     const isChecked = event.target.checked;
-    const checkboxes = document.querySelectorAll(
-      'input[type="checkbox"][name^="message-"]'
-    );
+    const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"][name^="message-"]');
     checkboxes.forEach((checkbox) => {
       checkbox.checked = isChecked;
     });
-    setDeleteAllChecked(isChecked); // Update state of "Delete All" checkbox
+    setDeleteAllChecked(isChecked);
   }
 
   function checkIfUnchecked() {
-    const checkboxes = document.querySelectorAll(
-      'input[type="checkbox"][name^="message-"]'
-    );
+    const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"][name^="message-"]');
     for (let i = 0; i < checkboxes.length; i++) {
       if (!checkboxes[i].checked) {
         setDeleteAllChecked(false);
@@ -142,7 +151,7 @@ export default function Inbox({searchParams}) {
             onChange={handleDeleteAll}
             checked={deleteAllChecked}
           />
-          {messages?.message.map((message: React.SetStateAction<{}>) => (
+          {messages.message.map((message) => (
             <div className="inbox" key={message._id}>
               <div>
                 <li className="inboxMessages">
@@ -171,41 +180,10 @@ export default function Inbox({searchParams}) {
           ))}
         </div>
         <div className="inboxRightSide">
-          
-          {openMessage && <CreateMessage friends={friends} paramName={paramName}/>}
-          {openInboxMessage && <InboxMessage message={displayedMessage}  />}
+          {openMessage && <CreateMessage friends={messages.friends} paramName={paramName} />}
+          {openInboxMessage && displayedMessage && <InboxMessage message={displayedMessage} />}
         </div>
       </div>
     </div>
   );
 }
-
-// done:
-
-// so we first call the api and we get the users inbox and set it to
-// the const [messages, setMessages] = useState(initialMessages); state
-// if delete button is pressed update users inbox and delete message
-// create more items in the inbox so you can delete them
-//delete actually deletes item in db
-
-//todo:
-
-//  CREATE inbox messages
-
-// find sender and reciever id, create inbox schema property and place reference
-// in recievers array
-
-// might change api for user to get inbox schema within user array. same with chat
-
-// READ AND UPDATE inbox messages (DO AFTER PROFILE PAGE FRIEND REQUESTS)
-
-// then we have to get the friendship schema for any friend requests
-// i find the ids since each message has a sender and receiver id
-// and i find the schema and make sure it says pending and then update it
-// to friends and add users to respective friendship array
-// or delete the friendship schema if denied
-
-// DELETE inbox messages pt2
-
-//if a friendrequest message is deleted it should be the same as denying it
-//and delete friendship schemas created by friend requests

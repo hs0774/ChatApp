@@ -1,12 +1,9 @@
 import "dotenv/config";
-import env from "../../../../utils/validateEnv.ts";
 import User from "@/app/(models)/user.ts";
 import Details from "../../../../(models)/details.ts";
 import Chat from "@/app/(models)/chat.ts";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import validator from "validator";
-import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 import Friendship from "@/app/(models)/friendship.ts";
@@ -14,7 +11,6 @@ import {Wall} from "@/app/(models)/wall.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import { profileZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
 import { uploadToS3 } from "@/app/utils/helperFunctions/s3ImgUpload.ts";
-// import { string } from "zod";
 
 interface DecodedToken {
   id: string;
@@ -72,6 +68,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       // Find details documents with matching hobbies, excluding the current user
       const matchingDetails = await Details.find({
         _id: { $ne: user.details._id },
+        // @ts-ignore: Property 'hobbies' does not exist on type 'ObjectId'
         hobbies: { $in: user.details.hobbies },
       })
       .select("_id");

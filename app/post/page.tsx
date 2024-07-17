@@ -2,13 +2,40 @@
 import Link from "next/link";
 import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { useAuth } from "../(stores)/authContext";
-import { useRouter } from "next/navigation";
-import { v4 as uuidv4 } from "uuid";
 import '../(styles)/post.css'
-import io from 'socket.io-client';
+import Image from "next/image"
+import io, {Socket} from 'socket.io-client';
 import Modal from "../(components)/Modal";
 import DalleModal from "../(components)/dalleModal";
 
+interface Comment{
+  _id:string;
+  sender:{_id:string,username:string,profilePic:string};
+  message:string;
+  image?:string;
+  time:Date;
+}
+
+interface Wall{
+  _id:string
+  user:{_id:string,username:string,profilePic:string};
+  content:string;
+  likes: {_id:string,username:string,profilePic:string}[]; //check if pfp is returned and if yes change check modal and see what it does 
+  replies:Comment[],
+  image?: string;
+  createdAt:Date;
+}
+ interface Post {
+  post:string | number | readonly string[] | undefined;
+  image:string | undefined | null;
+ }
+
+ interface Like  {
+  _id: string;
+  username: string;
+  profilePic: string;
+  status?: string;
+}
 const getData = async () => {
   const token = localStorage.getItem("token");
   const res = await fetch(`/api/v1/Post`, { //by using id we can get more reqs if needed by creating another directory in the api/v1/chat 
@@ -26,20 +53,21 @@ const getData = async () => {
 
 export default function Post() {
   const { user } = useAuth();   //user credentials
-  const [posts, setPosts] = useState([]); //sample posts will be replaced later
-  const [visibleComments, setVisibleComments] = useState({}); //tracks which posts have their comments visible
-  const [commentsToShow, setCommentsToShow] = useState({}); //tracks how many comments to show for each post 
-  const [newPostContent, setNewPostContent] = useState({
+  const [posts, setPosts] = useState<Wall[]>([]); //sample posts will be replaced later
+  const [visibleComments, setVisibleComments] = useState<Record<string, boolean>>({}); //tracks which posts have their comments visible
+  const [commentsToShow, setCommentsToShow] = useState<Record<string, number>>({}); //tracks how many comments to show for each post 
+ 
+  const [newPostContent, setNewPostContent] = useState<Post>({
     post:"",
-    image:null,
+    image:undefined,
   }); //content of a new wall post
-  const [newComments, setNewComments] = useState({}); //holds new comments for each post, identified by post ID 
-  const [socket,setSocket] = useState();
+
+  const [newComments, setNewComments] = useState<Record<string, { comment: string; image: string | null }>>({});  //holds new comments for each post, identified by post ID 
+  const [socket, setSocket] = useState<Socket | undefined>();
   const [openModal,setOpenModal] = useState(false);
-  const [modalLikes,setModalLikes] = useState();
-  const [postImgURL,setPostImgURL] = useState<string | undefined>();
-  const [commentImgURL,setCommentImgURL] = useState<string | undefined>();
-  const [showModal1, setShowModal1] = useState(false);
+  const [modalLikes,setModalLikes] = useState<Like[] | undefined>();
+  const [postImgURL,setPostImgURL] = useState<string | null |undefined>();
+  const [commentImgURL,setCommentImgURL] = useState<string | null | undefined>();
   const [showModal2, setShowModal2] = useState(false);
   const [showModal3, setShowModal3] = useState(false);
 
@@ -63,14 +91,14 @@ export default function Post() {
       socket.emit('joinWall', { userId: user.id });
     }
 
-    socket.on('create-wallPost', (wallPost) => {
+    socket.on('create-wallPost', (wallPost:Wall) => {
       console.log(wallPost)
       setPosts((prevPosts) => [wallPost, ...prevPosts]);
     });
 
     socket.on('delete-comment', (commentId) => {
       setPosts((prevPosts) => {
-        const updatedPosts = prevPosts.map((post) => {
+        const updatedPosts = prevPosts?.map((post) => {
           if (post.replies.some((reply) => reply._id === commentId)) {
             const updatedReplies = post.replies.filter((reply) => reply._id !== commentId);
             return { ...post, replies: updatedReplies };
@@ -83,17 +111,17 @@ export default function Post() {
 
     socket.on('delete-wallPost', (wallId) => {
       setPosts((prev) => {
-        const updatedPosts = prev.filter(posts => posts._id !== wallId);
+        const updatedPosts = prev?.filter(posts => posts._id !== wallId);
         return updatedPosts;
       })
     })
 
-    socket.on('toggle-like', (action,wallId,userId,username) => {
+    socket.on('toggle-like', (action,wallId,userId,username,profilePic) => {
       setPosts((prevPosts) =>
-      prevPosts.map((post) => {
+      prevPosts?.map((post) => {
         if (post._id === wallId) { //find post by its id
           if (action === 'add') { //if clicked like button 
-            const newLikes = [...post.likes, { _id: userId, username: username }]; //add users like to current likes 
+            const newLikes = [...post.likes, { _id: userId, username: username,profilePic:profilePic }]; //add users like to current likes 
             return { ...post, likes: newLikes }; //update the likes 
           } else { //if clicked unlike
             const newLikes = post.likes.filter((like) => like._id !== userId); //remove users like 
@@ -112,14 +140,14 @@ export default function Post() {
     }));
 
       setPosts((prevPosts) => {
-        const updatedPosts = prevPosts.map((post) => {
+        const updatedPosts = prevPosts?.map((post) => {
           if (post._id === wallId) {
             return { ...post, replies: [...post.replies, newComment] };
           }
           return post;
         });
 
-        const updatedPost = updatedPosts.find((post) => post._id === wallId);
+        const updatedPost = updatedPosts?.find((post) => post._id === wallId);
         if (updatedPost && user?.id === userId) {
           setCommentsToShow((prevState) => ({
             ...prevState,
@@ -142,14 +170,16 @@ export default function Post() {
 
   }, [user?.id]);
  
-  const toggleComments = (postId) => {
+  const toggleComments = (postId: string) => {
+    
     setVisibleComments((prevState) => ({
       ...prevState,
       [postId]: !prevState[postId],
     }));
   }; //toggles the visibility of comments for a specific post (postId)
 
-  const loadMoreComments = (postId) => {
+  const loadMoreComments = (postId:string) => {
+
     setCommentsToShow((prevState) => ({
       ...prevState,
       [postId]: (prevState[postId] || 3) + 3,
@@ -163,7 +193,7 @@ export default function Post() {
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
       >
     ): void {
-    const { value, name ,files} = event.target;
+    const { value, name , files} = event.target as HTMLInputElement;
     if (name === 'image' && files) {
       if (postImgURL) {
         URL.revokeObjectURL(postImgURL);
@@ -213,7 +243,7 @@ export default function Post() {
   
    
     console.log(imageURL);
-    socket.emit('create-wallPost', ({imageURL,wallId,token: `Bearer ${user?.token}`}));
+    socket?.emit('create-wallPost', ({imageURL,wallId,token: `Bearer ${user?.token}`}));
     setNewPostContent({
       post:"",
       image:null,
@@ -259,7 +289,7 @@ export default function Post() {
     }
   }; 
 
-  const handleCommentSubmit = async (postId: string, event: FormEvent<HTMLFormElement>): void => {
+  const handleCommentSubmit = async (postId: string, event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!user) return;//user must be logged in to submit a comment
 
@@ -289,24 +319,24 @@ export default function Post() {
     let imageURL = url;
   
    console.log(imageURL);
-   socket.emit('create-comment', ({imageURL,comment,wallId:postId,token: `Bearer ${user?.token}`}));
+   socket?.emit('create-comment', ({imageURL,comment,wallId:postId,token: `Bearer ${user?.token}`}));
   };
   
   const addOrRemoveLike = (postId: string, action: string) => {
     if (!user) return; //no login no likeZ
-    socket.emit('toggle-like', {action,wallId:postId,token: `Bearer ${user?.token}`});
+    socket?.emit('toggle-like', {action,wallId:postId,token: `Bearer ${user?.token}`});
 
   }; //handles liking and unliking a post
 
-  function deleteComment(_id: string,wallId): React.MouseEventHandler<HTMLDivElement> {
-    socket.emit('delete-comment', {wallId,commentId:_id,token: `Bearer ${user?.token}`});
+  function deleteComment(_id: string,wallId: string){
+    socket?.emit('delete-comment', {wallId,commentId:_id,token: `Bearer ${user?.token}`});
   }
   
   function deletePost(_id:string): void {
-    socket.emit('delete-wallPost', {wallId:_id,token: `Bearer ${user?.token}`});
+    socket?.emit('delete-wallPost', {wallId:_id,token: `Bearer ${user?.token}`});
   }
 
-  function openModalList(likes): void {
+  function openModalList(likes: { _id: string; username: string; profilePic: string; }[]) {
     setModalLikes(likes.reverse());
     setOpenModal(true);
   }
@@ -330,22 +360,22 @@ export default function Post() {
               accept="image/jpeg" 
               ref={fileInputRef}
               onChange={handleNewPostChange}
-            />
-            {newPostContent.image && <img className="postPreview" src={postImgURL} alt="Preview" />}
+            /> 
+            {newPostContent.image && <Image className="postPreview" src={postImgURL || ''} alt="Preview" height={100} width={100} />}
             <button type="submit">Post</button>
           </form>
           <button onClick={() => setShowModal2(!showModal2)}>
               {showModal2 ? 'Cancel' : 'Add an ai Image to your post'}
           </button>
-          {showModal2 && <DalleModal imgURL={postImgURL}  setFormData={setNewPostContent} setImgURL={setPostImgURL} fileInputRef={fileInputRef} setEditDetails={undefined} showModal={showModal2} setShowModal={setShowModal2}/>}
+          {showModal2 && <DalleModal imgURL={postImgURL} setFormData={setNewPostContent} setImgURL={setPostImgURL} fileInputRef={fileInputRef} setEditDetails={null} showModal={showModal2} setShowModal={setShowModal2} setNewComments={null} postId={null} fromChat={false}/>}
         </div>
         <div>
-          {posts.map((post) => (
+          {posts?.map((post) => (
             <div key={post._id} className="wallPosts">
               {user?.id === post.user._id ? <div onClick={()=> deletePost(post._id)} className="xButtonn">&times;</div> : <div></div>}
                 <Link href={`/profile/${post.user._id}`}>
                   <div className="picAndName">
-                        <img className='profilePic' src={post.user.profilePic} />
+                  <Image className='profilePic' height={40} width={40} src={post.user.profilePic} alt={"Profile Pic"} />
                         <p>{post.user.username}</p>
                   </div>
                 </Link>
@@ -353,7 +383,7 @@ export default function Post() {
                 <div className="wallPostInfo">
                 {post.image &&
                 <div className="imgHolder">
-                  <img className='img' src={post.image} /> 
+                <Image className='img' height={300} width={300} src={post.image} alt="post img"/> 
                 </div>
                 }
                 <p>{new Date(post.createdAt).toLocaleString()}</p>
@@ -390,11 +420,11 @@ export default function Post() {
                     <div>
                       <Link href={`/profile/${reply.sender._id}`}>
                         <div className="picAndName">
-                          <img className='profilePic' src={reply.sender.profilePic} alt="" />
+                          <Image className='profilePic' src={reply.sender.profilePic} height={40} width={40} alt="Profile Pic" />
                           <p>{reply.sender.username}</p>
                         </div>
                       </Link>
-                      {reply.image && <img className="replyimg" src={reply.image} /> }
+                      {reply.image && <Image className="replyimg" src={reply.image || ''} height={150} width={150} alt={"Image reply preview"} /> }
 
                       <p>{reply.message}</p>
                       <p>{new Date(reply.time).toLocaleString()}</p>
@@ -424,9 +454,9 @@ export default function Post() {
                       {showModal3 ? 'Cancel' : 'Add an ai Image to your post'}
                     </button>
                     <button type="submit">Post</button>
-                     {newComments[post._id]?.image && <img className="postPreview" src={commentImgURL} alt="Preview" />} 
+                     {newComments[post._id]?.image && <Image className="postPreview" src={commentImgURL || ''} height={100} width={100} alt="Preview" />} 
               </form>
-              {showModal3 && <DalleModal imgURL={commentImgURL} postId={post._id} setFormData={undefined} setNewComments={setNewComments} setImgURL={setCommentImgURL} fileInputRef={undefined} setEditDetails={undefined} showModal={showModal3} setShowModal={setShowModal3} fromChat={undefined}/>}
+              {showModal3 && <DalleModal imgURL={commentImgURL} postId={post._id} setFormData={null} setNewComments={setNewComments} setImgURL={setCommentImgURL} fileInputRef={undefined} setEditDetails={null} showModal={showModal3} setShowModal={setShowModal3} fromChat={false}/>}
             </div>
           ))}
         </div>
@@ -437,42 +467,3 @@ export default function Post() {
     </>
   );
 }
-
-
-
-// else if (name === 'image' && files) {
-//   //     image:null,
-// // });
-// // const [imgURL,setImgURL] = useState<string | undefined>();
-
-
-
-
-//   if (imgURL) {
-//     URL.revokeObjectURL(imgURL);
-//   }
-//   const url = URL.createObjectURL(files[0]);
-//   setImgURL(url);
-//   const reader = new FileReader();
-//   reader.readAsDataURL(files[0]);
-//   reader.onload = () => {
-//     const str = reader.result?.toString();
-//     if (str) {
-//       const buffer = Buffer.from(str.split(',')[1], 'base64');
-//       setFormData((prev) => ({
-//         ...prev,
-//         image: buffer,
-//       }));
-//     }
-//   };
-
-
-//   <label htmlFor="image">Add a picture:</label>
-//        <input type="file" id="image" name="image" accept="image/jpeg" value={formData.image} onChange={handleChange}/>
-//        {formData.image && <img className="preview" src={imgURL} alt="Profile Preview" />}
-
-
-
-
-//comment and post reply images will be turned into base64 and a link 
-//will be genned and passed from the server

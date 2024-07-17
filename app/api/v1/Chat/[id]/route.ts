@@ -1,14 +1,7 @@
-import "dotenv/config";
-import env from "../../../../utils/validateEnv.ts";
 import User from "../../../../(models)/user.ts";
-import Details from "../../../../(models)/details.ts";
-import Inbox from "../../../../(models)/inbox.ts";
-import Friendship from "@/app/(models)/friendship.ts";
 import { chatZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
-import validator from "validator";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
@@ -105,9 +98,3 @@ export async function PATCH(req: NextRequest, res: NextResponse) {
         return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
     }
 }    
-
-//PUT LEAVE CHAT OR NEW MEMBER 
-// remove the user from the chat schema and remove the reference. 
-//or if a user is added find the user and add them to the participants property
-//and add the chat reference to their chat array in the user document
-//

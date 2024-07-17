@@ -2,7 +2,8 @@
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "../(stores)/authContext";
-import '../(styles)/nav.css'
+import Image from "next/image";
+import '../(styles)/nav.css';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -10,6 +11,7 @@ export default function Navbar() {
   const handleClick = () => {
     logout();
   };
+
   return (
     <nav>
       <div className="Navleft">
@@ -35,23 +37,20 @@ export default function Navbar() {
             <Link href="/inbox">
               <p>Inbox</p>
             </Link>
-              <Link href={`/profile/${user.id}`}>
+            <Link href={`/profile/${user.id}`}>
               <div className="navProfileHolder">
-              <p>Hello, {user.username}</p>
+                <p>Hello, {user.username}</p>
                 {user.profilePic && (
-                    <img className="navProfilePic"
-                      src={user.profilePic}
-                    />
-                  )}
-                  {/* {user.profilePic && (
-                    <img className="navProfilePic"
-                      src={user.profilePic}
-                      // `data:image/jpeg;base64,${base64Image}`
-                    />
-                  )} */}
-                </div>
-              </Link>
-
+                  <Image
+                    className="navProfilePic"
+                    src={user.profilePic}
+                    alt={`${user.username}'s profile picture`}
+                    width={20}
+                    height={20}
+                  />
+                )}
+              </div>
+            </Link>
             <Link href="/post">
               <p>Wall</p>
             </Link>
@@ -62,8 +61,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
-//fix /profile/jim to get name/id
-//fix /chat/3 to chat/id
-//logout is going to be a post request and nav back to home page
-//this might solve easily when logged works/auth

@@ -1,17 +1,9 @@
-import "dotenv/config";
-import env from "../../../utils/validateEnv.ts";
 import User from "../../../(models)/user.ts";
-import Details from "../../../(models)/details.ts";
-import Inbox from "../../../(models)/inbox.ts";
 import Friendship from "@/app/(models)/friendship.ts";
-import { z } from "zod";
-import validator from "validator";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
-import jwt from "jsonwebtoken";
 import { jwtDecode } from "jwt-decode";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
-import { decode } from "querystring";
 
 //friend request
 interface DecodedToken {

@@ -51,7 +51,7 @@ export default function Login() {
     router.push(`/profile/${id}`);
   }
 
-  async function handleRandomLogin(event: MouseEvent<HTMLButtonElement, MouseEvent>) {
+  async function handleRandomLogin(event: React.MouseEvent<HTMLButtonElement>) {
     const res = await fetch("/api/v1/Login", {
       method: "POST",
       headers: {

@@ -66,3 +66,7 @@ export const signupZodSchema = z.object({
     comment: z.string().min(1, "Comment is required ").max(1000).trim(),
     image: z.optional(z.any()),
   });
+
+  export const promptZodSchema = z.object({
+    prompt: z.string().min(1, "Comment is required ").max(150).trim(),
+  });

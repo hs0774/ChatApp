@@ -1,10 +1,8 @@
 import "dotenv/config";
 import env from "../../../utils/validateEnv.ts";
 import User from "../../../(models)/user";
-import Details from "../../../(models)/details";
 import bcrypt from "bcryptjs";
 import { loginZodSchema } from "@/app/utils/helperFunctions/zodSchemas.ts";
-import validator from "validator";
 import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
 import jwt from "jsonwebtoken";

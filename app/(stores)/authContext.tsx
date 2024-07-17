@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
     const id = localStorage.getItem("id");
     const profilePic = localStorage.getItem("profilePic");
     if (token && username && id && profilePic) {
-      setUser({ token, username, id, profilePic: profilePic});
+      setUser({ token, username, id, profilePic});
     }
   }, []);
 

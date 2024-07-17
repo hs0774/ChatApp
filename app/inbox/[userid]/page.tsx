@@ -1,6 +1,25 @@
+"use client"
 import { useAuth } from "@/app/(stores)/authContext";
 
-export default function InboxMessage({ message }) {
+interface User {
+  username: string;
+}
+
+interface Message {
+  _id:string;
+  id: string; 
+  sender: User;
+  receiver: User;
+  createdAt: number; 
+  message: string;
+  type: string; 
+}
+
+interface InboxMessageProps {
+  message: Message;
+}
+
+export default function InboxMessage({ message } : InboxMessageProps) {
   const { user } = useAuth();
   console.log(user?.id);
 
@@ -72,5 +91,3 @@ export default function InboxMessage({ message }) {
     </div>
   );
 }
-
-//do sign up, login, profile page, home page, inbox page, chat page

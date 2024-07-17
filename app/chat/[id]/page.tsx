@@ -3,47 +3,73 @@ import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from "reac
 import "../../(styles)/chat.css";
 import { useAuth } from "@/app/(stores)/authContext";
 import { v4 as uuidv4 } from "uuid";
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import Resizer from 'react-image-file-resizer';
 import DalleModal from "@/app/(components)/dalleModal";
+import Image from "next/image";
 
 
-//const socket = io('http://localhost:3001');
+interface Chat {
+  _id: string;
+  id: number | string;
+  title: string;
+  participants: { _id: string; username: string; }[];
+  messages: {
+    image?: string; id: number|string; sender:{ _id: string; username: string; }; content: string; createdAt: number; 
+}[];
+}
+interface Friend {
+  _id: string;
+  id: string;
+  username: string;
+}
+interface UserFriend {
+  _id: string | null | undefined;
+  id: string;
+  username: string;
+}
 
-export default function OpenChat({currentChat,userFriends,setCurrentChat,setExampleChat,exampleChat}) { //{ params }: chatParams
-  const {user} = useAuth();
-  const [addUserOpen,setAddUserOpen] = useState(false);
-  const [currentFriendSelected, setCurrentFriendSelected] = useState();
-  const [sentMessage, setSentMessage] = useState({
-    message:'',
-    image:null,
-  });
+interface Chatprops {
+  currentChat:Chat | undefined;
+  userFriends:UserFriend[] | undefined;
+  setCurrentChat:React.Dispatch<React.SetStateAction<Chat | undefined>>;
+  setExampleChat: React.Dispatch<React.SetStateAction<Chat[]>>;
+  exampleChat:Chat[];
+}
 
-  const [editDetails,setEditDetails] = useState()
-  const [editing,setEditing] = useState(false);
-  const [addedUsers,setAddedUsers] = useState([])
-  const [socket,setSocket] = useState();
-  const [imgURL,setImgURL] = useState<string | undefined>();
+interface Message {
+  message: string | undefined | null;
+  image: string | undefined | null;
+}
+export default function OpenChat({currentChat,userFriends,setCurrentChat,setExampleChat,exampleChat}: Chatprops) { //{ params }: chatParams
+  const { user } = useAuth();
+  const [addUserOpen, setAddUserOpen] = useState(false);
+  const [currentFriendSelected, setCurrentFriendSelected] = useState<string | undefined>();
+  const [sentMessage, setSentMessage] = useState<Message>({ message: '', image: null });
+  const [editDetails, setEditDetails] = useState<string | undefined>(currentChat?.title);
+  const [editing, setEditing] = useState(false);
+  const [addedUsers, setAddedUsers] = useState<Friend[]>([]);
+  const [socket, setSocket] = useState<Socket | undefined>();
+  const [imgURL, setImgURL] = useState<string | null | undefined>();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => { 
     setAddedUsers([]);
     setCurrentFriendSelected('');
-    setEditDetails(currentChat.title);
+    setEditDetails(currentChat?.title);
     const socket = io('http://localhost:3001');
     setSocket(socket);
   
     // Join all chat rooms the user is part of
-    exampleChat.forEach(chatId => {
-      socket.emit('joinChat', { chatId: chatId._id, userId: user?.id });
+    exampleChat.forEach(chat => {
+      socket.emit('joinChat', { chatId: chat._id, userId: user?.id });
     });
   
     socket.on('get-message', (message,chatId) => {
       console.log(message);
       setExampleChat((prevChats) => {
-        return prevChats.map((chat: { _id: any; messages: any; }) => {
+        return prevChats.map((chat) => {
           if (chat._id === chatId) {
             return {
               ...chat,
@@ -54,18 +80,23 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
         });
       });
   
-      if (chatId === currentChat._id) {
-        setCurrentChat((prevChat) => ({
-          ...prevChat,
-          messages: [...prevChat.messages, message],
-        }));
+      if (chatId === currentChat?._id) {
+        setCurrentChat((prevChat) => {
+          if (!prevChat) return undefined;
+      
+          return {
+            ...prevChat,
+            messages: [...prevChat.messages, message],
+          };
+        });
       }
+      
     });
   
     return () => {
       socket.disconnect();
     };
-  }, [setExampleChat, currentChat._id, setCurrentChat, exampleChat, user?.id, currentChat.title]);
+  }, [setExampleChat, currentChat?._id, setCurrentChat, exampleChat, user?.id, currentChat?.title]);
   
 
   function handleSubmit(event: FormEvent<HTMLFormElement>){
@@ -75,7 +106,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
       return;
     }
     console.log(sentMessage);
-    socket.emit('get-message', {message:sentMessage,currentChatId:currentChat._id,token: `Bearer ${user?.token}`});
+    socket?.emit('get-message', {message:sentMessage,currentChatId:currentChat?._id,token: `Bearer ${user?.token}`});
     setSentMessage({
       message:'',
       image:null,
@@ -119,7 +150,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     setCurrentFriendSelected(value);
   }
 
-  function addUser(event: MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function addUser(event: React.MouseEvent<HTMLButtonElement>) {
     console.log(currentFriendSelected)
     if(currentFriendSelected) {
       const friendObject = JSON.parse(currentFriendSelected);
@@ -131,41 +162,41 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     }
   }
 
-  function removeChatFriend(friend:string){
-    setAddedUsers(prev => prev.filter(friendName => friendName !== friend));
+  function removeChatFriend(friend: UserFriend){
+    setAddedUsers(prev => prev.filter(friendName => friendName.username !== friend.username));
   }
   
 
-  async function addUserToChat(event: MouseEvent<HTMLButtonElement, MouseEvent>){
+  async function addUserToChat(event: React.MouseEvent<HTMLButtonElement>){
 
     console.log(currentChat);
     const existingParticipants = addedUsers.filter(user => 
-      currentChat.participants.some((participant: { username: string; }) => participant.username === user.username)
+      currentChat?.participants.some((participant) => participant.username === user.username)
     );
 
     if (existingParticipants.length > 0) {
       console.log("User(s) already exist in the chat:", existingParticipants);
       return; 
     }  
-    const res = await fetch(`/api/v1/Chat/${currentChat._id.toString()}/patch`, {
+    const res = await fetch(`/api/v1/Chat/${currentChat?._id.toString()}/patch`, {
       method:'PATCH',
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${user?.token}`,
       },
-      body: JSON.stringify({addedUsers,id:currentChat._id})
+      body: JSON.stringify({addedUsers,id:currentChat?._id})
     })
 
     if (!res.ok) {
       throw new Error('Failed to update Chat Title');
     } 
     const updatedChat = {
-      ...currentChat,
-      participants: [...currentChat.participants, ...addedUsers]
+      ...currentChat!,
+      participants: [...currentChat!.participants, ...addedUsers]
     };
 
-    const updatedExampleChat = exampleChat.map((chat: { _id: String; }) =>
-      chat._id === currentChat._id ? updatedChat : chat
+    const updatedExampleChat = exampleChat.map((chat) =>
+      chat._id === currentChat?._id ? updatedChat : chat
     );
   
     // Update the state
@@ -176,28 +207,28 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   }
 
 
-  function changeTitle(event: MouseEvent<HTMLButtonElement, MouseEvent>){
+  function changeTitle(event: React.MouseEvent<HTMLButtonElement>){
     setEditing(true);
   }
   
-  function handleTitleChange(event: MouseEvent<HTMLButtonElement, MouseEvent>){
+  function handleTitleChange(event: ChangeEvent<HTMLInputElement>){
     const {value} = event.target;
     setEditDetails(value)
   }
 
-  async function newTitle(event: MouseEvent<HTMLButtonElement, MouseEvent>) {
+  async function newTitle(event: React.MouseEvent<HTMLButtonElement>) {
 
-    if (!editDetails.trim()) {
+    if (!editDetails?.trim()) {
       return;
     }
 
-    const res = await fetch(`/api/v1/Chat/${currentChat._id.toString()}`, {
+    const res = await fetch(`/api/v1/Chat/${currentChat?._id.toString()}`, {
       method:'PATCH',
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${user?.token}`,
       },
-      body: JSON.stringify({currentChat:currentChat._id,newTitle:editDetails.trim()})
+      body: JSON.stringify({currentChat:currentChat?._id,newTitle:editDetails.trim()})
     })
 
     if (!res.ok) {
@@ -207,12 +238,12 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
     console.log(response);
     
     setCurrentChat((prev) => ({
-      ...prev,
+      ...prev!,
       title: editDetails.trim(), // Set the new title and trim any leading/trailing whitespace
     }));
   
     const updatedExampleChat = exampleChat.map((chat) => {
-      if (chat._id === currentChat._id) {
+      if (chat._id === currentChat?._id) {
         return {
           ...chat,
           title: editDetails.trim(), // Update the title in the exampleChat array
@@ -226,36 +257,29 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
   }
   
 
-  async function leaveChat(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    const res = await fetch(`/api/v1/Chat/${currentChat._id.toString()}/put`, {
+  async function leaveChat(event: React.MouseEvent<HTMLButtonElement>) {
+    const res = await fetch(`/api/v1/Chat/${currentChat?._id.toString()}/put`, {
       method:'PUT',
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${user?.token}`,
       },
-      body: JSON.stringify({currentChat})
+      body: JSON.stringify({userId:user?.id})
     })
 
     if (!res.ok) {
       throw new Error('Failed to update Chat Title');
     } 
-    const {copyChat} = await res.json();
-    console.log('gi')
-    console.log(copyChat);
-    
-    const updatedExampleChat = exampleChat.map((chat: { _id: string; }) => {
-      if (chat._id === currentChat._id) {
-        return copyChat; // replace currentchat with copychat
-      }
-      return chat;
-    });
-    setCurrentChat(copyChat);
+
+    const updatedExampleChat = exampleChat.filter((chat) => chat._id !== currentChat?._id);
     setExampleChat(updatedExampleChat);
+    setCurrentChat(undefined);
   }
 
-  return (
+
+    return (
      <div className="currentChat"> 
-      {!editing ? <h3>{currentChat.title} <button onClick={changeTitle}>Edit Title</button></h3> :
+      {!editing ? <h3>{currentChat?.title} <button onClick={changeTitle}>Edit Title</button></h3> :
        <> <label htmlFor="title">ChatTitle:</label>
         <input
           type="text"
@@ -263,15 +287,15 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
           name="title"
           value={editDetails}
           onChange={handleTitleChange}
-        /> <button onClick={newTitle}>Change</button> <button onClick={()=>{setEditing(false);setEditDetails(currentChat.title)}}>Cancel</button></>}
+        /> <button onClick={newTitle}>Change</button> <button onClick={()=>{setEditing(false);setEditDetails(currentChat?.title)}}>Cancel</button></>}
       <div className="actualChat">
         <button onClick={leaveChat}>Leave</button>
         <button onClick={() => setAddUserOpen(!addUserOpen)}>Add User</button>
-        {addUserOpen && <><select id="chatCreate" onChange={handleChangee} value={currentFriendSelected} username="chatCreate" >
+        {addUserOpen && <><select id="chatCreate" onChange={handleChangee} value={currentFriendSelected} name="chatCreate" >
                   {/* onChange={} value={} */}
               <option value="">Select a friend</option>
-              {userFriends
-              .filter(friend => !currentChat.participants.some((participant: { username: string; }) => participant.username === friend.username))
+              {(userFriends ?? [])
+              .filter(friend => !currentChat?.participants.some((participant: { username: string; }) => participant.username === friend.username))
               .map((friend) => (
                 <option key={friend._id} value={JSON.stringify(friend)}>
                   {friend.username}
@@ -283,7 +307,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
               <li key={`${friend._id}`}>{friend.username} <button onClick={()=> removeChatFriend(friend)}>&times;</button></li>
             ))}</>}
             {addedUsers.length > 0 && <button onClick={addUserToChat}>Add user{addedUsers.length>1 ? 's' : null} to chat</button>}
-        {currentChat.messages.map((chat) => (
+        {currentChat?.messages.map((chat) => (
           <div key={uuidv4()}>
             <li
               className={chat.sender.username !== user?.username ? "friendMessages" : "userMessages"}
@@ -293,7 +317,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
               {chat.sender.username} : {chat.content} 
               {/* && (chat.image ? <img className="preview" src={chat.image} alt="Profile Preview" /> : null)} */}
             </li>
-            { chat.image && (<img className="chatImage" src={chat.image} />)}
+            { chat.image && (<Image className="chatImage" height={100} width={100} src={chat.image} alt="Chat image" />)}
             </div>
         ))}
       </div>
@@ -301,7 +325,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
       <form onSubmit={handleSubmit}>
       <div className="messageItems"> 
       <div className="messageImgItems"> 
-      {sentMessage.image && <img className="chatImgPreview" src={imgURL} alt="Profile Preview" />}
+      {sentMessage.image && <Image className="chatImgPreview" height={50} width={50} src={imgURL || " "} alt="Preview" />}
       <button onClick={() => setShowModal(!showModal)}>
             {showModal ? 'Cancel' : 'Chat using ai images'}
       </button>
@@ -319,83 +343,7 @@ export default function OpenChat({currentChat,userFriends,setCurrentChat,setExam
         <button type="submit">Send</button></div></div>
         
       </form>
-      {showModal && <DalleModal imgURL={imgURL} setFormData={setSentMessage} setImgURL={setImgURL} fileInputRef={fileInputRef} setEditDetails={undefined} setNewComments={undefined} postId={undefined} fromChat={true} showModal={showModal} setShowModal={setShowModal}/>}
+      {showModal && <DalleModal imgURL={null} setFormData={setSentMessage} setImgURL={setImgURL} fileInputRef={fileInputRef} setEditDetails={null} setNewComments={null} postId={null} fromChat={true} showModal={showModal} setShowModal={setShowModal}/>}
     </div> 
   )
 }
-
-// else if (name === 'image' && files) {
-//   //     image:null,
-// // });
-// // const [imgURL,setImgURL] = useState<string | undefined>();
-
-
-
-
-//   if (imgURL) {
-//     URL.revokeObjectURL(imgURL);
-//   }
-//   const url = URL.createObjectURL(files[0]);
-//   setImgURL(url);
-//   const reader = new FileReader();
-//   reader.readAsDataURL(files[0]);
-//   reader.onload = () => {
-//     const str = reader.result?.toString();
-//     if (str) {
-//       const buffer = Buffer.from(str.split(',')[1], 'base64');
-//       setFormData((prev) => ({
-//         ...prev,
-//         image: buffer,
-//       }));
-//     }
-//   };
-
-
-//   <label htmlFor="image">Add a picture:</label>
-//        <input type="file" id="image" name="image" accept="image/jpeg" value={sentMessage.image} onChange={handleChange}/>
-//        {sentMessage.image && <img className="preview" src={imgURL} alt="Profile Preview" />}
-
-//todo 
-//find way to load up array of participants/make an array of more objects,
-// and have the particpants in one group per side, make chats with two particpants,
-//being you and a friend and make a couple more group chats too, 
-
-
-//ok so this page is the component on the second page  <ChatList/>\
-
-//todo2
-/* Ok so here are somethings i should add and some things i would like to add,kinda surprised
-i was this close to finishing so this is just a rough draft of features i would 
-like to add, i want a delete chat button, and a method for a user to leave a chat, i 
-think i also want to make use of the user property that allows users to chat nonfriends
-of course i have to save and trim each message, i have to make sure chat button finds
-the chat or creates it and opens it when clicked on in profile page oh i should have an
-add friend to chat feature which works if either one of the users are friends with the added
-person or if they have nonfriends chat as true, oh i have to figure out how to make group chats
-it seems easier with friends and i think i should disregard nonchat friends for this feature,
-ill have a create chat and it will have all the users friends and they can click on as
-many friends they want to add to a chat and omly for one on one chats should the i sesrch
-the db if the chat exists and deny the request, i think i should add a title property to the 
-chats, if its a non one on one chat, websockets too but i think these features are easier
-to implement since i dont know much about websockets 
-
-
-      TLDR: 
-      //done
-      Add Delete Chat Button  
-      Implement Leave Chat Method //chat is there,doesnt let you type nor is it updated,might not do 
-      Add create chat button 
-      Group Chats Implementation
-      Chat Existence Checking for One-on-One Chats
-      Allow users to be added to an existing chat
-      Utilize User Property for Non-Friend Chats 
-      Save and Trim Messages
-      Chat Button Functionality on profile page 
-      Title Property for Chats
-      WebSocket Integration
-      //todo
-      Add Friend to Chat Feature same as inbox search but also adds users who have nonfriendchat to true
-      
-      
-*/
-
