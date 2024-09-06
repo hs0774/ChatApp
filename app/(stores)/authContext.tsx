@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
     const id = localStorage.getItem("id");
     const profilePic = localStorage.getItem("profilePic");
     if (token && username && id && profilePic) {
-      setUser({ token, username, id, profilePic});
+      setUser({ token, username, id, profilePic });
     }
   }, []);
 
@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
   const logout = () => {
     setUser(null);
     localStorage.clear();
-    router.push("/");
+    router.push("/login");
   };
 
   return (

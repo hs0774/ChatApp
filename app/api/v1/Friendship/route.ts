@@ -10,7 +10,7 @@ import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 interface DecodedToken {
   id: string;
   email: string;
-  username:string;
+  username: string;
 }
 export async function POST(req: Request, res: Response) {
   try {
@@ -66,7 +66,7 @@ export async function POST(req: Request, res: Response) {
     console.log(error);
     return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
   }
-} 
+}
 
 export async function DELETE(req: Request, res: Response) {
   try {
@@ -77,46 +77,57 @@ export async function DELETE(req: Request, res: Response) {
     }
 
     await dbConnect();
-    const body = await req.json(); //friend you want to remove id 
-    const decodedToken = jwtDecode(token) as DecodedToken; //user who is removing id 
+    const body = await req.json(); //friend you want to remove id
+    const decodedToken = jwtDecode(token) as DecodedToken; //user who is removing id
     console.log(decodedToken);
 
     const user = await User.findById(decodedToken.id);
     const user2 = await User.findById(body);
 
-    if(!user || !user2) {
-      return NextResponse.json({ message: "Error: User not found" }, { status: 400 });
+    if (!user || !user2) {
+      return NextResponse.json(
+        { message: "Error: User not found" },
+        { status: 400 }
+      );
     }
 
     const friendship = await Friendship.findOneAndDelete({
       $or: [
-          { $and: [{ user: user._id }, { user2: user2._id}] },
-          { $and: [{ user:user2._id }, { user2: user._id }] }
-      ]
-    })
-    
-    if(!friendship){
-      return NextResponse.json({ message: "Error: Friendship not found" }, { status: 404 });
+        { $and: [{ user: user._id }, { user2: user2._id }] },
+        { $and: [{ user: user2._id }, { user2: user._id }] },
+      ],
+    });
+
+    if (!friendship) {
+      return NextResponse.json(
+        { message: "Error: Friendship not found" },
+        { status: 404 }
+      );
     }
 
-    await User.updateOne({ _id: user._id }, {
-      $pull: {
-        friends: user2._id
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $pull: {
+          friends: user2._id,
+        },
       }
-    });
-    
+    );
+
     // Remove user1's ID from user2's friends array
-    await User.updateOne({ _id: user2._id }, {
-      $pull: {
-        friends: user._id
+    await User.updateOne(
+      { _id: user2._id },
+      {
+        $pull: {
+          friends: user._id,
+        },
       }
-    });
+    );
 
     // Save the updated users
     await Promise.all([user.save(), user2.save()]);
 
     return NextResponse.json({ message: "success" }, { status: 200 });
-
   } catch (error) {
     console.log(error);
     return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });

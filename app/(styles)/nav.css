@@ -1,10 +1,67 @@
-.navProfilePic{
-  border-radius: 50%;
-  height:20px;
-  width:20px;
+/* nav.css */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #fff;
 }
 
-.navProfileHolder{
-    display: flex;
-    gap: 4px;
+.Navleft h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.Navleft h1:hover {
+  color: #f0c14b;
+}
+
+.NavRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.NavRight p,
+.NavRight .navButton {
+  margin: 0;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.NavRight p:hover,
+.NavRight .navButton:hover {
+  color: #f0c14b;
+}
+
+.navProfileHolder {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navProfilePic {
+  border-radius: 50%;
+  height: 32px;
+  width: 32px;
+}
+
+.navButton {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.3s;
+}
+
+.navButton:hover {
+  color: #f0c14b;
 }

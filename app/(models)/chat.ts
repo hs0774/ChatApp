@@ -1,21 +1,19 @@
 import mongoose, { Model, Schema, Document } from "mongoose";
 
-
 interface IChat extends Document {
-  title:string;
+  title: string;
   participants: mongoose.Types.ObjectId[];
   messages: {
     sender: mongoose.Types.ObjectId;
     content: string | null;
     image?: string | null;
     createdAt: Date;
-
   }[];
-  leftChatCopy:boolean;
+  leftChatCopy: boolean;
 }
 
 const ChatSchema: Schema<IChat> = new Schema({
-  title: {type: String,default: ''},
+  title: { type: String, default: "" },
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   messages: [
     {
@@ -24,12 +22,12 @@ const ChatSchema: Schema<IChat> = new Schema({
         ref: "User",
         required: true,
       },
-      content: { type: String},
+      content: { type: String },
       image: { type: String },
       createdAt: { type: Date, default: Date.now },
     },
   ],
-  leftChatCopy:{type:Boolean, default:false},
+  leftChatCopy: { type: Boolean, default: false },
 });
 
 const Chat: Model<IChat> =

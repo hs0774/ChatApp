@@ -1,39 +1,169 @@
-/* .dropdown .dropdown-menu {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 120px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 999;
-    
+@font-face {
+  font-family: roboto;
+  src: url("../../public/fonts/Roboto/Roboto-Light.ttf");
 }
-.dropdown-toggle:focus + .dropdown-menu {
-    display: block;
-   
+.profileContainer {
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  background-color: #f9f9f9;
+  /* height: 89vh; */
 }
 
-.dropdown{
-    display: flex;
+/* Profile Image */
+.profileImg {
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+  margin-bottom: 15px;
 }
 
-.namePlusDropdown{
-    display: flex;
-} */
+/* User Info */
+.userInfo {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  
+}
+/* font-family: roboto; */
 
-.profileImg{
-  height:400px;
-  width:400px;
-  /* border-radius: 50%; */
+.userInfo li {
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
-.friendsProfilePic{
-    border-radius: 50%;
-    height:20px;
-    width:20px;
-  }
+.userInfo button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
 
-  .picAndName{
-    display: flex;
-    gap:4px;
-    align-items: center;
-  }
+.userInfo button:hover {
+  background-color: #0056b3;
+}
+
+
+.friendsList,
+.suggestedFriends {
+  margin-top: 20px;
+}
+
+.friendsList ul,
+.suggestedFriends ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.friendsList li,
+.suggestedFriends li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background-color: white;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.picAndName {
+  display: flex;
+  align-items: center;
+}
+
+.picAndNamee {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.picccc{
+  display: flex;
+  align-items: center;
+}
+
+.friendsProfilePic {
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.dropdown-menu button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-top: 5px;
+  margin-left: 4px;
+}
+
+.dropdown-menu button:hover {
+  background-color: #0056b3;
+}
+
+.pfpAndDetails{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  
+  margin-top: 12px;
+}
+ul{
+  list-style-type: none;
+}
+.friendLists{
+   display: flex;
+   justify-content: space-between;
+   margin-left: 10%;
+   margin-right: 10%;
+}
+
+.friendsListsLeft, .friendListsRight{
+  height: 250px;
+  overflow-y: scroll;
+  max-width: 100%;
+} 
+
+.dropdownHolder{
+  margin-bottom: 4px;
+  
+}
+.menu{
+  display: flex;
+  justify-content: center;
+}
+
+.editDeets{
+  display: flex;
+  gap: 8px;
+}
+.black{
+  color: black;
+}
+
+.dropdown-menu{
+  font-family: roboto;
+}
+/* 
+Chat with Images
+Group Chats
+Inbox and Friend Requests
+Social Media Wall
+
+AI Image Generation
+
+
+
+
+
+
+Profile Customization */

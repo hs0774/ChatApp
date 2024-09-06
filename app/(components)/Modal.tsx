@@ -10,12 +10,12 @@ interface Like {
   username: string;
   profilePic: string;
   status?: string;
-};
+}
 
-interface ModalProps  {
+interface ModalProps {
   likes: Like[] | undefined;
   setOpenModal: (open: boolean) => void;
-};
+}
 
 export default function Modal({ likes, setOpenModal }: ModalProps) {
   const { user } = useAuth();
@@ -24,24 +24,24 @@ export default function Modal({ likes, setOpenModal }: ModalProps) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch('/api/v1/Modal', {
-          method: 'POST',
+        const token = localStorage.getItem("token");
+        const res = await fetch("/api/v1/Modal", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(likes),
         });
         if (!res.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error("Failed to fetch data");
         }
 
         const userData = await res.json();
         console.log(userData.likes);
-        setData(userData.likes);
+        setData(userData.likes.reverse());
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     };
 
@@ -65,7 +65,7 @@ export default function Modal({ likes, setOpenModal }: ModalProps) {
     setData((prev) =>
       prev?.map((like) => {
         if (like._id === _id) {
-          return { ...like, status: 'pending' };
+          return { ...like, status: "pending" };
         }
         return like;
       })
@@ -75,7 +75,7 @@ export default function Modal({ likes, setOpenModal }: ModalProps) {
   return (
     <div className="modalOverlay" onClick={() => setOpenModal(false)}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <button onClick={() => setOpenModal(false)}>&times;</button>
+        <button className="xbtn" onClick={() => setOpenModal(false)}>&times;</button>
         {data?.map((like) => (
           <div className="modalList" key={like._id}>
             <div className="modalReplyImg modalPicAndName">
@@ -92,12 +92,17 @@ export default function Modal({ likes, setOpenModal }: ModalProps) {
             </div>
             {like.username === user?.username ? (
               <p>You</p>
-            ) : like?.status === 'pending' ? (
+            ) : like?.status === "pending" ? (
               <p>Requested</p>
-            ) : like.status === 'accepted' ? (
+            ) : like.status === "accepted" ? (
               <p>Friends</p>
             ) : (
-              <p onClick={() => handleAddFriend(like._id)} className="addFriend">Add Friend</p>
+              <p
+                onClick={() => handleAddFriend(like._id)}
+                className="addFriend"
+              >
+                Add Friend
+              </p>
             )}
           </div>
         ))}

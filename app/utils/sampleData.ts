@@ -17,7 +17,12 @@ const openai = new OpenAI({ apiKey: env.OPEN_AI_SECRET_KEY });
 
 async function main() {
   const completion = await openai.chat.completions.create({
-    messages: [{ role: "system", content: "Explain recursion with the movie inception " }],
+    messages: [
+      {
+        role: "system",
+        content: "Explain recursion with the movie inception ",
+      },
+    ],
     model: "gpt-3.5-turbo",
   });
 
@@ -105,30 +110,29 @@ main();
 // async function main() {
 //     console.log("Debug: About to connect");
 //     await mongoose.connect(mongoDB);
-    //await Details.createIndexes();
-   // await checkWallReplies();
-    //await addWallPosts();
-    //await updateUserWall();
+//await Details.createIndexes();
+// await checkWallReplies();
+//await addWallPosts();
+//await updateUserWall();
 // await updateUserFriends();
 //  await chatCreate();
 //  await messageCreate();
 //await updateChatsCopy();
- //await createDetails();
+//await createDetails();
 // await createFriendship();
 // await createInbox();
 // await messageCreate();
- // await createUser();
+// await createUser();
 // await updateFriends();
 //      await createInbox();
-  //await updateChats();
-  //await updateAntonetta();
- //await updateReplyTimes();
+//await updateChats();
+//await updateAntonetta();
+//await updateReplyTimes();
 //  await changeDetails();
 // await findUsersByHobby('cooking');
 //     console.log("Debug: Closing Mongoose");
 //     mongoose.connection.close();
 //  }
-
 
 //  const findUsersByHobby = async (hobby: string) => {
 //   try {
@@ -154,7 +158,6 @@ main();
 //     console.log('Indexes on Details collection:', indexes);
 //        // await detail.save();
 //     //  }
-    
 
 //     console.log('Details updated successfully!');
 //   } catch (error) {
@@ -197,12 +200,10 @@ main();
 //     }
 // }
 
-
-
 // async function updateChats() {
 //       // Find chats without a title
 //       const chatsToUpdate = await Chat.find({ title: { $exists: false } });
-  
+
 //       // Update each chat to include a title
 //       let count = 1;
 
@@ -212,7 +213,7 @@ main();
 //       count++; // Increment the counter for the next chat
 //       await chat.save();
 //     }
-    
+
 // }
 // async function updateChatsCopy() {
 //     // Find chats without a title
@@ -225,14 +226,13 @@ main();
 //     chat.leftChatCopy = false; // Set the default title with a sequential number
 //     await chat.save();
 //   }
-  
 
 // async function updateUserWall() {
-//     // Find users without all 
+//     // Find users without all
 //     try {
 //         // Update all users to include an empty wall array
 //         await User.updateMany({}, { $set: { wall: [] } });
-    
+
 //         console.log('All users updated to include a wall field.');
 //       } catch (error) {
 //         console.error('Error updating users:', error);
@@ -311,7 +311,7 @@ main();
 // })
 
 // const WallSchema: Schema<IWall> = new Schema({
-// user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true  }, 
+// user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true  },
 // content: {type: String,default: ''},
 // image: { type: Buffer },
 // replies: [CommentSchema],
@@ -354,7 +354,7 @@ main();
 //     }
 // }
 
-//add titles and have faker create tiny messages too 
+//add titles and have faker create tiny messages too
 // async function chatCreate() {
 //     const user = await User.find();
 
@@ -372,7 +372,7 @@ main();
 //         const newChat = new Chat({
 //             participants:participants,
 //             title: `Default Title ${Math.floor(Math.random() * (100 - 50 + 1)) + 50}`,
-            
+
 //         })
 
 //         await newChat.save();
@@ -411,7 +411,7 @@ main();
 //     }
 // }
 
-//make the sentence smaller 
+//make the sentence smaller
 // async function messageCreate() {
 //     const chats = await Chat.find();
 
@@ -583,29 +583,26 @@ main();
 //     await Promise.all(users.slice(10, 19).map(user => user.save()));
 // }
 // async function updateAntonettasChat() {
-    
+
 // }
-//we want to create like 5-10 more users, details are created too 
+//we want to create like 5-10 more users, details are created too
 // we want them all to be friends with antonetta36
 
 //we want a good amount of them to be mutuals with each other as well, might not need
 
-//we want them to be in few more  group and individual chats with antonetta. 
-//we do this so we have more options to add more users to antonettas chats and 
-//possibly add an admin and kick feature probably not 
+//we want them to be in few more  group and individual chats with antonetta.
+//we do this so we have more options to add more users to antonettas chats and
+//possibly add an admin and kick feature probably not
 //this might also indirectly help us with handling leave and x button.
-//how do we do this? first step is using faker to create 10 more users, 
+//how do we do this? first step is using faker to create 10 more users,
 //we copy the same code we used to make the first 10 users but change the index count for password purposes
 //we then decide whom is friends with whom (most if not all will have antonetta as a friend),
 //i will probably not populate their inboxes, for chats i will create a few for antonetta,
-//be sure to give the chats titles now 
+//be sure to give the chats titles now
 //based on these chats i might have one where antonetta is not one of the users friend,
 //but they have a mutual. i will create the chat documents and populate the members user chat
-//array  
-// add a way to go on the users profile or have them listed to see if youre frens or not 
-
+//array
+// add a way to go on the users profile or have them listed to see if youre frens or not
 
 //quick note on how to get ts/node to compile this run "node --loader ts-node/esm sampleData.ts"
 // and make sure all files are named properly like user.ts detail.ts etc
-
-

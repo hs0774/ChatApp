@@ -1,0 +1,21 @@
+/* footer.css */
+.footer {
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-top: 1px solid #f0f0f0;
+  /* margin-top: 8px; */
+  background-color: #333;
+  color: #fff;
+}
+
+.footer .footer-img {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.footer .footer-img:hover {
+  transform: scale(1.1);
+  opacity: 0.8;
+}

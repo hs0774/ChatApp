@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useAuth } from "@/app/(stores)/authContext";
 
 interface User {
@@ -6,20 +6,20 @@ interface User {
 }
 
 interface Message {
-  _id:string;
-  id: string; 
+  _id: string;
+  id: string;
   sender: User;
   receiver: User;
-  createdAt: number; 
+  createdAt: number;
   message: string;
-  type: string; 
+  type: string;
 }
 
 interface InboxMessageProps {
   message: Message;
 }
 
-export default function InboxMessage({ message } : InboxMessageProps) {
+export default function InboxMessage({ message }: InboxMessageProps) {
   const { user } = useAuth();
   console.log(user?.id);
 
@@ -46,23 +46,24 @@ export default function InboxMessage({ message } : InboxMessageProps) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${user?.token}`,
         },
-        body: JSON.stringify({ sender, receiver,action }),
+        body: JSON.stringify({ sender, receiver, action }),
       });
     }
   }
 
   return (
     <div>
-      <h2>Message List</h2>
+      <h2>{`${message.sender.username}'s message`}</h2>
       <ul>
-        <li key={message.id}>
+        <li className="clickedOnMessage" key={message.id}>
           <p>From: {message.sender.username}</p>
           <p>To: {message.receiver.username} (you) </p>
           <p>{new Date(message.createdAt).toLocaleString()}</p>
           <p>{message.message}</p>
           {message.type === "friendRequest" && (
-            <>
+            <div className="buttons">
               <button
+                className="buttonA"
                 onClick={() =>
                   handleFriendReq(
                     "accept",
@@ -74,6 +75,7 @@ export default function InboxMessage({ message } : InboxMessageProps) {
                 Accept
               </button>
               <button
+                className="buttonA"
                 onClick={() =>
                   handleFriendReq(
                     "deny",
@@ -84,7 +86,7 @@ export default function InboxMessage({ message } : InboxMessageProps) {
               >
                 Deny
               </button>
-            </>
+            </div>
           )}
         </li>
       </ul>

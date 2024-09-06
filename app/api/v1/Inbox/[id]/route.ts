@@ -8,11 +8,11 @@ import dbConnect from "@/app/utils/dbConnect";
 import verifyToken from "@/app/utils/helperFunctions/verifyToken.ts";
 import { jwtDecode } from "jwt-decode";
 
-//get inbox page 
+//get inbox page
 interface DecodedToken {
   id: string;
   email: string;
-  username:string;
+  username: string;
 }
 
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -56,7 +56,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
- 
 export async function POST(req: Request, res: Response) {
   try {
     const token = verifyToken(req.headers.get("authorization"));
@@ -64,33 +63,36 @@ export async function POST(req: Request, res: Response) {
     if (!token) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    
-    await dbConnect();
-    const body = await req.json(); //sender, reciver, action(accept,deny) 
-    console.log(body);
-    
-    const [user,user2] = await Promise.all([
-      User.findOne({username:body.sender}),
-      User.findOne({username:body.receiver}),
-    ])
 
-    if(!user || !user2) {
+    await dbConnect();
+    const body = await req.json(); //sender, reciver, action(accept,deny)
+    console.log(body);
+
+    const [user, user2] = await Promise.all([
+      User.findOne({ username: body.sender }),
+      User.findOne({ username: body.receiver }),
+    ]);
+
+    if (!user || !user2) {
       return NextResponse.json({ message: "User not found" }, { status: 401 });
     }
 
     const friendship = await Friendship.findOne({
       $or: [
-          { $and: [{ user: user }, { user2: user2 }] },
-          { $and: [{ user: user2 }, { user2: user }] }
-      ]
-    })
+        { $and: [{ user: user }, { user2: user2 }] },
+        { $and: [{ user: user2 }, { user2: user }] },
+      ],
+    });
 
-    if(!friendship || friendship.status !== 'pending') {
-      return NextResponse.json({ message: "Request has already been handled" }, { status: 400 });
+    if (!friendship || friendship.status !== "pending") {
+      return NextResponse.json(
+        { message: "Request has already been handled" },
+        { status: 400 }
+      );
     }
 
-    if(body.action === 'accept') {
-      friendship.status = 'accepted';
+    if (body.action === "accept") {
+      friendship.status = "accepted";
       await friendship.save();
 
       user.friends.push(user2._id);
@@ -98,7 +100,7 @@ export async function POST(req: Request, res: Response) {
       await Promise.all([user.save(), user2.save()]);
     }
 
-    if(body.action === 'deny') {
+    if (body.action === "deny") {
       Friendship.findByIdAndDelete(friendship._id);
     }
 
@@ -107,4 +109,4 @@ export async function POST(req: Request, res: Response) {
     console.log(error);
     return NextResponse.json({ message: `Error: ${error}` }, { status: 500 });
   }
-} 
+}

@@ -12,16 +12,16 @@ interface User {
 
 interface Message {
   _id: string;
-  id:string
+  id: string;
   sender: User;
   receiver: User;
   createdAt: number;
   message: string;
-  type:string;
+  type: string;
 }
 
 interface Friend {
-  _id:string;
+  _id: string;
   id: string;
   username: string;
 }
@@ -48,17 +48,25 @@ const getData = async () => {
 
 export default function Inbox({ searchParams }: { searchParams: ParamName }) {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<{ message: Message[]; friends: Friend[] }>({ message: [], friends: [] });
+  const [messages, setMessages] = useState<{
+    message: Message[];
+    friends: Friend[];
+  }>({ message: [], friends: [] });
   const [paramName, setParamName] = useState<ParamName>({ username: "" });
   const [openInboxMessage, setOpenInboxMessage] = useState(false);
   const [openMessage, setOpenMessage] = useState(true);
-  const [displayedMessage, setDisplayedMessage] = useState<Message | null>(null);
+  const [displayedMessage, setDisplayedMessage] = useState<Message | null>(
+    null
+  );
   const [deleteAllChecked, setDeleteAllChecked] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userData = await getData();
+        if (Array.isArray(userData.message)) {
+          userData.message.reverse();
+        }
         setMessages(userData);
         setParamName(searchParams);
       } catch (error) {
@@ -78,7 +86,12 @@ export default function Inbox({ searchParams }: { searchParams: ParamName }) {
     try {
       const id = localStorage.getItem("id");
       const messagesToDelete = messages.message
-        .filter((message) => document.getElementById(`message-${message._id}`) as HTMLInputElement | null)
+        .filter(
+          (message) =>
+            document.getElementById(
+              `message-${message._id}`
+            ) as HTMLInputElement | null
+        )
         .map((message) => message._id);
 
       const response = await fetch(`/api/v1/Inbox`, {
@@ -94,8 +107,10 @@ export default function Inbox({ searchParams }: { searchParams: ParamName }) {
       }
 
       const updatedMessages = messages.message.filter((message) => {
-        const element = document.getElementById(`message-${message._id}`) as HTMLInputElement | null;
-        return !(element?.checked ?? false); 
+        const element = document.getElementById(
+          `message-${message._id}`
+        ) as HTMLInputElement | null;
+        return !(element?.checked ?? false);
       });
       setMessages({ ...messages, message: updatedMessages });
 
@@ -109,7 +124,9 @@ export default function Inbox({ searchParams }: { searchParams: ParamName }) {
 
   function handleDeleteAll(event: React.ChangeEvent<HTMLInputElement>) {
     const isChecked = event.target.checked;
-    const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"][name^="message-"]');
+    const checkboxes = document.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"][name^="message-"]'
+    );
     checkboxes.forEach((checkbox) => {
       checkbox.checked = isChecked;
     });
@@ -117,7 +134,9 @@ export default function Inbox({ searchParams }: { searchParams: ParamName }) {
   }
 
   function checkIfUnchecked() {
-    const checkboxes = document.querySelectorAll<HTMLInputElement>('input[type="checkbox"][name^="message-"]');
+    const checkboxes = document.querySelectorAll<HTMLInputElement>(
+      'input[type="checkbox"][name^="message-"]'
+    );
     for (let i = 0; i < checkboxes.length; i++) {
       if (!checkboxes[i].checked) {
         setDeleteAllChecked(false);
@@ -128,9 +147,12 @@ export default function Inbox({ searchParams }: { searchParams: ParamName }) {
   }
 
   return (
-    <div>
+    <div className="mainInbox">
       <div className="inboxCommands">
-        <h2>Message List</h2>
+        <div className="leftinboxCommands">
+          {/* <h2>Message List</h2> */}
+          <button onClick={handleDelete}>Delete Clicked Messages</button>
+        </div>
         <button
           onClick={() => {
             setOpenInboxMessage(false);
@@ -139,49 +161,59 @@ export default function Inbox({ searchParams }: { searchParams: ParamName }) {
         >
           Create Message
         </button>
-        <button onClick={handleDelete}>Delete</button>
       </div>
       <br />
       <div className="inboxAndMessage">
-        <div className="inboxLeftSide">
-          <label htmlFor="deleteAll">Delete All</label>
-          <input
-            type="checkbox"
-            name="deleteAll"
-            onChange={handleDeleteAll}
-            checked={deleteAllChecked}
-          />
-          {messages.message.map((message) => (
-            <div className="inbox" key={message._id}>
-              <div>
-                <li className="inboxMessages">
-                  <div className="inboxLeft">
-                    <input
-                      type="checkbox"
-                      id={`message-${message._id}`}
-                      name={`message-${message._id}`}
-                      onChange={checkIfUnchecked}
-                    />
-                  </div>
-                  <div onClick={() => openInbox(message)}>
-                    <div className="inboxMiddle">
-                      <p>{message.sender.username}</p>
+        <div className="inboxLeftSideWrapper">
+          <div className="fixedSelectAll">
+            <input
+              type="checkbox"
+              name="deleteAll"
+              onChange={handleDeleteAll}
+              checked={deleteAllChecked}
+            />
+            <label htmlFor="deleteAll">Select All</label>
+          </div>
+          <div className="inboxLeftSide">
+            {messages.message.map((message) => (
+              <div className="inbox" key={message._id}>
+                <div>
+                  <li
+                    className="inboxMessages"
+                    onClick={() => openInbox(message)}
+                  >
+                    <div className="inboxLeft">
+                      <input
+                        type="checkbox"
+                        id={`message-${message._id}`}
+                        name={`message-${message._id}`}
+                        onChange={checkIfUnchecked}
+                      />
                     </div>
-                    <div className="inboxRight">
-                      <p>{message.message.slice(0, 50)}</p>
+                    <div>
+                      <div className="inboxMiddle">
+                        <p>{message.sender.username}</p>
+                      </div>
+                      <div className="inboxRight">
+                        <p>{message.message.slice(0, 50)}</p>
+                      </div>
+                      <div className="inboxEnd">
+                        <p>{new Date(message.createdAt).toLocaleString()}</p>
+                      </div>
                     </div>
-                    <div className="inboxEnd">
-                      <p>{new Date(message.createdAt).toLocaleString()}</p>
-                    </div>
-                  </div>
-                </li>
+                  </li>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
         <div className="inboxRightSide">
-          {openMessage && <CreateMessage friends={messages.friends} paramName={paramName} />}
-          {openInboxMessage && displayedMessage && <InboxMessage message={displayedMessage} />}
+          {openMessage && (
+            <CreateMessage friends={messages.friends} paramName={paramName} />
+          )}
+          {openInboxMessage && displayedMessage && (
+            <InboxMessage message={displayedMessage} />
+          )}
         </div>
       </div>
     </div>

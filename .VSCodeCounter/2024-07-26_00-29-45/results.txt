@@ -1,0 +1,146 @@
+Date : 2024-07-26 00:29:45
+Directory : /Users/hardeepsingh/repos/React/Next/chatapp
+Total : 69 files,  12222 codes, 290 comments, 874 blanks, all 13386 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| JSON               |          2 |      6,168 |          0 |          2 |      6,170 |
+| TypeScript JSX     |         17 |      2,942 |        166 |        327 |      3,435 |
+| TypeScript         |         30 |      2,088 |         80 |        352 |      2,520 |
+| CSS                |         11 |        954 |         40 |        173 |      1,167 |
+| JSON with Comments |          2 |         36 |          0 |          2 |         38 |
+| Markdown           |          1 |         23 |          0 |         14 |         37 |
+| JavaScript         |          1 |          6 |          4 |          4 |         14 |
+| XML                |          5 |          5 |          0 |          0 |          5 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                      | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                         |         69 |     12,222 |        290 |        874 |     13,386 |
+| . (Files)                                                                                 |          6 |      6,233 |          4 |         22 |      6,259 |
+| app                                                                                       |         58 |      5,984 |        286 |        852 |      7,122 |
+| app (Files)                                                                               |          2 |         38 |          9 |          9 |         56 |
+| app/(components)                                                                          |          5 |        319 |          0 |         34 |        353 |
+| app/(models)                                                                              |          6 |        166 |          0 |         38 |        204 |
+| app/(stores)                                                                              |          1 |         52 |          0 |          9 |         61 |
+| app/(styles)                                                                              |         11 |        954 |         40 |        173 |      1,167 |
+| app/api                                                                                   |         15 |      1,414 |         70 |        262 |      1,746 |
+| app/api/v1                                                                                |         15 |      1,414 |         70 |        262 |      1,746 |
+| app/api/v1/Chat                                                                           |          4 |        272 |         16 |         52 |        340 |
+| app/api/v1/Chat (Files)                                                                   |          1 |         97 |          2 |         19 |        118 |
+| app/api/v1/Chat/[id]                                                                      |          3 |        175 |         14 |         33 |        222 |
+| app/api/v1/Chat/[id] (Files)                                                              |          1 |         80 |          8 |         13 |        101 |
+| app/api/v1/Chat/[id]/patch                                                                |          1 |         35 |          1 |          7 |         43 |
+| app/api/v1/Chat/[id]/put                                                                  |          1 |         60 |          5 |         13 |         78 |
+| app/api/v1/Friendship                                                                     |          1 |        100 |          3 |         22 |        125 |
+| app/api/v1/Genimg                                                                         |          1 |         41 |          0 |          8 |         49 |
+| app/api/v1/Inbox                                                                          |          2 |        160 |          6 |         29 |        195 |
+| app/api/v1/Inbox (Files)                                                                  |          1 |         73 |          2 |         10 |         85 |
+| app/api/v1/Inbox/[id]                                                                     |          1 |         87 |          4 |         19 |        110 |
+| app/api/v1/Login                                                                          |          1 |         79 |          0 |         10 |         89 |
+| app/api/v1/Modal                                                                          |          1 |         43 |          1 |          5 |         49 |
+| app/api/v1/Post                                                                           |          1 |        136 |          6 |         20 |        162 |
+| app/api/v1/Profile                                                                        |          1 |        161 |          8 |         24 |        193 |
+| app/api/v1/Profile/[id]                                                                   |          1 |        161 |          8 |         24 |        193 |
+| app/api/v1/Server                                                                         |          1 |        275 |         27 |         72 |        374 |
+| app/api/v1/Signup                                                                         |          1 |         85 |          2 |         11 |         98 |
+| app/api/v1/s3Img                                                                          |          1 |         62 |          1 |          9 |         72 |
+| app/chat                                                                                  |          2 |        539 |        146 |         64 |        749 |
+| app/chat (Files)                                                                          |          1 |        235 |         67 |         16 |        318 |
+| app/chat/[id]                                                                             |          1 |        304 |         79 |         48 |        431 |
+| app/inbox                                                                                 |          3 |        389 |          3 |         34 |        426 |
+| app/inbox (Files)                                                                         |          1 |        172 |          1 |         16 |        189 |
+| app/inbox/[userid]                                                                        |          1 |         87 |          0 |          7 |         94 |
+| app/inbox/create                                                                          |          1 |        130 |          2 |         11 |        143 |
+| app/login                                                                                 |          1 |         97 |          0 |         10 |        107 |
+| app/post                                                                                  |          1 |        419 |          2 |         49 |        470 |
+| app/profile                                                                               |          1 |        862 |          5 |         94 |        961 |
+| app/profile/[username]                                                                    |          1 |        862 |          5 |         94 |        961 |
+| app/signup                                                                                |          1 |        227 |          1 |         24 |        252 |
+| app/utils                                                                                 |          9 |        508 |         10 |         52 |        570 |
+| app/utils (Files)                                                                         |          4 |        351 |          4 |         21 |        376 |
+| app/utils/helperFunctions                                                                 |          5 |        157 |          6 |         31 |        194 |
+| public                                                                                    |          5 |          5 |          0 |          0 |          5 |
+| public (Files)                                                                            |          3 |          3 |          0 |          0 |          3 |
+| public/images                                                                             |          2 |          2 |          0 |          0 |          2 |
++-------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                  | language           | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| /Users/hardeepsingh/repos/React/Next/chatapp/.eslintrc.json                               | JSON with Comments |          3 |          0 |          1 |          4 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/README.md                                    | Markdown           |         23 |          0 |         14 |         37 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(components)/Footer.tsx                  | TypeScript JSX     |         11 |          0 |          2 |         13 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(components)/Modal.tsx                   | TypeScript JSX     |         98 |          0 |         10 |        108 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(components)/Navbar.tsx                  | TypeScript JSX     |         60 |          0 |          6 |         66 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(components)/dalleModal.tsx              | TypeScript JSX     |        150 |          0 |         15 |        165 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(components)/wallPosts.tsx               | TypeScript JSX     |          0 |          0 |          1 |          1 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(models)/chat.ts                         | TypeScript         |         32 |          0 |          7 |         39 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(models)/details.ts                      | TypeScript         |         23 |          0 |          6 |         29 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(models)/friendship.ts                   | TypeScript         |         17 |          0 |          5 |         22 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(models)/inbox.ts                        | TypeScript         |         24 |          0 |          5 |         29 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(models)/user.ts                         | TypeScript         |         34 |          0 |          6 |         40 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(models)/wall.ts                         | TypeScript         |         36 |          0 |          9 |         45 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(stores)/authContext.tsx                 | TypeScript JSX     |         52 |          0 |          9 |         61 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/chat.css                        | CSS                |        331 |          2 |         62 |        395 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/footer.css                      | CSS                |         18 |          1 |          3 |         22 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/globals.css                     | CSS                |         94 |          0 |         14 |        108 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/imggen.css                      | CSS                |         55 |          0 |          7 |         62 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/inbox.css                       | CSS                |         27 |          3 |          9 |         39 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/modal.css                       | CSS                |         76 |          5 |         14 |         95 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/nav.css                         | CSS                |         55 |          1 |         10 |         66 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/page.module.css                 | CSS                |        196 |          3 |         32 |        231 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/post.css                        | CSS                |         79 |          3 |         18 |        100 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/profile.css                     | CSS                |         14 |         22 |          3 |         39 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/(styles)/signup.css                      | CSS                |          9 |          0 |          1 |         10 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Chat/[id]/patch/route.ts          | TypeScript         |         35 |          1 |          7 |         43 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Chat/[id]/put/route.ts            | TypeScript         |         60 |          5 |         13 |         78 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Chat/[id]/route.ts                | TypeScript         |         80 |          8 |         13 |        101 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Chat/route.ts                     | TypeScript         |         97 |          2 |         19 |        118 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Friendship/route.ts               | TypeScript         |        100 |          3 |         22 |        125 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Genimg/route.ts                   | TypeScript         |         41 |          0 |          8 |         49 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Inbox/[id]/route.ts               | TypeScript         |         87 |          4 |         19 |        110 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Inbox/route.ts                    | TypeScript         |         73 |          2 |         10 |         85 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Login/route.ts                    | TypeScript         |         79 |          0 |         10 |         89 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Modal/route.ts                    | TypeScript         |         43 |          1 |          5 |         49 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Post/route.ts                     | TypeScript         |        136 |          6 |         20 |        162 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Profile/[id]/route.ts             | TypeScript         |        161 |          8 |         24 |        193 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Server/index.ts                   | TypeScript         |        275 |         27 |         72 |        374 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/Signup/route.ts                   | TypeScript         |         85 |          2 |         11 |         98 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/api/v1/s3Img/route.ts                    | TypeScript         |         62 |          1 |          9 |         72 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/chat/[id]/page.tsx                       | TypeScript JSX     |        304 |         79 |         48 |        431 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/chat/page.tsx                            | TypeScript JSX     |        235 |         67 |         16 |        318 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/inbox/[userid]/page.tsx                  | TypeScript JSX     |         87 |          0 |          7 |         94 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/inbox/create/page.tsx                    | TypeScript JSX     |        130 |          2 |         11 |        143 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/inbox/page.tsx                           | TypeScript JSX     |        172 |          1 |         16 |        189 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/layout.tsx                               | TypeScript JSX     |         28 |          1 |          5 |         34 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/login/page.tsx                           | TypeScript JSX     |         97 |          0 |         10 |        107 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/page.tsx                                 | TypeScript JSX     |         10 |          8 |          4 |         22 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/post/page.tsx                            | TypeScript JSX     |        419 |          2 |         49 |        470 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/profile/[username]/page.tsx              | TypeScript JSX     |        862 |          5 |         94 |        961 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/signup/page.tsx                          | TypeScript JSX     |        227 |          1 |         24 |        252 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/countries.ts                       | TypeScript         |        250 |          0 |          1 |        251 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/dbConnect.ts                       | TypeScript         |         15 |          0 |          4 |         19 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/helperFunctions/s3ImgUpload.ts     | TypeScript         |         41 |          6 |         10 |         57 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/helperFunctions/sanitizeData.ts    | TypeScript         |         14 |          0 |          2 |         16 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/helperFunctions/tokenMiddleware.ts | TypeScript         |         20 |          0 |          5 |         25 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/helperFunctions/verifyToken.ts     | TypeScript         |         18 |          0 |          6 |         24 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/helperFunctions/zodSchemas.ts      | TypeScript         |         64 |          0 |          8 |         72 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/s3.ts                              | TypeScript         |         75 |          4 |         14 |         93 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/app/utils/validateEnv.ts                     | TypeScript         |         11 |          0 |          2 |         13 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/next.config.mjs                              | JavaScript         |          6 |          4 |          4 |         14 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/package-lock.json                            | JSON               |      6,115 |          0 |          1 |      6,116 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/package.json                                 | JSON               |         53 |          0 |          1 |         54 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/public/edit_icon.svg                         | XML                |          1 |          0 |          0 |          1 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/public/images/github-mark-white.svg          | XML                |          1 |          0 |          0 |          1 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/public/images/github-mark.svg                | XML                |          1 |          0 |          0 |          1 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/public/next.svg                              | XML                |          1 |          0 |          0 |          1 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/public/vercel.svg                            | XML                |          1 |          0 |          0 |          1 |
+| /Users/hardeepsingh/repos/React/Next/chatapp/tsconfig.json                                | JSON with Comments |         33 |          0 |          1 |         34 |
+| Total                                                                                     |                    |     12,222 |        290 |        874 |     13,386 |
++-------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+

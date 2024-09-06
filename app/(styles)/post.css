@@ -1,100 +1,545 @@
-.wallPage{
+/*
+ Main container styling
+.mainPost {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  background-color: #fff;
+  color: black;
+  height: 100vh;
+  overflow: hidden;
+  padding: 10px;
 }
 
-.wallPostForm{
+ Wall page container 
+.wallPage {
   display: flex;
   flex-direction: column;
-  padding-bottom: 24px;
+  gap: 20px;
+  overflow-y: auto;
+  flex: 1;
 }
 
-.wallPosts{
-  border: solid 1px red;
-  margin-bottom:24px ;
+/* Form container 
+.wallPostFormContainer {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 50%;
+  margin: 0 auto;
+  margin-top: 10px; 
+  z-index: 10;
+}
+
+/* Form styling 
+.wallPostForm {
   display: flex;
   flex-direction: column;
-  background-color: black;
+  gap: 10px;
 }
 
-.comments{
-  display: flex;
-  justify-content: space-around;
+.wallPostForm label {
+  font-weight: bold;
 }
 
-.xButton {
-  float: right;
+.wallPostForm textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: none;
+}
+
+.wallPostForm input[type="file"] {
+  padding: 10px;
+}
+
+.wallPostForm .postPreview {
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+/* Button styling
+.wallPostForm button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 24px;
-  color: red;
-}
-  
-.wallPostInfo{
-  display: flex;
-  flex-direction: column;
 }
 
-.wallPosts {
+.wallPostForm button:hover {
+  background-color: #0056b3;
+}
+
+/* Posts container 
+.postsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Individual post styling 
+.wallPost {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   position: relative;
 }
-  
-.xButtonn {
+
+.wallPost .xButtonn {
   position: absolute;
-  top: -5px;
-  right: 0px;
+  top: 10px;
+  right: 10px;
   cursor: pointer;
-}
-  
-.openModal:hover{
-  text-decoration: underline;
-  cursor: pointer;
+  font-size: 20px;
 }
 
-.img{
-  height: 50%;
-  width:50%;
-}
-
-.imgHolder{
+.wallPost .picAndName {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
-.picAndName{
-  display: flex;
-  gap: 4px;
-  padding-bottom: 4px;
-  align-items: center;    
-}
-
-.picAndName:hover{
-  text-decoration: underline;
-}
-
-.replyimg{
-  height: 150px;
-  width:150px;
-}
-
-.profilePic{
-  height: 40px;
-  width:40px;
+.wallPost .picAndName .profilePic {
   border-radius: 50%;
 }
 
+.wallPostInfo {
+  margin-top: 10px;
+}
 
-.picAndNamee{
+.wallPostInfo .imgHolder {
+  margin-top: 10px;
+}
+
+.wallPostInfo .img {
+  border-radius: 8px;
+}
+
+.wallPostInfo p,button {
+  margin: 5px 0;
+}
+
+.wallPostInfo .openModal {
+  cursor: pointer;
+  color: #007bff;
+}
+
+.wallPostInfo button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.wallPostInfo button:hover {
+  background-color: #0056b3;
+}
+
+/* Comments styling 
+.comments {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.comments .picAndName {
   display: flex;
   align-items: center;
-  gap:5px;
+  gap: 10px;
+}
+
+.comments .profilePic {
+  border-radius: 50%;
+}
+
+.comments .replyimg {
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+.comments p {
+  margin: 5px 0;
+}
+
+.comments .xButton {
+  cursor: pointer;
+  font-size: 20px;
+  float: right;
+}
+
+/* Comment form styling 
+.wallPost form {
+  margin-top: 10px;
+}
+
+.wallPost form label {
+  font-weight: bold;
+}
+
+.wallPost form input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.wallPost form input[type="file"] {
+  margin-top: 10px;
+}
+
+.wallPost form button {
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.wallPost form button:hover {
+  background-color: #0056b3;
+}
+
+.wallPost form .postPreview {
+  margin-top: 10px;
+  border-radius: 8px;
+}
+ .image-upload-input {
+  display: none;
+}
+
+.imgPost{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.image-upload-icon,
+.imgPostP{
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.generate-image-btn {
+  padding: 10px;
+  background-color: #b1c2d5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.postCommentBtn{
+ width: 100%;
+  display: block;
+  
+}
+
+.image-upload-labell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.image-upload-input {
+  display: none;
+}
+
+.imgBtns{
+  display: flex;
+  align-items: center;
 }
 
 .postPreview{
-  height:100px;
-  width:100px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+ */
+
+ /* Main container styling */
+ .mainPost {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  color: black;
+  height: 89vh;
+  overflow:scroll;
+  padding: 10px;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
-  /* .commentPreview{
+.mainPost::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
 
-  } */
+/* Wall page container */
+.wallPage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* overflow-y: auto; */
+  flex: 1;
+
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.wallPage::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
+/* Form container */
+.wallPostFormContainer {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 50%;
+  margin: 0 auto;
+  margin-top: 10px;
+  z-index: 10;
+}
+
+/* Form styling */
+.wallPostForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formLabel {
+  font-weight: bold;
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: none;
+}
+
+.image-upload-input {
+  padding: 10px;
+}
+
+.postPreview {
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+/* Button styling */
+.submitButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+/* Posts container */
+.postsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Individual post styling */
+.wallPost {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.xButtonn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.picAndName {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.profilePic {
+  border-radius: 50%;
+}
+
+.wallPostInfo {
+  margin-top: 10px;
+}
+
+.imgHolder {
+  margin-top: 10px;
+}
+
+.img {
+  border-radius: 8px;
+}
+
+.wallPostInfo p {
+  margin: 5px 0;
+}
+
+.openModal {
+  cursor: pointer;
+  color: #007bff;
+}
+
+.likeButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.likeButton:hover {
+  background-color: #0056b3;
+}
+
+.toggleCommentsButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.toggleCommentsButton:hover {
+  background-color: #0056b3;
+}
+
+/* Comments styling */
+.comments {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.comments .picAndName {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comments .profilePic {
+  border-radius: 50%;
+}
+
+.replyimg {
+  margin-top: 10px;
+  border-radius: 8px;
+}
+
+.comments p {
+  margin: 5px 0;
+}
+
+.xButton {
+  cursor: pointer;
+  font-size: 20px;
+  float: right;
+}
+
+/* Comment form styling */
+.commentForm {
+  margin-top: 10px;
+}
+
+.commentLabel {
+  font-weight: bold;
+}
+
+.commentInput {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.loadMoreCommentsButton {
+  margin-top: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.loadMoreCommentsButton:hover {
+  background-color: #0056b3;
+}
+
+.imgPost {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.image-upload-iconn,
+.imgPostP {
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.image-upload-labell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.image-upload-input {
+  display: none;
+}
+
+.postCommentBtn {
+  width: 100%;
+  display: block;
+  
+}
+
+.commentPreview {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 8px;
+  border-radius: 12px;
+}

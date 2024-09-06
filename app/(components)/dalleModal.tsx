@@ -5,13 +5,13 @@ import { TailSpin } from "react-loader-spinner";
 import Image from "next/image";
 
 interface DalleModalProps {
-  imgURL: string | null| undefined;
+  imgURL: string | null | undefined;
   setFormData: React.Dispatch<React.SetStateAction<any>> | null;
   setImgURL: React.Dispatch<React.SetStateAction<string | undefined | null>>;
   fileInputRef: React.RefObject<HTMLInputElement> | undefined;
   setEditDetails: React.Dispatch<React.SetStateAction<any>> | null;
   setNewComments: React.Dispatch<React.SetStateAction<any>> | null;
-  postId: string | null ;
+  postId: string | null | undefined;
   fromChat: boolean;
   showModal: boolean;
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
@@ -29,14 +29,16 @@ export default function DalleModal({
   showModal,
   setShowModal,
 }: DalleModalProps) {
+
   const [prompt, setPrompt] = useState<string>("");
   const [url, setUrl] = useState<string | null>(null);
+  const [previewUrl,setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   async function genImage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem("token");
     const response = await fetch("/api/v1/Genimg", {
       method: "POST",
       headers: {
@@ -50,9 +52,9 @@ export default function DalleModal({
       const data = await response.json();
 
       const base64img = `data:image/jpeg;base64,${data}`;
-
+      setPreviewUrl(base64img);
       if (fromChat) {
-        const resizedImage = await resizeImage(base64img, 150, 150);
+        const resizedImage = await resizeImage(base64img, 200, 200);
         setUrl(resizedImage);
       } else {
         setUrl(base64img);
@@ -65,7 +67,7 @@ export default function DalleModal({
 
   function resizeImage(base64Str: string, maxWidth: number, maxHeight: number) {
     return new Promise<string>((resolve) => {
-      const img = new window.Image(); 
+      const img = new window.Image();
       img.src = base64Str;
       img.onload = () => {
         const canvas = document.createElement("canvas");
@@ -81,7 +83,7 @@ export default function DalleModal({
     });
   }
 
-  function handleChange(event: ChangeEvent<HTMLInputElement>): void {
+  function handleChange(event: ChangeEvent<HTMLTextAreaElement>): void {
     const { value } = event.target;
     setPrompt(value);
   }
@@ -93,6 +95,7 @@ export default function DalleModal({
   }
 
   function setImg(event: MouseEvent<HTMLButtonElement>): void {
+    console.log(url)
     setImgURL(url);
     if (setFormData) {
       setFormData((prev: any) => ({
@@ -105,6 +108,7 @@ export default function DalleModal({
         profilePic: url,
       }));
     } else if (setNewComments) {
+      console.log(postId)
       setNewComments((prevComments: any) => ({
         ...prevComments,
         [postId as string]: {
@@ -126,36 +130,43 @@ export default function DalleModal({
       {showModal && (
         <div className="modalOverlay">
           <div className="imgGenModal">
-            <button className="closebtn" onClick={toggleModal}>
+            <button className="closebtnn" onClick={toggleModal}>
               &times;
             </button>
             {loading && (
               <div className="loadingSpinner">
-                <TailSpin height="50" width="50" color="white" ariaLabel="loading" />
+                <TailSpin
+                  height="50"
+                  width="50"
+                  color="black"
+                  ariaLabel="loading"
+                />
               </div>
             )}
             <div>
               {!url ? null : (
                 <Image
                   className="genImg"
-                  src={url}
+                  src={previewUrl || ""}
                   alt="Generated image"
-                  width={150}
-                  height={150}
+                  width={2000}
+                  height={2000}
                 />
               )}
             </div>
-            <div>
-              <label htmlFor="genImg">Enter a prompt:</label>
-            </div>
 
-            <form onSubmit={genImage}>
-              <input type="text" onChange={handleChange} />
-              <button>Generate</button>
+            <label htmlFor="genImg">What would you like an image of </label> 
+            <form className="imgGenModalForm" onSubmit={genImage}>
+            <div className="promptAndGenerate">
+               <textarea onChange={handleChange} /><button className="send-message-btn">Generate</button>
+            </div>
             </form>
-            <button className="finishGen" onClick={setImg}>
+            
+            <div>
+            <button type="button" className="generate-image-btn" onClick={setImg}>
               Done
             </button>
+            </div>
           </div>
         </div>
       )}

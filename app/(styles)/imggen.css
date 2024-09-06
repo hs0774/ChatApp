@@ -1,61 +1,111 @@
-
 .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.01);
+  display: flex;
+  
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
+/* .imgGenModal {
+  position: relative;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 500px;
+  max-width: 100%;
+  text-align: center;
+} */
 .imgGenModal {
-    position: relative;
-    background: grey;
-    padding: 20px;
-    border-radius: 10px;
-    width: 500px;
-    max-width: 100%;
-    text-align: center;
+  position: relative;
+  background: white;
+  padding: 20px;
+  border-radius: 24px;
+  width: 500px;
+  max-width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), /* Slight shadow for depth */
+              0 6px 20px rgba(0, 0, 0, 0.1); /* Larger shadow for a soft border effect */
 }
 
-.closebtn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
+.closebtnn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: black;
 }
 
 .genImg {
-    width: 100%;
-    height: auto;
-    margin-top: 20px;
+  width: 100%;
+  height: auto;
+  margin-top: 20px;
 }
 
 .finishGen {
-    margin-top: 20px;
-    background-color: #4CAF50; /* Green */
-    color: black;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 16px;
+  margin-top: 20px;
+  background-color: #4caf50; /* Green */
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 16px;
 }
 
 .loadingSpinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100px; /* Adjust as needed */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px; /* Adjust as needed */
+}
+
+/* .send-chat-btn,
+.send-message-btn, */
+/* .image-upload-label, */
+.generate-image-btn {
+  padding: 10px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.generate-image-btn {
+  background-color: #28a745;
+  margin-top: 5px;
+}
+
+.imgGenModalForm{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+
+.send-message-btn {
+  padding: 8px;
+  background-color: #0070f3;
+  color: white;
+  border: none;
+  /* border-radius: 4px; */
+  cursor: pointer;
+}
+
+.promptAndGenerate{
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }

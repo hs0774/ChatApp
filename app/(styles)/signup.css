@@ -1,10 +1,178 @@
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* General Form Styles */
+.signup-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: black;
 }
 
-.preview{
-   height:200px;
-   width: 200px;
+.signup-container-form {
+  display: flex;
+  flex-direction: column;
+  
+}
+
+.signup-container-label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.signup-container-input
+/* .signup-container textarea,
+.signup-container select  */
+{
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  color: #333;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.signup-container-input:focus{
+  border-color: #0070f3;
+  outline: none;
+}
+
+/* .signup-container textarea {
+  resize: vertical;
+  min-height: 100px;
+} */
+
+.signup-container .preview {
+  margin-bottom: 15px;
+  border-radius: 8px;
+}
+
+.signup-container button[type="submit"] {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #0070f3;
+  color: white;
+  transition: background-color 0.3s ease;
+  margin-bottom: 10px;
+}
+
+.signup-container button[type="submit"]:hover {
+  background-color: #005bb5;
+}
+
+.signup-container p {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.signup-container a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.signup-container a:hover {
+  text-decoration: underline;
+}
+
+/* Upload Section */
+.signup-container .imgPost {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.signup-container .upload-button {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  background-color: #0070f3;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.signup-container .upload-button:hover {
+  background-color: #005bb5;
+}
+
+.signup-container .imgPostP {
+  text-decoration: underline;
+  display: flex;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-container .image-upload-input {
+  display: none;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 600px) {
+  .signup-container {
+    padding: 20px;
+  }
+
+  .signup-container button[type="submit"],
+  .signup-container .upload-button {
+    font-size: 0.9rem;
+  }
+}
+
+/* Upload Section */
+.signup-container .imgPost {
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Aligns all children vertically */
+  gap: 12px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.signup-container .image-upload-labell {
+  display: flex; /* Makes the label a flex container */
+  align-items: center; /* Vertically aligns the content inside the label */
+  cursor: pointer;
+}
+
+.signup-container .image-upload-iconn {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: .9rem;
+  background-color: #0070f3;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.signup-container .image-upload-iconn:hover {
+  background-color: #005bb5;
+  cursor: pointer;
+}
+
+.signup-container .imgPostP {
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: .9rem;
+  font-weight: 400;
+  align-items: center;
+  justify-content: center;
+  display: flex; /* Ensures the text inside is vertically centered */
+}
+
+.signup-container .image-upload-input {
+  display: none;
 }

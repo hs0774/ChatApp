@@ -8,13 +8,11 @@ import { NextResponse, NextRequest } from "next/server";
 import dbConnect from "@/app/utils/dbConnect";
 import jwt from "jsonwebtoken";
 import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
-import {uploadToS3} from '../../../utils/helperFunctions/s3ImgUpload.ts'
+import { uploadToS3 } from "../../../utils/helperFunctions/s3ImgUpload.ts";
 
 const createToken = (email: string | number) => {
   return jwt.sign({ email: email }, env.SECRET);
 };
-
-
 
 export async function POST(req: Request, res: Response) {
   try {
@@ -68,17 +66,17 @@ export async function POST(req: Request, res: Response) {
     });
     await newUser.save();
 
-    if(body.image) {
-
-      const s3Url = await uploadToS3(body.image, 'profilePics', newUser._id);
-      newUser.profilePic=s3Url;
+    if (body.image) {
+      const s3Url = await uploadToS3(body.image, "profilePics", newUser._id);
+      newUser.profilePic = s3Url;
       console.log(s3Url);
       await newUser.save();
     } else {
-      newUser.profilePic='https://newchatapp.s3.amazonaws.com/profilePics/background2.jpg';
+      newUser.profilePic =
+        "https://newchatapp.s3.amazonaws.com/profilePics/background2.jpg";
       await newUser.save();
     }
-    
+
     const token = createToken(sanitizedData.email as string);
     return NextResponse.json(
       {
@@ -87,7 +85,7 @@ export async function POST(req: Request, res: Response) {
         username: sanitizedData.username,
         email: sanitizedData.email,
         id: newUser._id,
-        profilePic:newUser.profilePic,
+        profilePic: newUser.profilePic,
       },
       { status: 200 }
     );

@@ -1,38 +1,236 @@
-/* inbox main page */
+/* Main container styling */
+.mainInbox {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  color: black;
+  height: 89vh;
+  overflow: hidden; /* Prevent content from overflowing the main container */
+}
+
+/* Container for the inbox commands */
 .inboxCommands {
   display: flex;
-  justify-content: space-evenly;
-}
-
-.inboxTitles {
-  display: flex;
   justify-content: space-around;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: #fff;
+  color: black;
 }
 
+/* Button styling within the inbox commands */
+.inboxCommands button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.inboxCommands button:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+/* Flex container for inbox and message sections */
 .inboxAndMessage {
   display: flex;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  justify-content: space-between;
+  flex: 1; /* Allow the inboxAndMessage container to grow and fill the remaining space */
+  overflow: hidden; /* Prevent content overflow */
+}
+
+/* Wrapper for the left side of the inbox */
+.inboxLeftSideWrapper {
+  width: 70%;
+  border-right: 1px solid #ccc;
+  padding-right: 10px;
+  position: relative; /* Ensure the fixed element is positioned relative to this container */
+}
+
+/* Fixed position for the select all checkbox and label */
+.fixedSelectAll {
+  position: sticky;
+  top: 0;
+  background-color: #fff; /* Ensure the background is white to overlay the content */
+  z-index: 1; /* Ensure it is above the scrolling content */
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Styling for the inbox list */
+.inboxLeftSide {
+  max-height: calc(100vh - 150px); /* Adjust height to fit within the viewport */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds the height */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.inboxLeftSide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
+.inbox {
+  border-bottom: 1px solid #eee;
+  padding: 10px;
 }
 
 .inboxMessages {
+  display: flex;
+  align-items: center;
   cursor: pointer;
 }
 
-/* inbox create message page  */
+.inboxMessages:hover {
+  background-color: #0056b3;
+}
 
-.dropdown {
+.inboxLeft input {
+  margin-right: 10px;
+}
+
+.inboxMiddle {
+  flex: 1;
+}
+
+.inboxRight {
+  flex: 2;
+}
+
+.inboxEnd {
+  flex: 1;
+  /* text-align: right; */
+  font-style: italic;
+}
+
+/* Styling for the message detail view */
+.inboxRightSide {
+  width: 30%;
+  padding-left: 10px;
+  max-height: calc(100vh - 150px); /* Adjust height to fit within the viewport */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds the height */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.inboxRightSide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
+/* Styling for the CreateMessage form */
+
+.inboxForm {
   display: flex;
   flex-direction: column;
-  border: 1px solid gray;
 }
 
-.dropdown:empty {
+.inboxForm label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.inboxForm input,
+.inboxForm textarea {
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.inboxForm textarea {
+  resize: vertical;
+}
+
+.inboxForm button,
+.buttonA,
+.buttonB {
+  background-color: #007bff;
+  color: #fff;
   border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
+.buttonA:hover,
+.buttonB:hover,
+.inboxForm button:hover {
+  background-color: #0056b3;
+}
+
+
+.buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+/* Styling for the dropdown */
+.dropdown {
+  position: absolute;
+  top: 65%; 
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  z-index: 1000;
+  overflow-y: auto;
+
+  -ms-overflow-style: none;  
+  scrollbar-width: none;  
+}
+
+.dropdown::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
+
+/* Styling for individual rows in the dropdown */
 .dropdown-row {
-  text-align: start;
+  padding: 10px;
+  cursor: pointer;
 }
 
-/* inbox read message page  */
+.dropdown-row:hover {
+  background-color: #f0f0f0;
+}
+
+/* Relative positioning for the name search container */
+.nameSearch {
+  position: relative;
+}
+
+.nameSearchInner {
+  margin-bottom: 10px;
+}
+
+/* Styling for the clicked message */
+.clickedOnMessage {
+  list-style-type: none;
+}
+
+/* Flexbox styling for left inbox commands */
+.leftinboxCommands {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Styling for individual left side inbox commands */
+.inboxLeftSideCommand {
+  padding: 10px;
+  margin-right: 5px;
+}
+

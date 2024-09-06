@@ -24,12 +24,15 @@ interface CreateMessageProps {
 }
 //const friends = ['jim','bob','billy','bill','belle','dan','daniel','xsui','name'];
 
-export default function CreateMessage({friends, paramName} : CreateMessageProps) {
+export default function CreateMessage({
+  friends,
+  paramName,
+}: CreateMessageProps) {
   const { user } = useAuth();
- console.log(friends);
+  console.log(friends);
   const [formData, setFormData] = useState<FormData>({
     sender: user?.username || null,
-    receiver:paramName.username || '',
+    receiver: paramName.username || "",
     message: "",
   });
 
@@ -38,7 +41,7 @@ export default function CreateMessage({friends, paramName} : CreateMessageProps)
       setFormData((prev) => ({
         ...prev,
         sender: user.username || null,
-        receiver:paramName.username,
+        receiver: paramName.username,
       }));
     }
   }, [paramName.username, user]); //[paramName.username, user]);
@@ -80,11 +83,11 @@ export default function CreateMessage({friends, paramName} : CreateMessageProps)
 
   return (
     <main>
-      <form
+      <form className="inboxForm"
         onSubmit={handleSubmit}
         style={{ display: "flex", flexDirection: "column" }}
       >
-        <p>From {user?.username} (you) </p>
+        <p>From: {user?.username} (you) </p>
 
         <div className="nameSearch">
           <div className="nameSearchInner">
@@ -101,7 +104,7 @@ export default function CreateMessage({friends, paramName} : CreateMessageProps)
           <div className="dropdown">
             {friends &&
               friends
-                .filter((item: { username: string; }) => {
+                .filter((item: { username: string }) => {
                   const searchTerm = formData.receiver?.toLowerCase();
                   const arrayItemName = item.username?.toLowerCase();
                   return (
@@ -111,7 +114,7 @@ export default function CreateMessage({friends, paramName} : CreateMessageProps)
                   );
                 })
                 .slice(0, 10)
-                .map((item: { _id: string; username: string; }) => (
+                .map((item: { _id: string; username: string }) => (
                   <div
                     className="dropdown-row"
                     key={item._id}

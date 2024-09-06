@@ -1,95 +1,108 @@
 /* Modal Background Overlay */
 .modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999; /* Ensure it covers other content */
-  }
-  
-  /* Modal Container */
-  .modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: solid 1px red;
-    height: 50%;
-    width: 50vw;
-    display: flex;
-    flex-direction: column;
-    background-color: green; /* Ensure it has a background */
-    z-index: 1000; /* Ensure it appears above other content */
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
-    padding: 20px; /* Optional: Add padding for better content spacing */
-    overflow: scroll;
-  }
-  
-  /* Modal List Styling */
-  .modalList {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px; /* Optional: Add some space between each row */
-    color: white;
-  }
-  
-  /* Close Button Styling */
-  .modal button {
-    align-self: flex-end; /* Position the button at the top right */
-    border: none;
-    background: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-  
-  .modalItem:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999; /* Ensure it covers other content */
+}
 
-  .addFriend{
-    text-decoration: underline;
-    cursor: pointer;
-  }
+/* Modal Container */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* border: solid 1px red; */
+  border-radius: 32px;
+  height: 50%;
+  width: 50vw;
+  display: flex;
+  flex-direction: column;
+  background-color: white; /* Ensure it has a background */
+  z-index: 1000; /* Ensure it appears above other content */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), /* Slight shadow for depth */
+  0 6px 20px rgba(0, 0, 0, 0.1); /* Larger shadow for a soft border effect */
+  padding: 20px; /* Optional: Add padding for better content spacing */
+  overflow-y: scroll;
 
-  .addFriend:hover{
-    color: black;
-  }
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 
+.modal::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
 
-  .img{
-    height: 50%;
-    width:50%;
- }
+/* Modal List Styling */
+.modalList {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px; /* Optional: Add some space between each row */
+  color: #333;
+  background-color: #f5f5f5;
+  align-items: center;
+}
 
- .imgHolder{
-   display: flex;
-   justify-content: center;
- }
+.xbtn{
+  color: #333;
+}
+/* Close Button Styling */
+.modal button {
+  align-self: flex-end; /* Position the button at the top right */
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
 
- .modalPicAndName{
-   display: flex;
-   gap: 4px;
-   padding-bottom: 4px;
-   align-items: center;
-   
- }
- .modalPicAndName:hover{
-   text-decoration: underline;
- }
+.modalItem:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
 
- .modalReplyImg{
-   display: flex;
-   align-items: center;
-   gap: 5px;
- }
+.addFriend {
+  text-decoration: underline;
+  cursor: pointer;
 
- .modalProfilePic{
-    height: 25px;
-    width: 25px;
-    border-radius: 50%;
- }
+}
 
- /* replyimg">picAndName  'modalProfilePic'*/
+.addFriend:hover {
+  color: black;
+}
+
+.img {
+  height: 50%;
+  width: 50%;
+}
+
+.imgHolder {
+  display: flex;
+  justify-content: center;
+}
+
+.modalPicAndName {
+  display: flex;
+  gap: 4px;
+  padding-bottom: 4px;
+  align-items: center;
+}
+.modalPicAndName:hover {
+  text-decoration: underline;
+}
+
+.modalReplyImg {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.modalProfilePic {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+}
+
+/* replyimg">picAndName  'modalProfilePic'*/
