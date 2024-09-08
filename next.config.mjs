@@ -1,13 +1,15 @@
-// /** @type {import('next').NextConfig} */
-// const nextConfig = {};
-
-// export default nextConfig;
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["newchatapp.s3.amazonaws.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "newchatapp.s3.amazonaws.com",
+        pathname: "/**", // Allows all paths
+      },
+    ],
   },
 };
 
 export default nextConfig;
+

@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", `http://${env.URL}:3000`],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   },
 });
@@ -408,6 +408,7 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(3001, () => {
+server.listen(3001, '0.0.0.0', () => {
   console.log("WebSocket server listening on port 3001");
 });
+
