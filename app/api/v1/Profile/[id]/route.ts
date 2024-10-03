@@ -29,8 +29,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const body = req.url.slice(req.url.lastIndexOf("/") + 1);
     const decodedToken = jwtDecode(token) as DecodedToken;
     console.log(decodedToken)
-    // const wall = await Wall;
-    // const chat = await Chat;
+    const wall = await Wall;
+    const chat = await Chat;
     const user = await User.findById(body)
       .populate("details")
       .populate({

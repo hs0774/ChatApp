@@ -6,14 +6,15 @@ import React, {
   useRef,
   useState,
 } from "react";
-import "../../(styles)/chat.css";
+import "../(styles)/chat.css"
 import { useAuth } from "@/app/(stores)/authContext";
 import { v4 as uuidv4 } from "uuid";
 import io, { Socket } from "socket.io-client";
 import Resizer from "react-image-file-resizer";
 import DalleModal from "@/app/(components)/dalleModal";
 import Image from "next/image";
-import editIcon from "../../../public/edit_icon.svg";
+
+import editIcon from "../../public/edit_icon.svg"
 
 interface Chat {
   _id: string;
@@ -52,14 +53,15 @@ interface Message {
   message: string | undefined | null;
   image: string | undefined | null;
 }
-export default function OpenChat({
+
+const OpenChat: React.FC<Chatprops> = ({
   currentChat,
   userFriends,
   setCurrentChat,
   setExampleChat,
   exampleChat,
-}: Chatprops) {
-  //{ params }: chatParams
+}) => {
+  
   const { user } = useAuth();
   const [addUserOpen, setAddUserOpen] = useState(false);
   const [currentFriendSelected, setCurrentFriendSelected] = useState<
@@ -83,7 +85,7 @@ export default function OpenChat({
     setAddedUsers([]);
     setCurrentFriendSelected("");
     setEditDetails(currentChat?.title);
-    const socket = io("http://localhost:3001");
+    const socket = io("wss://thechat-app.com", { path: '/socket.io' });
     setSocket(socket);
 
     // Join all chat rooms the user is part of
@@ -591,3 +593,5 @@ export default function OpenChat({
     </div>
   );
 }
+
+export default OpenChat;

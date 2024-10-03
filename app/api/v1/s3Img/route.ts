@@ -51,9 +51,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
       content: sanitizedData?.post,
     });
 
-    newWall.save();
+   await newWall.save();
     user.wall.push(newWall._id);
-    user.save();
+    await user.save();
 
     console.log(body.hasImage);
     if (!body.hasImage) {

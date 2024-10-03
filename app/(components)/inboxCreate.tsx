@@ -2,7 +2,7 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@/app/(stores)/authContext";
 import React from "react";
-import "../../(styles)/inbox.css";
+import "../(styles)/inbox.css";
 
 interface FormData {
   sender: string | null;

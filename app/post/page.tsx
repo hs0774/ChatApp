@@ -101,7 +101,7 @@ export default function Post() {
       }
     };
     //fetchData();
-    const socket = io("http://localhost:3001");
+    const socket = io("wss://thechat-app.com", { path: '/socket.io' });
     setSocket(socket);
     if (user?.id) {
       fetchData();

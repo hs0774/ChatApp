@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import "../(styles)/chat.css";
-import OpenChat from "./[id]/page";
+import OpenChat from "../(components)/openChat";
 import { useAuth } from "../(stores)/authContext";
 import { useRouter } from "next/navigation";
 
@@ -35,7 +35,7 @@ interface UserFriend {
 
 interface NewChatParticipant {
   _id: string;
-  id: string;
+  id: string | null;
   username: string;
 }
 
@@ -220,71 +220,6 @@ export default function Chat({
       setNewChat([]);
     }
   }
-
-  // return (
-  //   <main>
-  //     <h1>Welcome to your chats</h1>
-  //     <div className="Chat">
-  //       <div className="chatpage">
-  //         <div className="friendslist">
-  //           <h3>Your chats and Group Chats</h3>
-  //           {exampleChat?.map((obj) => (
-  //             <div key={obj._id}>
-  //               <div className={`groups ${obj._id}`} onClick={() => openChat(obj)}>
-  //                 <h3>{obj.title}</h3>
-  //                 <div className="chatMembers">
-  //                   {obj.participants.map((participant) => (
-  //                     <li className="listItem" key={participant._id}>
-  //                       {participant.username !== user?.username ? `${participant.username},` : null}
-  //                     </li>
-  //                   ))}
-  //                 </div>
-  //               </div>
-  //               <button  className="remove-chat-btn" onClick={() => removeChat(obj._id)}>&times;</button>
-  //             </div>
-  //           ))}
-  //           <button className="create-chat-btn"  onClick={() => setCreateChatOpen(true)}>Create a new Chat</button>
-  //           {chatCreateOpen && (
-  //             <>
-  //               <select id="chatCreate" onChange={handleChange} value={currentFriendSelected} name="chatCreate">
-  //                 <option value="">Select a friend</option>
-  //                 {userFriends?.map((friend) => (
-  //                   <option key={friend._id} value={JSON.stringify(friend)}>
-  //                     {friend.username}
-  //                   </option>
-  //                 ))}
-  //               </select>
-  //               <button className="add-friend-btn"  onClick={addFriend}>Add</button>
-  //               {newChat.map(friend => (
-  //                 <li key={friend._id}>
-  //                   {friend.username} <button className="remove-chat-friend-btn"  onClick={() => removeChatFriend(friend)}>&times;</button>
-  //                 </li>
-  //               ))}
-  //             </>
-  //           )}
-  //           {newChat.length > 0 && (
-  //             <>
-  //               <label htmlFor="title">Chat Name:</label>
-  //               <input
-  //                 type="text"
-  //                 id="title"
-  //                 name="title"
-  //                 value={chatTitle}
-  //                 onChange={handleChange}
-  //                 required
-  //               />
-  //               <button className="create-chat-btn" onClick={createChat}>Create Chat</button>
-  //             </>
-  //           )}
-  //           {errorMessage && <p className="error-message">{errorMessage}</p>}
-  //         </div>
-  //       </div>
-  //       <div className="openChat">
-  //         {chatIsOpen && <OpenChat userFriends={userFriends} exampleChat={exampleChat} setExampleChat={setExampleChat} setCurrentChat={setCurrentChat} currentChat={currentChat} />}
-  //       </div>
-  //     </div>
-  //   </main>
-  // );
   return (
     <div className="main">
       {/* <h1 className="title">Welcome to your chats</h1> */}
@@ -396,7 +331,7 @@ export default function Chat({
           </div>
         </div>
         <div className="openChat">
-          {chatIsOpen && (
+          {chatIsOpen &&  (
             <OpenChat
               userFriends={userFriends}
               exampleChat={exampleChat}

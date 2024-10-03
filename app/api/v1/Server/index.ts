@@ -34,10 +34,11 @@ const server = http.createServer((req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", `http://${env.URL}:3000`],
+    origin: ["https://thechat-app.com", "http://localhost:3000"], // Allow your domain and localhost
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   },
 });
+
 // io.on('request', cors());
 io.on("connection", (socket) => {
   console.log("A user connected", socket.id);

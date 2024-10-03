@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import "../../app/(styles)/inbox.css";
-import CreateMessage from "./create/page";
-import InboxMessage from "./[userid]/page";
+import CreateMessage from "../(components)/inboxCreate";
+import InboxMessage from "../(components)/inboxMessage";
 import { useAuth } from "../(stores)/authContext";
 
 // Define your interfaces here
