@@ -69,4 +69,5 @@ export const commentZodSchema = z.object({
 
 export const promptZodSchema = z.object({
   prompt: z.string().min(1, "Comment is required ").max(150).trim(),
+  model: z.enum(["dalle3","stability","leonardo"])
 });

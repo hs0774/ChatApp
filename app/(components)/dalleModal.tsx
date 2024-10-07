@@ -30,13 +30,18 @@ export default function DalleModal({
   setShowModal,
 }: DalleModalProps) {
 
-  const [prompt, setPrompt] = useState<string>("");
+  const [prompt, setPrompt] = useState({
+    prompt:'',
+    model:'dalle3'
+  });
   const [url, setUrl] = useState<string | null>(null);
   const [previewUrl,setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function genImage(event: React.FormEvent<HTMLFormElement>) {
+  async function genImage(event: React.FormEvent<HTMLButtonElement>) {
     event.preventDefault();
+    console.log(prompt)
+    
     setLoading(true);
     const token = localStorage.getItem("token");
     const response = await fetch("/api/v1/Genimg", {
@@ -45,7 +50,7 @@ export default function DalleModal({
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ prompt }),
+      body: JSON.stringify( prompt ),
     });
 
     if (response.ok) {
@@ -83,14 +88,25 @@ export default function DalleModal({
     });
   }
 
-  function handleChange(event: ChangeEvent<HTMLTextAreaElement>): void {
-    const { value } = event.target;
-    setPrompt(value);
+  function handleChange(
+    event: ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ): void {
+    const { name,value } = event.target;
+    setPrompt((prev) => ({
+      ...prev,
+      [name]:value,
+    }));
   }
+  
 
   function toggleModal(event: MouseEvent<HTMLButtonElement>): void {
     setShowModal(false);
-    setPrompt("");
+    setPrompt({
+      prompt:'',
+      model:'dalle3'
+    });
     setUrl(null);
   }
 
@@ -121,7 +137,10 @@ export default function DalleModal({
       fileInputRef.current.value = "";
     }
     setShowModal(false);
-    setPrompt("");
+    setPrompt({
+      prompt:'',
+      model:'dalle3'
+    });
     setUrl(null);
   }
 
@@ -154,19 +173,27 @@ export default function DalleModal({
                 />
               )}
             </div>
-
             <label htmlFor="genImg">What would you like an image of </label> 
-            <form className="imgGenModalForm" onSubmit={genImage}>
-            <div className="promptAndGenerate">
-               <textarea onChange={handleChange} /><button className="send-message-btn">Generate</button>
+            <div className="promptAndGenerate imgGenModalForm">
+              <textarea onChange={handleChange} name="prompt" value={prompt.prompt} />  
             </div>
-            </form>
-            
-            <div>
+            <div className="selectPlusGen">
+              <select
+                  className="signup-container-input"
+                  id="model"
+                  name="model"
+                  value={prompt.model}
+                  onChange={handleChange}
+                >
+                <option value="dalle">Dalle-3</option>
+                <option value="stability">Stable Diffusion</option>
+                <option value="leonardo">Leonardo Ai</option>
+              </select>
+              <button onClick={genImage} className="send-message-btn">Generate</button>
+            </div>
             <button type="button" className="generate-image-btn" onClick={setImg}>
               Done
             </button>
-            </div>
           </div>
         </div>
       )}

@@ -93,6 +93,7 @@
   justify-content: center;
   align-items: center;
   gap: 4px;
+  margin-top: 4px;
 }
 
 .send-message-btn {
@@ -108,4 +109,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.selectPlusGen{
+  display: flex;
+  /* flex-direction: column; */
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
 }

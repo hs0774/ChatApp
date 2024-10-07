@@ -10,4 +10,6 @@ export default cleanEnv(process.env, {
   AWS_SECRET_KEY: str(),
   OPEN_AI_SECRET_KEY: str(),
   URL:str(),
+  STABLE_DIFFUSION_KEY:str(),
+  LEONARDO_AI_KEY:str(),
 });
