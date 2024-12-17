@@ -1,5 +1,5 @@
 <h1>LIVE: </h1>
-  <a href="https://thechatapp.com" target="_blank">thechatapp.com</a>
+  <a href="https://thechat-app.com" target="_blank">https://thechat-app.com</a>
 <br>
 <br>
 <br>
