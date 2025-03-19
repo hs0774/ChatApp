@@ -20,11 +20,14 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+      - name: Test
+        run:
           cd $APP_DIR
           touch $APP_DIR.env
           echo "${{secrets.SECRETS}}" >> .env
           touch $APP_DIR/chatapp/app/utils/.env
           echo "${{secrets.SECRETS}}" >> .env
+          
       - name: Build the Next.js app
         run: npm run build
 
