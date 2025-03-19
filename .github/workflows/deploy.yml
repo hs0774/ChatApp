@@ -21,7 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Check Secrets
-        run: echo "AWS Access Key: ${{ secrets.SECRET }}"
+        run: |
+        echo "AWS Access Key: ${{ secrets.SECRET }}"
       - name: Build the Next.js app
         run: npm run build
 
