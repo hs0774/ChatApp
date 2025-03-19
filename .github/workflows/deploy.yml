@@ -30,6 +30,16 @@ jobs:
           EC2_USER: ubuntu  # EC2 username (commonly "ubuntu" on AWS EC2)
           EC2_HOST: 3.215.189.63  # EC2 public IP or DNS name
           APP_DIR: /home/ubuntu/ChatApp  # The directory where your app resides
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          AWS_BUCKET_REGION: ${{ secrets.AWS_BUCKET_REGION }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          LEONARDO_AI_KEY: ${{ secrets.LEONARDO_AI_KEY }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          OPEN_AI_SECRET_KEY: ${{ secrets.OPEN_AI_SECRET_KEY }}
+          SECRET: ${{ secrets.SECRET }}
+          STABLE_DIFFUSION_KEY: ${{ secrets.STABLE_DIFFUSION_KEY }}
+          URL: ${{ secrets.URL }}
         run: |
           # Set up SSH with the private key
           echo "$PRIVATE_KEY" > private_key.pem
