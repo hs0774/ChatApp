@@ -1,0 +1,46 @@
+name: Deploy Next.js App to AWS EC2
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest 
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'  # Use the correct Node.js version for your app
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the Next.js app
+        run: npm run build
+
+      - name: Deploy to AWS EC2
+        env:
+          PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # Use the secret created in GitHub
+          EC2_USER: ubuntu  # EC2 username (commonly "ubuntu" on AWS EC2)
+          EC2_HOST: 3.215.189.63  # EC2 public IP or DNS name
+          APP_DIR: /home/ubuntu/ChatApp  # The directory where your app resides
+        run: |
+          # Set up SSH with the private key
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+
+          # Deploy the app via SCP (Secure Copy)
+          scp -i private_key.pem -o StrictHostKeyChecking=no -r ./* $EC2_USER@$EC2_HOST:$APP_DIR
+
+          # SSH into EC2 to install production dependencies and restart the app
+          ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            cd $APP_DIR
+            npm install --production  # Install production dependencies
+            pm2 restart your-app-name || pm2 start npm --name "your-app-name" -- start  # Restart or start app with PM2
+          EOF

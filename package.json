@@ -11,6 +11,7 @@
     "websocket": "node --loader ts-node/esm app/api/v1/Server/index.ts"
   },
   "dependencies": {
+    "@leonardo-ai/sdk": "^4.17.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/multer": "^1.4.11",

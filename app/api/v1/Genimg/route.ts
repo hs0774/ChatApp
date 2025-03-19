@@ -7,6 +7,7 @@ import sanitizeData from "@/app/utils/helperFunctions/sanitizeData.ts";
 import OpenAI from "openai";
 import FormData from "form-data";
 import axios from "axios";
+import { Leonardo } from "@leonardo-ai/sdk";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const token = verifyToken(req.headers.get("authorization"));
@@ -66,13 +67,54 @@ export async function POST(req: NextRequest, res: NextResponse) {
       const buffer = Buffer.from(arrayBuffer);
       const base64Image = buffer.toString('base64');
 
-  // Send back the base64 string with the correct data URL prefix
-  return NextResponse.json(base64Image ,{status:200});
+      return NextResponse.json(base64Image ,{status:200});
     
     } else {
-       console.log('hi')
+      const prompt = sanitizedData.prompt;
+
+      const payload = {
+        prompt: prompt,
+        modelId: "6bef9f1b-29cb-40c7-b9df-32b51c1f67d3", 
+        width: 1024,
+        height: 1024,
+        num_images:1,
+        imagePrompts: [],
+      };
+
+      const generateResponse = await axios.post(
+        `https://cloud.leonardo.ai/api/rest/v1/generations`,
+        payload,
+        {
+          headers: {
+            accept: "application/json",
+            "content-type": "application/json",
+            authorization: `Bearer ${env.LEONARDO_AI_KEY}`,
+          },
+        }
+      );
+
+      const generationId = generateResponse.data.sdGenerationJob.generationId;
+
+      await new Promise((resolve) => setTimeout(resolve, 15000)); 
+
+      const resultResponse = await axios.get(
+        `https://cloud.leonardo.ai/api/rest/v1/generations/${generationId}`,
+        {
+          headers: {
+            authorization: `Bearer ${env.LEONARDO_AI_KEY}`,
+          },
+        }
+      );
+      const imageUrl  = resultResponse.data.generations_by_pk.generated_images[0].url;
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "arraybuffer", 
+      });
+      const buffer = Buffer.from(imageResponse.data, "binary");
+
+      const base64Image = buffer.toString("base64");
+
+      return NextResponse.json(base64Image ,{status:200});
     }
-    return NextResponse.json({ message: `Something went wrong` }, { status: 400 });
    
   } catch (error) {
     console.log(error);
