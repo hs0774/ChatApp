@@ -47,12 +47,13 @@ jobs:
 
           # Deploy the app via SCP (Secure Copy)
           scp -i private_key.pem -o StrictHostKeyChecking=no -r ./* $EC2_USER@$EC2_HOST:$APP_DIR
-
+          cd $APP_DIR
+          touch $APP_DIR/chatapp/app/utils/.env
+          echo "${{secrets.SECRETS}}" >> .env
           # SSH into EC2 to install production dependencies and restart the app
           ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             cd $APP_DIR
             npm install --production  # Install production dependencies
-            touch .env
-            echo "${{secrets.SECRETS}}" >> .env
+
             pm2 restart your-app-name || pm2 start npm --name "your-app-name" -- start  # Restart or start app with PM2
           EOF
