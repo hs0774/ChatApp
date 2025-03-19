@@ -29,7 +29,7 @@ jobs:
           PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}  # Use the secret created in GitHub
           EC2_USER: ubuntu  # EC2 username (commonly "ubuntu" on AWS EC2)
           EC2_HOST: 3.215.189.63  # EC2 public IP or DNS name
-          # APP_DIR: /home/ubuntu/ChatApp  # The directory where your app resides
+          APP_DIR: /home/ubuntu/ChatApp  # The directory where your app resides
           # AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           # AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
           # AWS_BUCKET_REGION: ${{ secrets.AWS_BUCKET_REGION }}
